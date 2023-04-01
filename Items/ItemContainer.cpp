@@ -1,7 +1,13 @@
 #include "ItemContainer.h"
+#include "../SurvivalGameInstance.h"
 
 UItemContainer::UItemContainer() : Super() {
 	SetOwnerID("0");
+}
+
+USurvivalGameInstance* UItemContainer::GetGame()
+{
+	return GameInstance(GetWorld());
 }
 
 void UItemContainer::DataTableChanged() {
@@ -10,7 +16,7 @@ void UItemContainer::DataTableChanged() {
 
 FString UItemContainer::GetItemName(int32 itemID)
 {
-	return "";
+	return GetGame()->GetItemByID(itemID).name;
 }
 
 int32 UItemContainer::GetNextInventoryID()
@@ -20,12 +26,12 @@ int32 UItemContainer::GetNextInventoryID()
 
 int32 UItemContainer::GetItemStackSize(int32 itemID)
 {
-	return 1;
+	return GetGame()->GetItemByID(itemID).maxStack;
 }
 
 bool UItemContainer::HasSpace(FInventoryItemData item)
 {
-	return item.GetRemainingSpace(10) > 1;
+	return item.GetRemainingSpace(GetGame()->GetItemByID(item.itemID).maxStack) > 1;
 }
 
 FInventoryItemData UItemContainer::GetExistingItemWithSpace(FInventoryItemData inItem) {
@@ -69,7 +75,7 @@ FInventoryItemData UItemContainer::AddItem(FInventoryItemData itemToAdd) {
 		// Keep adding new items until we're either full or added all items
 		while (itemToAdd.amount > 0 && HasSpace()) {
 			// Make a new item
-			FInventoryItemData newItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());// TODO get data from database
+			FInventoryItemData newItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
 			newItem.amount = 0;
 			newItem.TakeFrom(itemToAdd);
 

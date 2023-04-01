@@ -75,6 +75,16 @@ public:
 	FString name;
 	EItemType type;
 	int32 maxStack;
+
+	FItemData() : ID(0), type(EItemType::Consumable), maxStack(0) {	}
+	FItemData(int32 id, const FString& name, EItemType type, int32 maxStack)
+		: ID(id),
+		name(name),
+		type(type),
+		maxStack(maxStack)
+	{
+	}
+
 };
 
 USTRUCT(BlueprintType)

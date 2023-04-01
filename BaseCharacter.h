@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "SurvivalTestCharacter.generated.h"
+#include "BaseCharacter.generated.h"
 
 class UInputComponent;
 class USkeletalMeshComponent;
@@ -48,34 +48,33 @@ public:
 		float restLossRate;
 };
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
-
 UCLASS(config = Game)
-class ASurvivalTestCharacter : public ACharacter
+class ABaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
 public:
-	ASurvivalTestCharacter();
+	ABaseCharacter();
 
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	
+	FCharacterStats GetCurrentStats() const
+	{
+		return currentStats;
+	}
 
-	UPROPERTY(BlueprintAssignable, Category = "Interaction")
-		FOnUseItem OnUseItem;
+	FCharacterStats GetMaxStats() const
+	{
+		return maxStats;
+	}
 
-protected:
-	virtual void BeginPlay() override;
-	void OnPrimaryAction();
-	void MoveForward(float Val);
-	void MoveRight(float Val);
-	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
-	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
-
-public:
 	virtual void Tick(float DeltaSeconds) override;
 
 protected:
+	virtual void BeginPlay() override;
+	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
+		
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		USkeletalMeshComponent* Mesh1P;
 

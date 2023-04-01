@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "ItemStructs.h"
+#include "../SurvivalGameInstance.h"
 #include "ItemContainer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInventoryItemData, item);
@@ -64,6 +65,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void SetOwnerID(FString val) { ownerID = val; }
+	
 private:
 
 	UPROPERTY()
@@ -74,4 +76,6 @@ private:
 
 	UPROPERTY()
 		int32 maxItemCount = 10;
+	
+	USurvivalGameInstance* GetGame();
 };

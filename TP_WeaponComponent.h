@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "TP_WeaponComponent.generated.h"
 
-class ASurvivalTestCharacter;
+class ABaseCharacter;
 
 UCLASS(Blueprintable, BlueprintType, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SURVIVALTEST_API UTP_WeaponComponent : public UActorComponent
@@ -35,7 +35,7 @@ public:
 
 	/** Attaches the actor to a FirstPersonCharacter */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
-	void AttachWeapon(ASurvivalTestCharacter* TargetCharacter);
+	void AttachWeapon(ABaseCharacter* TargetCharacter);
 
 	/** Make the weapon Fire a Projectile */
 	UFUNCTION(BlueprintCallable, Category="Weapon")
@@ -49,5 +49,5 @@ protected:
 
 private:
 	/** The Character holding this weapon*/
-	ASurvivalTestCharacter* Character;
+	ABaseCharacter* Character;
 };
