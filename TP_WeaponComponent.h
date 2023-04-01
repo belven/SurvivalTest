@@ -16,7 +16,7 @@ class SURVIVALTEST_API UTP_WeaponComponent : public UActorComponent
 public:
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category=Projectile)
-	TSubclassOf<class ASurvivalTestProjectile> ProjectileClass;
+	TSubclassOf<class ABaseProjectile> ProjectileClass;
 
 	/** Sound to play each time we fire */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Gameplay)

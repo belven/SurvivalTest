@@ -16,7 +16,7 @@ void UItemContainer::DataTableChanged() {
 
 FString UItemContainer::GetItemName(int32 itemID)
 {
-	return GetGame()->GetItemByID(itemID).name;
+	return GetGame()->GetItemData(itemID).name;
 }
 
 int32 UItemContainer::GetNextInventoryID()
@@ -26,12 +26,12 @@ int32 UItemContainer::GetNextInventoryID()
 
 int32 UItemContainer::GetItemStackSize(int32 itemID)
 {
-	return GetGame()->GetItemByID(itemID).maxStack;
+	return GetGame()->GetItemData(itemID).maxStack;
 }
 
 bool UItemContainer::HasSpace(FInventoryItemData item)
 {
-	return item.GetRemainingSpace(GetGame()->GetItemByID(item.itemID).maxStack) > 1;
+	return item.GetRemainingSpace(GetGame()->GetItemData(item.itemID).maxStack) > 1;
 }
 
 FInventoryItemData UItemContainer::GetExistingItemWithSpace(FInventoryItemData inItem) {

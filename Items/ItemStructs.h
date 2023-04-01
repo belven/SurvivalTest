@@ -3,13 +3,7 @@
 #include "UObject/NoExportTypes.h"
 #include "ItemStructs.generated.h"
 
-UCLASS()
-class SURVIVALTEST_API UItemStructs : public UObject
-{
-	GENERATED_BODY()
-public:
-	static const int32 InvalidInt;
-};
+
 
 
 UENUM(BlueprintType)
@@ -87,52 +81,7 @@ public:
 
 };
 
-USTRUCT(BlueprintType)
-struct FInventoryItemData
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	int32 ID = UItemStructs::InvalidInt;
-	int32 itemID = UItemStructs::InvalidInt;
-	int32 amount = UItemStructs::InvalidInt;
-	int32 slot = UItemStructs::InvalidInt;
 
-	friend bool operator==(const FInventoryItemData& lhs, const FInventoryItemData& rhs)
-	{
-		return lhs.ID == rhs.ID;
-	}
-
-	friend bool operator!=(const FInventoryItemData& lhs, const FInventoryItemData& rhs)
-	{
-		return !(lhs == rhs);
-	}
-
-	bool isValid()
-	{
-		return ID != UItemStructs::InvalidInt;
-	}
-
-	void TakeFrom(FInventoryItemData& itemToAdd)
-	{
-		amount += itemToAdd.amount;
-		itemToAdd.amount = 0;
-	}
-
-	FInventoryItemData CopyItem(int32 emptySlot, int32 nextID)
-	{
-		FInventoryItemData newData = {};
-		newData.ID = nextID;
-		newData.itemID = itemID;
-		newData.amount = 0;
-		newData.slot = emptySlot;
-		return newData;
-	}
-
-	int GetRemainingSpace(int32 maxStackSize)
-	{
-		return maxStackSize - amount;
-	}
-};
 
 USTRUCT(BlueprintType)
 struct FArmourData
@@ -189,4 +138,64 @@ public:
 	int32 ID;
 	int32 weaponID;
 	float accuracy;
+};
+
+UCLASS()
+class SURVIVALTEST_API UItemStructs : public UObject
+{
+	GENERATED_BODY()
+public:
+	static const int32 InvalidInt;
+	static EWeaponType GetWeaponType(FString typeName);
+	static EItemType GetItemType(FString typeName);
+	static EArmourSlot GetArmourSlot(FString typeName);
+	static ECharacterType GetCharacterType(FString typeName);
+	static bool GetBoolean(FString value);
+};
+
+USTRUCT(BlueprintType)
+struct FInventoryItemData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	int32 ID = UItemStructs::InvalidInt;
+	int32 itemID = UItemStructs::InvalidInt;
+	int32 amount = UItemStructs::InvalidInt;
+	int32 slot = UItemStructs::InvalidInt;
+
+	friend bool operator==(const FInventoryItemData& lhs, const FInventoryItemData& rhs)
+	{
+		return lhs.ID == rhs.ID;
+	}
+
+	friend bool operator!=(const FInventoryItemData& lhs, const FInventoryItemData& rhs)
+	{
+		return !(lhs == rhs);
+	}
+
+	bool isValid()
+	{
+		return ID != UItemStructs::InvalidInt;
+	}
+
+	void TakeFrom(FInventoryItemData& itemToAdd)
+	{
+		amount += itemToAdd.amount;
+		itemToAdd.amount = 0;
+	}
+
+	FInventoryItemData CopyItem(int32 emptySlot, int32 nextID)
+	{
+		FInventoryItemData newData = {};
+		newData.ID = nextID;
+		newData.itemID = itemID;
+		newData.amount = 0;
+		newData.slot = emptySlot;
+		return newData;
+	}
+
+	int GetRemainingSpace(int32 maxStackSize)
+	{
+		return maxStackSize - amount;
+	}
 };

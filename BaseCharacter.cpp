@@ -1,9 +1,18 @@
 #include "BaseCharacter.h"
-#include "SurvivalTestProjectile.h"
+#include "BaseProjectile.h"
+#include "SurvivalGameInstance.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Events/CombatStateEvent.h"
+#include "Events/HealthChangeEvent.h"
+#include "Events/RPGEventManager.h"
 #include "GameFramework/InputSettings.h"
+#include "Items/Armour.h"
+#include "Items/ArmourCreator.h"
+#include "Items/WeaponCreator.h"
+#include "Perception/AIPerceptionSystem.h"
+#include "SurvivalGameInstance.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -46,6 +55,85 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	SetupLoadout();
+}
+
+void ABaseCharacter::SetupLoadout()
+{
+	const FLoadoutData ld = GetBaseGameInstance()->GetLoadoutData(1);
+
+	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
+
+	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld()));
+	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld()));
+	EquipArmour(UArmourCreator::CreateArmour(ld.leftArmArmourID, GetWorld()));
+	EquipArmour(UArmourCreator::CreateArmour(ld.rightArmArmourID, GetWorld()));
+	EquipArmour(UArmourCreator::CreateArmour(ld.leftLegArmourID, GetWorld()));
+	EquipArmour(UArmourCreator::CreateArmour(ld.rightLegArmourID, GetWorld()));	
+}
+
+void ABaseCharacter::EquipArmour(UArmour* armour)
+{
+	equippedArmour.FindOrAdd(armour->GetData().slot, armour);
+}
+
+USurvivalGameInstance* ABaseCharacter::GetBaseGameInstance()
+{
+	if (gameInstance == NULL)
+		gameInstance = GameInstance(GetWorld());
+	return gameInstance;
+}
+
+void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
+{
+	mEventTriggered(GetBaseGameInstance(), mCreateHealthChangeEvent(this, health_change, true));
+
+	if (!inCombat && !health_change.heals)
+	{
+		FCombatStateChange csc;
+		csc.source = this;
+		csc.oldState = false;
+		csc.newState = true;
+		inCombat = true;
+		mEventTriggered(GetBaseGameInstance(), mCreateCombatStateEvent(this, csc));
+	}
+
+	if (health_change.heals) {
+		currentStats.health += health_change.changeAmount;
+	}
+	else {
+		health_change.changeAmount = GetDamageAfterResistance(health_change.changeAmount);
+		currentStats.health -= health_change.changeAmount;
+	}
+
+	FMath::Clamp(health_change.heals, 0, maxStats.health);
+
+	if (IsDead())
+	{
+		SetActorHiddenInGame(true);
+		SetActorEnableCollision(false);
+		//UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, NULL);
+	}
+}
+
+float  ABaseCharacter::GetDamageAfterResistance(float damage) {
+	const float resistance = 100.0f + GetDamageResistance();
+	const float damageReduction = 100.0f / resistance;
+	return damage * damageReduction;
+}
+
+int32  ABaseCharacter::GetDamageResistance() {
+	int32 total = 0;
+
+	TArray<UArmour*> armour;
+	equippedArmour.GenerateValueArray(armour);
+
+	for (const UArmour* a : armour)
+	{
+		total += a->GetData().resistance;
+	}
+
+	return total;
 }
 
 void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds)
