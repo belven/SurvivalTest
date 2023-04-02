@@ -3,7 +3,7 @@
 #include "FactionManager.h"
 #include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
-#include "Tables/ArmourCSVDataTable.h"
+#include "Tables/ArmourDataTable.h"
 #include "Tables/CSVTable.h"
 #include "Tables/ItemDataTable.h"
 #include "Tables/LoadoutTableData.h"
@@ -249,11 +249,11 @@ UMeleeWeaponDataTable* USurvivalGameInstance::GetMeleeWeaponData()
 	return meleeWeaponData;
 }
 
-UArmourCSVDataTable* USurvivalGameInstance::GetArmourDataTable()
+UArmourDataTable* USurvivalGameInstance::GetArmourDataTable()
 {
 	if (armourDataTable == NULL)
 	{
-		armourDataTable = NewObject<UArmourCSVDataTable>();
+		armourDataTable = NewObject<UArmourDataTable>();
 	}
 
 	return armourDataTable;

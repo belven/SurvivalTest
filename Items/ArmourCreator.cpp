@@ -8,8 +8,7 @@ UArmour* UArmourCreator::CreateArmour(int32 itemID, UWorld* world)
 	UArmour* a = NULL;
 	USurvivalGameInstance* gameIn = GameInstance(world);
 	const FItemData id = gameIn->GetItemData(itemID);
-
-	const FArmourData ad = gameIn->GetArmourDataByItemID(itemID);
+	
 	a  = UArmour::CreateArmour(itemID, gameIn);
 	a->SetItemData(id);
 	return a;

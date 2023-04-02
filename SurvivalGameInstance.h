@@ -13,7 +13,7 @@ class UMeleeWeaponDataTable;
 class URangedWeaponDataTable;
 class UWeaponDataTable;
 class UItemDataTable;
-class UArmourCSVDataTable;
+class UArmourDataTable;
 class UArmourResistanceDataTable;
 class ULoadoutTableData;
 class UFactionManager;
@@ -56,7 +56,7 @@ public:
 	URangedWeaponDataTable* GetRangedWeaponData();
 	UProjectileWeaponDataTable* GetProjectileWeaponData();
 	UMeleeWeaponDataTable* GetMeleeWeaponData();
-	UArmourCSVDataTable* GetArmourDataTable();
+	UArmourDataTable* GetArmourDataTable();
 	ULoadoutTableData* GetLoadoutTableData();
 
 	static TArray<FString> CleanData(TArray<FString> strings);
@@ -95,7 +95,7 @@ private:
 		UProjectileWeaponDataTable* projectileWeaponData;
 
 	UPROPERTY()
-		UArmourCSVDataTable* armourDataTable;
+		UArmourDataTable* armourDataTable;
 
 	UPROPERTY()
 		ULoadoutTableData* loadoutTableData;

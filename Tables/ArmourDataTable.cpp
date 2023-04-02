@@ -1,11 +1,11 @@
-#include "ArmourCSVDataTable.h"
+#include "ArmourDataTable.h"
 
-UArmourCSVDataTable::UArmourCSVDataTable() : Super()
+UArmourDataTable::UArmourDataTable() : Super()
 {
 	path = CSVT::GetTableFilePath("ArmourData.csv");
 }
 
-void UArmourCSVDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
+void UArmourDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 {
 	for (TArray<FString> row : inDataStrings)
 	{
@@ -13,6 +13,7 @@ void UArmourCSVDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		FArmourData data;
 		data.ID = GetIntFromString(row[index++]);
 		data.itemID = GetIntFromString(row[index++]);
+		data.containerID = GetIntFromString(row[index++]);
 		data.slot = UItemStructs::GetArmourSlot(row[index++]);
 		data.resistance = GetIntFromString(row[index++]);
 		armourData.Add(data);

@@ -17,10 +17,7 @@ void ULoadoutTableData::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.weaponID = GetIntFromString(row[index++]);
 		data.headArmourID = GetIntFromString(row[index++]);
 		data.chestArmourID = GetIntFromString(row[index++]);
-		data.leftLegArmourID = GetIntFromString(row[index++]);
-		data.rightLegArmourID = GetIntFromString(row[index++]);
-		data.leftArmArmourID = GetIntFromString(row[index++]);
-		data.rightArmArmourID = GetIntFromString(row[index++]);
+		data.legsArmourID = GetIntFromString(row[index++]);
 		data.health = GetIntFromString(row[index++]);
 		data.moveSpeed = GetIntFromString(row[index++]);
 		loadoutData.Add(data);

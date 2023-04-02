@@ -31,10 +31,7 @@ UENUM(BlueprintType)
 enum class  EArmourSlot : uint8 {
 	Head,
 	Chest,
-	Left_Leg,
-	RIght_Leg,
-	Left_Arm,
-	Right_Arm,
+	Legs,
 	End
 };
 
@@ -49,10 +46,7 @@ public:
 	int32 weaponID;
 	int32 headArmourID;
 	int32 chestArmourID;
-	int32 leftLegArmourID;
-	int32 rightLegArmourID;
-	int32 leftArmArmourID;
-	int32 rightArmArmourID;
+	int32 legsArmourID;
 	int32 health;
 	int32 moveSpeed;
 };

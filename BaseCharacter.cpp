@@ -1,7 +1,6 @@
 #include "BaseCharacter.h"
 #include "BaseProjectile.h"
 #include "SurvivalGameInstance.h"
-#include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Events/CombatStateEvent.h"
@@ -63,10 +62,7 @@ void ABaseCharacter::SetupLoadout()
 
 	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld()));
 	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld()));
-	EquipArmour(UArmourCreator::CreateArmour(ld.leftArmArmourID, GetWorld()));
-	EquipArmour(UArmourCreator::CreateArmour(ld.rightArmArmourID, GetWorld()));
-	EquipArmour(UArmourCreator::CreateArmour(ld.leftLegArmourID, GetWorld()));
-	EquipArmour(UArmourCreator::CreateArmour(ld.rightLegArmourID, GetWorld()));	
+	EquipArmour(UArmourCreator::CreateArmour(ld.legsArmourID, GetWorld()));
 }
 
 void ABaseCharacter::EquipArmour(UArmour* armour)

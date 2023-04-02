@@ -2,14 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "CSVTable.h"
-#include "ArmourCSVDataTable.generated.h"
+#include "ArmourDataTable.generated.h"
 
 UCLASS()
-class SURVIVALTEST_API UArmourCSVDataTable : public UCSVTable
+class SURVIVALTEST_API UArmourDataTable : public UCSVTable
 {
 	GENERATED_BODY()
 public:
-	UArmourCSVDataTable();
+	UArmourDataTable();
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
 	TArray<FArmourData >& GetData() { return armourData; }

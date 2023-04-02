@@ -43,25 +43,12 @@ EArmourSlot UItemStructs::GetArmourSlot(FString typeName)
 	{
 		return EArmourSlot::Head;
 	}
-	else if (typeName.Equals("LeftArm"))
+	else if (typeName.Equals("Legs"))
 	{
-		return EArmourSlot::Left_Arm;
-	}
-	else if (typeName.Equals("RightArm"))
-	{
-		return EArmourSlot::Right_Arm;
-	}
-	else if (typeName.Equals("LeftLeg"))
-	{
-		return EArmourSlot::Left_Leg;
-	}
-	else if (typeName.Equals("RIghtLeg"))
-	{
-		return EArmourSlot::RIght_Leg;
+		return EArmourSlot::Legs;
 	}
 	return EArmourSlot::Head;
 }
-
 
 ECharacterType UItemStructs::GetCharacterType(FString typeName)
 {
