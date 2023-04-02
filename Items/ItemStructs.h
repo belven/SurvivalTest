@@ -124,6 +124,13 @@ public:
 	float accuracy;
 };
 
+UENUM(BlueprintType)
+enum class  EContainerType : uint8 {
+	Box,
+	Armour,
+	End
+};
+
 UCLASS()
 class SURVIVALTEST_API UItemStructs : public UObject
 {
@@ -134,6 +141,7 @@ public:
 	static EItemType GetItemType(FString typeName);
 	static EArmourSlot GetArmourSlot(FString typeName);
 	static ECharacterType GetCharacterType(FString typeName);
+	static EContainerType GetContainerType(FString typeName);
 	static bool GetBoolean(FString value);
 };
 
@@ -159,13 +167,6 @@ public:
 	FString name;
 };
 
-
-UENUM(BlueprintType)
-enum class  EContainerType : uint8 {
-	Box,
-	Armour,
-	End
-};
 
 USTRUCT(BlueprintType)
 struct FInstanceContainerData

@@ -84,6 +84,19 @@ ECharacterType UItemStructs::GetCharacterType(FString typeName)
 	return ECharacterType::Neutral;
 }
 
+EContainerType UItemStructs::GetContainerType(FString typeName)
+{
+	if (typeName.Equals("Armour"))
+	{
+		return EContainerType::Armour;
+	}
+	else if (typeName.Equals("Box"))
+	{
+		return EContainerType::Box;
+	}
+	return EContainerType::Box;
+}
+
 bool UItemStructs::GetBoolean(FString value)
 {
 	return value.Equals("true") ? true : false;
