@@ -14,6 +14,7 @@ void UArmourCSVDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.ID = GetIntFromString(row[index++]);
 		data.itemID = GetIntFromString(row[index++]);
 		data.slot = UItemStructs::GetArmourSlot(row[index++]);
+		data.resistance = GetIntFromString(row[index++]);
 		armourData.Add(data);
 	}
 }
