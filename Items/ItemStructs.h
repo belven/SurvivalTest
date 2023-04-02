@@ -188,7 +188,7 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FArmourInstanceData
+struct FInstanceArmourData
 {
 	GENERATED_USTRUCT_BODY()
 public:

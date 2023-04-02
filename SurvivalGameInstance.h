@@ -25,7 +25,7 @@ class SURVIVALTEST_API USurvivalGameInstance : public UGameInstance
 	GENERATED_BODY()
 public:
 	USurvivalGameInstance();
-	
+
 	UFUNCTION(BlueprintCallable)
 		void LoadTableFromFile(UCSVTable* table);
 
@@ -39,8 +39,9 @@ public:
 	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
+	FArmourData GetArmourData(int32 armourID);
 
-	FArmourData GetArmourData(int32 itemID);
+	FArmourData GetArmourDataByItemID(int32 itemID);
 
 	FLoadoutData GetLoadoutData(int32 entityID);
 
@@ -60,13 +61,18 @@ public:
 
 	static TArray<FString> CleanData(TArray<FString> strings);
 
+	TMap<int32, FInstanceItemData>& GetInstanceItems() { return instanceItems; }
+	TMap<int32, FContainerData>& GetContainers() { return containers; }
+	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
+	TMap<int32, FInstanceArmourData>& GetArmourInstances() { return armourInstances; }
+	TMap<int32, FInstanceBoxData>& GetBoxContainers() { return boxContainers; }
+private:
+	TMap<int32, FInstanceContainerData> instancedContainers;
+	TMap<int32, FInstanceArmourData> armourInstances;
+	TMap<int32, FInstanceBoxData> boxContainers;
 	TMap<int32, FInstanceItemData> instanceItems;
 	TMap<int32, FContainerData> containers;
-	TMap<int32, FInstanceContainerData> instancedContainers;
-	TMap<int32, FArmourInstanceData> armourInstances;
-	TMap<int32, FInstanceBoxData> boxContainers;
-	
-private:
+
 	UPROPERTY()
 		URPGEventManager* eventManager;
 
@@ -81,7 +87,7 @@ private:
 
 	UPROPERTY()
 		URangedWeaponDataTable* rangedWeaponData;
-	
+
 	UPROPERTY()
 		UMeleeWeaponDataTable* meleeWeaponData;
 
@@ -90,7 +96,7 @@ private:
 
 	UPROPERTY()
 		UArmourCSVDataTable* armourDataTable;
-	
+
 	UPROPERTY()
-		ULoadoutTableData* loadoutTableData;	
+		ULoadoutTableData* loadoutTableData;
 };

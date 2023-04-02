@@ -17,17 +17,16 @@ public:
 	void SetData(FArmourData inData) { this->data = inData; }
 
 	static UArmour* CreateArmour(int32 itemID, USurvivalGameInstance* game);
+	static UArmour* LoadArmour(int32 armourInstanceID, USurvivalGameInstance* game);
 
-	FArmourInstanceData GetContainerData() const { return containerData; }
-
-	void SetContainerData(FArmourInstanceData inContainerData) { this->containerData = inContainerData; }
+	FInstanceArmourData GetInstanceArmourData() const { return instanceArmourData; }
+	void SetInstanceArmourData(FInstanceArmourData inContainerData) { this->instanceArmourData = inContainerData; }
 
 	UItemContainer* GetContainer() const { return container; }
-
 	void SetContainer(UItemContainer* inContainer) { this->container = inContainer; }
 private:
 	FArmourData data;
-	FArmourInstanceData containerData;
+	FInstanceArmourData instanceArmourData;
 
 	UPROPERTY()
 		UItemContainer* container;

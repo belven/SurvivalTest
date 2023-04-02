@@ -129,7 +129,18 @@ FProjectileWeaponData USurvivalGameInstance::GetProjectileWeaponData(int32 range
 	return {};
 }
 
-FArmourData USurvivalGameInstance::GetArmourData(int32 itemID)
+
+FArmourData USurvivalGameInstance::GetArmourData(int32 armourID)
+{
+	for (const FArmourData ad : GetArmourDataTable()->GetData())
+	{
+		if (ad.ID == armourID)
+			return ad;
+	}
+	return {};
+}
+
+FArmourData USurvivalGameInstance::GetArmourDataByItemID(int32 itemID)
 {
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
 	{
