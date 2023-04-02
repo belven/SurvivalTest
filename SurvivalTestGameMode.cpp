@@ -8,7 +8,7 @@
 ASurvivalTestGameMode::ASurvivalTestGameMode()
 	: Super()
 {
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("/Game/FirstPerson/Blueprints/BP_FirstPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("Blueprint'/Game/FirstPerson/Blueprints/MainCharacter_BP.MainCharacter_BP_C'"));
 	DefaultPawnClass = PlayerPawnClassFinder.Class;
 
 	HUDClass = ABaseHUD::StaticClass();

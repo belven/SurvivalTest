@@ -61,7 +61,7 @@ class ABaseCharacter : public ACharacter, public IDamagable, public ITeam
 public:
 	ABaseCharacter();
 
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	//USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	
 	FCharacterStats GetCurrentStats() const	{		return currentStats;	}
@@ -95,8 +95,8 @@ protected:
 	UPROPERTY()
 		TMap<EArmourSlot, UArmour*> equippedArmour;
 
-	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-		USkeletalMeshComponent* Mesh1P;
+	//UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	//	USkeletalMeshComponent* Mesh1P;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Factions, meta = (AllowPrivateAccess = "true"))
 		EFaction faction;
