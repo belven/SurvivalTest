@@ -3,9 +3,6 @@
 #include "UObject/NoExportTypes.h"
 #include "ItemStructs.generated.h"
 
-
-
-
 UENUM(BlueprintType)
 enum class  EWeaponType : uint8 {
 	Melee,
@@ -81,19 +78,6 @@ public:
 
 };
 
-
-
-USTRUCT(BlueprintType)
-struct FArmourData
-{
-	GENERATED_USTRUCT_BODY()
-public:
-	int32 ID;
-	int32 itemID;
-	int32 resistance;
-	EArmourSlot slot;
-};
-
 USTRUCT(BlueprintType)
 struct FWeaponData
 {
@@ -154,21 +138,83 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FInventoryItemData
+struct FArmourData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	int32 ID;
+	int32 itemID;
+	int32 containerID;
+	int32 resistance;
+	EArmourSlot slot;
+};
+
+USTRUCT(BlueprintType)
+struct FContainerData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	int32 ID = UItemStructs::InvalidInt;
+	int32 slots = 10;
+	FString name;
+};
+
+
+UENUM(BlueprintType)
+enum class  EContainerType : uint8 {
+	Box,
+	Armour,
+	End
+};
+
+USTRUCT(BlueprintType)
+struct FInstanceContainerData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	int32 ID = UItemStructs::InvalidInt;
+	int32 containerID = UItemStructs::InvalidInt;
+	EContainerType type;
+};
+
+USTRUCT(BlueprintType)
+struct FInstanceBoxData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	int32 ID = UItemStructs::InvalidInt;
+	int32 boxID = UItemStructs::InvalidInt;
+	int32 containerInstanceID = UItemStructs::InvalidInt;
+};
+
+USTRUCT(BlueprintType)
+struct FArmourInstanceData
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	int32 ID = UItemStructs::InvalidInt;
+	int32 containerInstanceID = UItemStructs::InvalidInt;
+	int32 armourID = UItemStructs::InvalidInt;
+	int32 instancedItemDataID = UItemStructs::InvalidInt;
+};
+
+USTRUCT(BlueprintType)
+struct FInstanceItemData
 {
 	GENERATED_USTRUCT_BODY()
 public:
 	int32 ID = UItemStructs::InvalidInt;
 	int32 itemID = UItemStructs::InvalidInt;
+	int32 containerInstanceID = UItemStructs::InvalidInt;
 	int32 amount = UItemStructs::InvalidInt;
 	int32 slot = UItemStructs::InvalidInt;
 
-	friend bool operator==(const FInventoryItemData& lhs, const FInventoryItemData& rhs)
+	friend bool operator==(const FInstanceItemData& lhs, const FInstanceItemData& rhs)
 	{
 		return lhs.ID == rhs.ID;
 	}
 
-	friend bool operator!=(const FInventoryItemData& lhs, const FInventoryItemData& rhs)
+	friend bool operator!=(const FInstanceItemData& lhs, const FInstanceItemData& rhs)
 	{
 		return !(lhs == rhs);
 	}
@@ -178,17 +224,18 @@ public:
 		return ID != UItemStructs::InvalidInt;
 	}
 
-	void TakeFrom(FInventoryItemData& itemToAdd)
+	void TakeFrom(FInstanceItemData& itemToAdd)
 	{
 		amount += itemToAdd.amount;
 		itemToAdd.amount = 0;
 	}
 
-	FInventoryItemData CopyItem(int32 emptySlot, int32 nextID)
+	FInstanceItemData CopyItem(int32 emptySlot, int32 nextID)
 	{
-		FInventoryItemData newData = {};
+		FInstanceItemData newData = {};
 		newData.ID = nextID;
 		newData.itemID = itemID;
+		newData.containerInstanceID = containerInstanceID;
 		newData.amount = 0;
 		newData.slot = emptySlot;
 		return newData;

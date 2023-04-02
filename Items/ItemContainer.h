@@ -5,8 +5,8 @@
 #include "../SurvivalGameInstance.h"
 #include "ItemContainer.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInventoryItemData, item);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemAdded, FInventoryItemData, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInstanceItemData, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemAdded, FInstanceItemData, item);
 
 UCLASS()
 class SURVIVALTEST_API UItemContainer : public UObject
@@ -16,6 +16,8 @@ class SURVIVALTEST_API UItemContainer : public UObject
 public:
 	UItemContainer();
 
+	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, TArray<FInstanceItemData> items);
+
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void DataTableChanged();
 	FString GetItemName(int32 itemID);
@@ -23,19 +25,19 @@ public:
 	int32 GetItemStackSize(int32 itemID);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		TArray<FInventoryItemData>& GetItems() { return items; }
+		TArray<FInstanceItemData>& GetItems() { return items; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		void SetItems(TArray<FInventoryItemData> newVal) { items = newVal; }
+		void SetItems(TArray<FInstanceItemData> newVal) { items = newVal; }
 
-	bool HasSpace(FInventoryItemData item);
-	FInventoryItemData GetExistingItemWithSpace(FInventoryItemData inItem);
-
-	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		FInventoryItemData AddItem(FInventoryItemData itemToAdd);
+	bool HasSpace(FInstanceItemData item);
+	FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		bool RemoveItem(FInventoryItemData itemToRemove);
+		FInstanceItemData AddItem(FInstanceItemData itemToAdd);
+
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		bool RemoveItem(FInstanceItemData itemToRemove);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		int32 GetItemAmount(int32 id);
@@ -61,21 +63,30 @@ public:
 		FItemAdded OnItemAdded;
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		FString GetOwnerID() const { return ownerID; }
+		int32 GetOwnerID() const { return containerData.ID; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		void SetOwnerID(FString val) { ownerID = val; }
-	
+		FContainerData GetContainerData() const { return containerData; }
+
+	FInstanceContainerData GetInstanceContainerData() const { return instanceContainerData; }
+
+	void SetInstanceContainerData(FInstanceContainerData inInstanceContainerData) { this->instanceContainerData = inInstanceContainerData; }
+
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		void SetContainerData(FContainerData inContainerData) { this->containerData = inContainerData; }
+
 private:
+	UPROPERTY()
+		FContainerData containerData;
 
 	UPROPERTY()
-		FString ownerID;
+		FInstanceContainerData instanceContainerData;
 
 	UPROPERTY()
-		TArray<FInventoryItemData> items;
+		TArray<FInstanceItemData> items;
 
 	UPROPERTY()
 		int32 maxItemCount = 10;
-	
+
 	USurvivalGameInstance* GetGame();
 };

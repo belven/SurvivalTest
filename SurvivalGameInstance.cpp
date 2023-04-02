@@ -2,6 +2,7 @@
 
 #include "FactionManager.h"
 #include "Events/RPGEventManager.h"
+#include "Items/ItemContainer.h"
 #include "Tables/ArmourCSVDataTable.h"
 #include "Tables/CSVTable.h"
 #include "Tables/ItemDataTable.h"
@@ -148,10 +149,33 @@ FLoadoutData USurvivalGameInstance::GetLoadoutData(int32 entityID)
 	return {};
 }
 
+TArray<FInstanceItemData> USurvivalGameInstance::GetInventoryItems(int32 instanceContainerID)
+{
+	TArray<FInstanceItemData> data;
+	for(TTuple<int32, FInstanceItemData>& iid : instanceItems)
+	{
+		if (iid.Value.containerInstanceID == instanceContainerID)
+			data.Add(iid.Value);
+	}
+	return data;
+}
+
+void USurvivalGameInstance::CreateItemBoxes()
+{
+	for(auto& ibd : boxContainers)
+	{
+		FInstanceContainerData icd = instancedContainers.FindChecked(ibd.Value.containerInstanceID);
+		FContainerData cd = containers.FindChecked(icd.containerID);
+		TArray<FInstanceItemData> items = GetInventoryItems(icd.ID);
+		UItemContainer* container = UItemContainer::CreateItemContainer(cd, icd, items);
+	}
+}
+
 void USurvivalGameInstance::Init()
 {
 	Super::Init();
 	LoadTableData();
+	CreateItemBoxes();
 }
 
 URPGEventManager* USurvivalGameInstance::GetEventManager()

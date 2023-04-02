@@ -2,8 +2,19 @@
 #include "../SurvivalGameInstance.h"
 
 UItemContainer::UItemContainer() : Super() {
-	SetOwnerID("0");
+
 }
+
+UItemContainer* UItemContainer::CreateItemContainer(FContainerData inContainerData,
+	FInstanceContainerData inInstanceContainerData, TArray<FInstanceItemData> items)
+{
+	UItemContainer* ic = NewObject<UItemContainer>();
+	ic->SetContainerData(inContainerData);
+	ic->SetItems(items);
+	ic->SetInstanceContainerData(inInstanceContainerData);
+	return ic;
+}
+
 
 USurvivalGameInstance* UItemContainer::GetGame()
 {
@@ -29,19 +40,19 @@ int32 UItemContainer::GetItemStackSize(int32 itemID)
 	return GetGame()->GetItemData(itemID).maxStack;
 }
 
-bool UItemContainer::HasSpace(FInventoryItemData item)
+bool UItemContainer::HasSpace(FInstanceItemData item)
 {
 	return item.GetRemainingSpace(GetGame()->GetItemData(item.itemID).maxStack) > 1;
 }
 
-FInventoryItemData UItemContainer::GetExistingItemWithSpace(FInventoryItemData inItem) {
-	for (FInventoryItemData item : items) {
+FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inItem) {
+	for (FInstanceItemData item : items) {
 		// Finds the first item with space available and a matching name
 		if (GetItemName(item.itemID).Equals(GetItemName(inItem.itemID)) && HasSpace(item)) {
 			return item;
 		}
 	}
-	return FInventoryItemData();
+	return FInstanceItemData();
 }
 
 /* Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
@@ -49,19 +60,19 @@ FInventoryItemData UItemContainer::GetExistingItemWithSpace(FInventoryItemData i
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
-FInventoryItemData UItemContainer::AddItem(FInventoryItemData itemToAdd) {
+FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd) {
 	bool itemAdded = false;
 
 	// Are we adding a whole item, i.e. an item that is at it's max stack size? If so, just add it
 	if (HasSpace() && itemToAdd.GetRemainingSpace(GetItemStackSize(itemToAdd.itemID)) == 0) {
-		FInventoryItemData tempItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
+		FInstanceItemData tempItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
 		items.Add(tempItem);
 		itemToAdd.amount = 0;
 		itemAdded = true;
 	}
 	else
 	{
-		FInventoryItemData existingItem = GetExistingItemWithSpace(itemToAdd);
+		FInstanceItemData existingItem = GetExistingItemWithSpace(itemToAdd);
 
 		// Check all existing matching items to see if they have space
 		while (itemToAdd.amount > 0 && existingItem.isValid()) {
@@ -75,7 +86,7 @@ FInventoryItemData UItemContainer::AddItem(FInventoryItemData itemToAdd) {
 		// Keep adding new items until we're either full or added all items
 		while (itemToAdd.amount > 0 && HasSpace()) {
 			// Make a new item
-			FInventoryItemData newItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
+			FInstanceItemData newItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
 			newItem.amount = 0;
 			newItem.TakeFrom(itemToAdd);
 
@@ -109,17 +120,17 @@ int32 UItemContainer::GetNextEmptySpace() {
 
 void UItemContainer::RemoveFilledSlots(TArray<int32>& slots)
 {
-	for(FInventoryItemData iid : items)
+	for(FInstanceItemData iid : items)
 	{
 		slots.Remove(iid.slot);
 	}
 }
 
 /* This will reduce the an items amount by the given item if found */
-bool UItemContainer::RemoveItem(FInventoryItemData itemToRemove) {
-	TArray<FInventoryItemData> itemsToRemove;
+bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove) {
+	TArray<FInstanceItemData> itemsToRemove;
 
-	for (FInventoryItemData item : items) {
+	for (FInstanceItemData item : items) {
 		int32 amountToTake = itemToRemove.amount;
 
 		// Check if the IDs match
@@ -144,7 +155,7 @@ bool UItemContainer::RemoveItem(FInventoryItemData itemToRemove) {
 	}
 
 	if (itemsToRemove.Num() > 0) {
-		for (FInventoryItemData ii : itemsToRemove) {
+		for (FInstanceItemData ii : itemsToRemove) {
 			items.Remove(ii);
 		}
 	}
@@ -162,7 +173,7 @@ bool UItemContainer::RemoveItem(FInventoryItemData itemToRemove) {
 /* Returns the total amount of items for the given id */
 int32 UItemContainer::GetItemAmount(int32 id) {
 	int32 total = 0;
-	for (FInventoryItemData item : items) {
+	for (FInstanceItemData item : items) {
 		if (item.itemID == id) {
 			total += item.amount;
 		}

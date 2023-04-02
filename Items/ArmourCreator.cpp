@@ -10,7 +10,7 @@ UArmour* UArmourCreator::CreateArmour(int32 itemID, UWorld* world)
 	const FItemData id = gameIn->GetItemData(itemID);
 
 	const FArmourData ad = gameIn->GetArmourData(itemID);
-	a  = UArmour::CreateArmour(ad);
+	a  = UArmour::CreateArmour(itemID, gameIn);
 	a->SetItemData(id);
 	return a;
 }

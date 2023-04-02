@@ -44,6 +44,9 @@ public:
 
 	FLoadoutData GetLoadoutData(int32 entityID);
 
+	TArray<FInstanceItemData> GetInventoryItems(int32 instanceContainerID);
+
+	void CreateItemBoxes();
 	virtual void Init() override;
 	URPGEventManager* GetEventManager();
 
@@ -57,7 +60,12 @@ public:
 
 	static TArray<FString> CleanData(TArray<FString> strings);
 
-	//TArray<APatrolPath*> paths;
+	TMap<int32, FInstanceItemData> instanceItems;
+	TMap<int32, FContainerData> containers;
+	TMap<int32, FInstanceContainerData> instancedContainers;
+	TMap<int32, FArmourInstanceData> armourInstances;
+	TMap<int32, FInstanceBoxData> boxContainers;
+	
 private:
 	UPROPERTY()
 		URPGEventManager* eventManager;
