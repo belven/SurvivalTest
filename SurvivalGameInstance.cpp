@@ -4,6 +4,7 @@
 #include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
 #include "Tables/ArmourDataTable.h"
+#include "Tables/ContainerTableData.h"
 #include "Tables/CSVTable.h"
 #include "Tables/ItemDataTable.h"
 #include "Tables/LoadoutTableData.h"
@@ -55,6 +56,36 @@ TArray<FString> USurvivalGameInstance::CleanData(TArray<FString> strings)
 	return newStrings;
 }
 
+int32 USurvivalGameInstance::GetNextInstanceItemDataID()
+{
+	int32 instanceItemDataID = 0;
+	if (GetInstancedItems().Num() > 0)
+	{
+		instanceItemDataID = GetInstancedItems()[GetInstancedItems().Num() - 1].ID + 1;
+	}
+	return instanceItemDataID;
+}
+
+int32 USurvivalGameInstance::GetNextInstanceBoxDataID()
+{
+	int32 instanceBoxDataID = 0;
+	if (GetInstancedBoxes().Num() > 0)
+	{
+		instanceBoxDataID = GetInstancedBoxes()[GetInstancedBoxes().Num() - 1].ID + 1;
+	}
+	return instanceBoxDataID;
+}
+
+int32 USurvivalGameInstance::GetNextInstanceContainerDataID()
+{
+	int32 instanceContainerDataID = 0;
+	if (GetInstancedContainers().Num() > 0)
+	{
+		instanceContainerDataID = GetInstancedContainers()[GetInstancedContainers().Num() - 1].ID + 1;
+	}
+	return instanceContainerDataID;
+}
+
 void USurvivalGameInstance::LoadTableData()
 {
 	LoadTableFromFile(GetItemDataTable());
@@ -64,6 +95,7 @@ void USurvivalGameInstance::LoadTableData()
 	LoadTableFromFile(GetProjectileWeaponData());
 	LoadTableFromFile(GetArmourDataTable());
 	LoadTableFromFile(GetLoadoutTableData());
+	LoadTableFromFile(GetContainerData());
 }
 
 UFactionManager* USurvivalGameInstance::GetFactionManager()
@@ -140,6 +172,11 @@ FArmourData USurvivalGameInstance::GetArmourData(int32 armourID)
 	return {};
 }
 
+FContainerData USurvivalGameInstance::GetContainerDataByID(int32 containerID)
+{
+	return GetContainerData()->GetData().FindChecked(containerID);
+}
+
 FArmourData USurvivalGameInstance::GetArmourDataByItemID(int32 itemID)
 {
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
@@ -171,22 +208,10 @@ TArray<FInstanceItemData> USurvivalGameInstance::GetInventoryItems(int32 instanc
 	return data;
 }
 
-void USurvivalGameInstance::CreateItemBoxes()
-{
-	for(auto& ibd : boxContainers)
-	{
-		FInstanceContainerData icd = instancedContainers.FindChecked(ibd.Value.containerInstanceID);
-		FContainerData cd = containers.FindChecked(icd.containerID);
-		TArray<FInstanceItemData> items = GetInventoryItems(icd.ID);
-		UItemContainer* container = UItemContainer::CreateItemContainer(cd, icd, items);
-	}
-}
-
 void USurvivalGameInstance::Init()
 {
 	Super::Init();
 	LoadTableData();
-	CreateItemBoxes();
 }
 
 URPGEventManager* USurvivalGameInstance::GetEventManager()
@@ -267,4 +292,14 @@ ULoadoutTableData* USurvivalGameInstance::GetLoadoutTableData()
 	}
 
 	return loadoutTableData;
+}
+
+UContainerTableData* USurvivalGameInstance::GetContainerData()
+{
+	if (containerData == NULL)
+	{
+		containerData = NewObject<UContainerTableData>();
+	}
+
+	return containerData;
 }

@@ -6,11 +6,10 @@ UItemContainer::UItemContainer() : Super() {
 }
 
 UItemContainer* UItemContainer::CreateItemContainer(FContainerData inContainerData,
-	FInstanceContainerData inInstanceContainerData, TArray<FInstanceItemData> items)
+	FInstanceContainerData inInstanceContainerData)
 {
 	UItemContainer* ic = NewObject<UItemContainer>();
 	ic->SetContainerData(inContainerData);
-	ic->SetItems(items);
 	ic->SetInstanceContainerData(inInstanceContainerData);
 	return ic;
 }

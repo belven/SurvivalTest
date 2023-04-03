@@ -1,5 +1,8 @@
 #include "ItemStructs.h"
 
+#include "SurvivalTest/SurvivalGameInstance.h"
+#include "SurvivalTest/Tables/ItemDataTable.h"
+
 
 const int32 UItemStructs::InvalidInt = -1;
 
@@ -87,4 +90,11 @@ EContainerType UItemStructs::GetContainerType(FString typeName)
 bool UItemStructs::GetBoolean(FString value)
 {
 	return value.Equals("true") ? true : false;
+}
+
+FItemData UItemStructs::GetRandomItemData(USurvivalGameInstance* game)
+{
+	TArray<FItemData> itemData = game->GetItemDataTable()->GetData();
+	FItemData id = itemData[FMath::RandRange(0, itemData.Num() - 1)];
+	return id;
 }

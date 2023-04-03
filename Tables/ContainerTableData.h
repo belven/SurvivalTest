@@ -11,8 +11,8 @@ public:
 	UContainerTableData();
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
-	TArray<FContainerData >& GetData() { return containerData; }
+	TMap<int32, FContainerData >& GetData() { return containerData; }
 private:
-	TArray<FContainerData > containerData;
+	TMap<int32, FContainerData > containerData;
 	
 };

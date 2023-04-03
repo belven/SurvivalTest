@@ -18,6 +18,7 @@ class UArmourResistanceDataTable;
 class ULoadoutTableData;
 class UFactionManager;
 class URPGEventManager;
+class UContainerTableData;
 
 UCLASS()
 class SURVIVALTEST_API USurvivalGameInstance : public UGameInstance
@@ -40,14 +41,14 @@ public:
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
 	FArmourData GetArmourData(int32 armourID);
+	FContainerData GetContainerDataByID(int32 containerID);
 
 	FArmourData GetArmourDataByItemID(int32 itemID);
 
 	FLoadoutData GetLoadoutData(int32 entityID);
 
 	TArray<FInstanceItemData> GetInventoryItems(int32 instanceContainerID);
-
-	void CreateItemBoxes();
+	
 	virtual void Init() override;
 	URPGEventManager* GetEventManager();
 
@@ -58,20 +59,24 @@ public:
 	UMeleeWeaponDataTable* GetMeleeWeaponData();
 	UArmourDataTable* GetArmourDataTable();
 	ULoadoutTableData* GetLoadoutTableData();
+	UContainerTableData* GetContainerData();
 
 	static TArray<FString> CleanData(TArray<FString> strings);
 
-	TMap<int32, FInstanceItemData>& GetInstanceItems() { return instanceItems; }
-	TMap<int32, FContainerData>& GetContainers() { return containers; }
+	int32 GetNextInstanceItemDataID();
+	int32 GetNextInstanceBoxDataID();
+
+	int32 GetNextInstanceContainerDataID();
+
+	TMap<int32, FInstanceItemData>& GetInstancedItems() { return instanceItems; }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetArmourInstances() { return armourInstances; }
-	TMap<int32, FInstanceBoxData>& GetBoxContainers() { return boxContainers; }
+	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
 	TMap<int32, FInstanceBoxData> boxContainers;
 	TMap<int32, FInstanceItemData> instanceItems;
-	TMap<int32, FContainerData> containers;
 
 	UPROPERTY()
 		URPGEventManager* eventManager;
@@ -99,4 +104,7 @@ private:
 
 	UPROPERTY()
 		ULoadoutTableData* loadoutTableData;
+
+	UPROPERTY()
+		UContainerTableData* containerData;
 };

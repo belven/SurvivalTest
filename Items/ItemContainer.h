@@ -16,7 +16,7 @@ class SURVIVALTEST_API UItemContainer : public UObject
 public:
 	UItemContainer();
 
-	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, TArray<FInstanceItemData> items);
+	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void DataTableChanged();

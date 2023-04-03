@@ -1,17 +1,13 @@
 #include "Armour.h"
 #include "ItemContainer.h"
 #include "SurvivalTest/SurvivalGameInstance.h"
+#include "SurvivalTest/Tables/ContainerTableData.h"
 
 UArmour* UArmour::CreateArmour(int32 itemID, USurvivalGameInstance* game)
 {
 	FArmourData armourData = game->GetArmourDataByItemID(itemID);
 
-	int32 instanceContainerDataID = 0;
-
-	if (game->GetInstancedContainers().Num() > 0)
-	{
-		instanceContainerDataID = game->GetInstancedContainers().Num() - 1;
-	}
+	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
 
 	FInstanceContainerData icd;
 	icd.ID = instanceContainerDataID;
@@ -37,9 +33,9 @@ UArmour* UArmour::CreateArmour(int32 itemID, USurvivalGameInstance* game)
 	armour->SetItemData(game->GetItemData(itemID));
 	armour->SetInstanceArmourData(acd);
 
-	FContainerData cd = game->GetContainers().FindOrAdd(armourData.containerID);
+	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armourData.containerID);
 
-	UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd, game->GetInventoryItems(icd.ID));
+	UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd);
 	return armour;
 }
 
@@ -51,9 +47,9 @@ UArmour* UArmour::LoadArmour(int32 armourInstanceID, USurvivalGameInstance* game
 	armour->SetData(armourData);
 	armour->SetItemData(game->GetItemData(armourData.itemID));
 	armour->SetInstanceArmourData(acd);
-	
-	FContainerData cd = game->GetContainers().FindOrAdd(armourData.containerID);
+
+	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armourData.containerID);
 	FInstanceContainerData icd = game->GetInstancedContainers().FindChecked(acd.containerInstanceID);
-	UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd, game->GetInventoryItems(icd.ID));
+	UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd);
 	return armour;
 }

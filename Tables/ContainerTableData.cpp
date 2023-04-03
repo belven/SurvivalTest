@@ -14,6 +14,6 @@ void UContainerTableData::LoadData(TArray<TArray<FString>> inDataStrings)
 		data. ID = GetIntFromString(row[index++]);
 		data.slots = GetIntFromString(row[index++]);
 		data.name = row[index++];		
-		containerData.Add(data);
+		containerData.Add(data.ID,data);
 	}
 }

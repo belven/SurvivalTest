@@ -125,6 +125,8 @@ enum class  EContainerType : uint8 {
 	End
 };
 
+class USurvivalGameInstance;
+
 UCLASS()
 class SURVIVALTEST_API UItemStructs : public UObject
 {
@@ -137,6 +139,7 @@ public:
 	static ECharacterType GetCharacterType(FString typeName);
 	static EContainerType GetContainerType(FString typeName);
 	static bool GetBoolean(FString value);
+	static FItemData GetRandomItemData(USurvivalGameInstance* game);
 };
 
 USTRUCT(BlueprintType)
