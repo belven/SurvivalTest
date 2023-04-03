@@ -2,12 +2,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ItemStructs.h"
+#include "SurvivalTest/Interactable.h"
 #include "LootBox.generated.h"
 
 class UItemContainer;
 
 UCLASS()
-class SURVIVALTEST_API ALootBox : public AActor
+class SURVIVALTEST_API ALootBox : public AActor, public IInteractable
 {
 	GENERATED_BODY()
 
@@ -17,6 +18,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Interact(ABasePlayerController* instigator) override;
+
 	USurvivalGameInstance* GetGame();
 	void CreateLootboxData();
 	FInstanceItemData CreateLoot(FItemData id);

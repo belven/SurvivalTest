@@ -2,7 +2,7 @@
 
 UContainerTableData::UContainerTableData() : Super()
 {
-	path = CSVT::GetTableFilePath("ContainerTableData.csv");
+	path = CSVT::GetTableFilePath("ContainerData.csv");
 }
 
 void UContainerTableData::LoadData(TArray<TArray<FString>> inDataStrings)

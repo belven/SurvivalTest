@@ -15,6 +15,11 @@ void ALootBox::BeginPlay()
 	CreateLootboxData();
 }
 
+void ALootBox::Interact(ABasePlayerController* instigator)
+{
+
+}
+
 USurvivalGameInstance* ALootBox::GetGame()
 {
 	if(!gameIn)
@@ -51,13 +56,14 @@ void ALootBox::CreateLootboxData()
 FInstanceItemData ALootBox::CreateLoot(FItemData id)
 {
 	FInstanceItemData iid;
-	if(icd.ID != UItemStructs::InvalidInt)
+	if(id.ID != UItemStructs::InvalidInt)
 	{
 		iid.ID = GetGame()->GetNextInstanceItemDataID();
 		iid.amount = FMath::RandRange(1, id.maxStack);
 		iid.containerInstanceID = icd.ID;
 		iid.itemID = id.ID;
 		iid.slot = container->GetNextEmptySpace();
+		GetGame()->GetInstancedItems().Add(iid.ID, iid);
 	}
 	return iid;
 }
