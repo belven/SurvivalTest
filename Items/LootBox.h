@@ -3,12 +3,13 @@
 #include "GameFramework/Actor.h"
 #include "ItemStructs.h"
 #include "SurvivalTest/Interactable.h"
+#include "SurvivalTest/ItemContainerInterface.h"
 #include "LootBox.generated.h"
 
 class UItemContainer;
 
 UCLASS()
-class SURVIVALTEST_API ALootBox : public AActor, public IInteractable
+class SURVIVALTEST_API ALootBox : public AActor, public IInteractable, public IItemContainerInterface
 {
 	GENERATED_BODY()
 
@@ -16,15 +17,16 @@ public:
 	ALootBox();
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual UItemContainer* GetItemContainer() override { return container; }
+	virtual void Interact(ABasePlayerController* instigator) override;
+	virtual void Highlight(bool activate) override;
+	FInstanceItemData CreateLoot(FItemData id);
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Interact(ABasePlayerController* instigator) override;
 
-	virtual void Highlight(bool activate) override;
 	USurvivalGameInstance* GetGame();
 	void CreateLootboxData();
-	FInstanceItemData CreateLoot(FItemData id);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
 		UStaticMesh* boxMesh;

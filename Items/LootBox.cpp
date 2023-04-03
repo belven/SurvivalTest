@@ -46,7 +46,7 @@ void ALootBox::CreateLootboxData()
 	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
 
 	int32 instanceBoxDataID = GetGame()->GetNextInstanceBoxDataID();
-
+	
 	ibd.ID = instanceBoxDataID;
 	ibd.containerInstanceID = icd.ID;
 	ibd.boxID = boxID;
