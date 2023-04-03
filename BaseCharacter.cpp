@@ -1,6 +1,6 @@
 #include "BaseCharacter.h"
 #include "BaseProjectile.h"
-#include "SurvivalGameInstance.h"
+#include "BaseGameInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Events/CombatStateEvent.h"
@@ -11,7 +11,7 @@
 #include "Items/ArmourCreator.h"
 #include "Items/WeaponCreator.h"
 #include "Perception/AIPerceptionSystem.h"
-#include "SurvivalGameInstance.h"
+#include "BaseGameInstance.h"
 #include "Components/SphereComponent.h"
 
 ABaseCharacter::ABaseCharacter()
@@ -80,7 +80,7 @@ void ABaseCharacter::EquipArmour(UArmour* armour)
 	equippedArmour.FindOrAdd(armour->GetData().slot, armour);
 }
 
-USurvivalGameInstance* ABaseCharacter::GetBaseGameInstance()
+UBaseGameInstance* ABaseCharacter::GetBaseGameInstance()
 {
 	if (gameInstance == NULL)
 		gameInstance = GameInstance(GetWorld());

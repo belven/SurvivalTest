@@ -1,5 +1,5 @@
 #include "ItemContainer.h"
-#include "../SurvivalGameInstance.h"
+#include "../BaseGameInstance.h"
 
 UItemContainer::UItemContainer() : Super() {
 
@@ -15,7 +15,7 @@ UItemContainer* UItemContainer::CreateItemContainer(FContainerData inContainerDa
 }
 
 
-USurvivalGameInstance* UItemContainer::GetGame()
+UBaseGameInstance* UItemContainer::GetGame()
 {
 	return GameInstance(GetWorld());
 }

@@ -2,13 +2,13 @@
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
 #include "ItemStructs.h"
-#include "../SurvivalGameInstance.h"
+#include "../BaseGameInstance.h"
 #include "ItemContainer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInstanceItemData, item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemAdded, FInstanceItemData, item);
 
-UCLASS()
+UCLASS(Blueprintable)
 class SURVIVALTEST_API UItemContainer : public UObject
 {
 	GENERATED_BODY()
@@ -88,5 +88,5 @@ private:
 	UPROPERTY()
 		int32 maxItemCount = 10;
 
-	USurvivalGameInstance* GetGame();
+	UBaseGameInstance* GetGame();
 };

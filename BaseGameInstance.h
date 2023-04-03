@@ -4,9 +4,9 @@
 #include "Engine/GameInstance.h"
 #include "Items/ItemStructs.h"
 #include "Kismet/GameplayStatics.h"
-#include "SurvivalGameInstance.generated.h"
+#include "BaseGameInstance.generated.h"
 
-#define GameInstance(world) Cast<USurvivalGameInstance>(UGameplayStatics::GetGameInstance(world))
+#define GameInstance(world) Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(world))
 
 class UProjectileWeaponDataTable;
 class UMeleeWeaponDataTable;
@@ -21,11 +21,11 @@ class URPGEventManager;
 class UContainerTableData;
 
 UCLASS()
-class SURVIVALTEST_API USurvivalGameInstance : public UGameInstance
+class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	USurvivalGameInstance();
+	UBaseGameInstance();
 
 	UFUNCTION(BlueprintCallable)
 		void LoadTableFromFile(UCSVTable* table);
@@ -34,7 +34,8 @@ public:
 
 	UFactionManager* GetFactionManager();
 
-	FItemData GetItemData(int32 itemID);
+	UFUNCTION(BlueprintCallable)
+		FItemData GetItemData(int32 itemID);
 
 	FWeaponData GetWeaponData(int32 itemID);
 	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
@@ -48,7 +49,7 @@ public:
 	FLoadoutData GetLoadoutData(int32 entityID);
 
 	TArray<FInstanceItemData> GetInventoryItems(int32 instanceContainerID);
-	
+
 	virtual void Init() override;
 	URPGEventManager* GetEventManager();
 

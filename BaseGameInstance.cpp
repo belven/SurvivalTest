@@ -1,4 +1,4 @@
-#include "SurvivalGameInstance.h"
+#include "BaseGameInstance.h"
 
 #include "FactionManager.h"
 #include "Events/RPGEventManager.h"
@@ -13,12 +13,12 @@
 #include "Tables/RangedWeaponDataTable.h"
 #include "Tables/WeaponDataTable.h"
 
-USurvivalGameInstance::USurvivalGameInstance()
+UBaseGameInstance::UBaseGameInstance()
 {
 
 }
 
-void USurvivalGameInstance::LoadTableFromFile(UCSVTable* table)
+void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
 {
 	const FString path = table->GetPath();
 
@@ -46,7 +46,7 @@ void USurvivalGameInstance::LoadTableFromFile(UCSVTable* table)
 	}
 }
 
-TArray<FString> USurvivalGameInstance::CleanData(TArray<FString> strings)
+TArray<FString> UBaseGameInstance::CleanData(TArray<FString> strings)
 {
 	TArray<FString> newStrings;
 	for (FString s : strings)
@@ -56,7 +56,7 @@ TArray<FString> USurvivalGameInstance::CleanData(TArray<FString> strings)
 	return newStrings;
 }
 
-int32 USurvivalGameInstance::GetNextInstanceItemDataID()
+int32 UBaseGameInstance::GetNextInstanceItemDataID()
 {
 	int32 instanceItemDataID = 0;
 	if (GetInstancedItems().Num() > 0)
@@ -66,7 +66,7 @@ int32 USurvivalGameInstance::GetNextInstanceItemDataID()
 	return instanceItemDataID;
 }
 
-int32 USurvivalGameInstance::GetNextInstanceBoxDataID()
+int32 UBaseGameInstance::GetNextInstanceBoxDataID()
 {
 	int32 instanceBoxDataID = 0;
 	if (GetInstancedBoxes().Num() > 0)
@@ -76,7 +76,7 @@ int32 USurvivalGameInstance::GetNextInstanceBoxDataID()
 	return instanceBoxDataID;
 }
 
-int32 USurvivalGameInstance::GetNextInstanceContainerDataID()
+int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 {
 	int32 instanceContainerDataID = 0;
 	if (GetInstancedContainers().Num() > 0)
@@ -86,7 +86,7 @@ int32 USurvivalGameInstance::GetNextInstanceContainerDataID()
 	return instanceContainerDataID;
 }
 
-void USurvivalGameInstance::LoadTableData()
+void UBaseGameInstance::LoadTableData()
 {
 	LoadTableFromFile(GetItemDataTable());
 	LoadTableFromFile(GetWeaponDataTable());
@@ -98,7 +98,7 @@ void USurvivalGameInstance::LoadTableData()
 	LoadTableFromFile(GetContainerData());
 }
 
-UFactionManager* USurvivalGameInstance::GetFactionManager()
+UFactionManager* UBaseGameInstance::GetFactionManager()
 {
 	if (factionManager == NULL)
 	{
@@ -109,7 +109,7 @@ UFactionManager* USurvivalGameInstance::GetFactionManager()
 }
 
 
-FItemData USurvivalGameInstance::GetItemData(int32 itemID)
+FItemData UBaseGameInstance::GetItemData(int32 itemID)
 {
 	TArray<FItemData> itemData = GetItemDataTable()->GetData();
 	for (const FItemData id : itemData)
@@ -120,7 +120,7 @@ FItemData USurvivalGameInstance::GetItemData(int32 itemID)
 	return {};
 }
 
-FWeaponData USurvivalGameInstance::GetWeaponData(int32 itemID)
+FWeaponData UBaseGameInstance::GetWeaponData(int32 itemID)
 {
 	TArray<FWeaponData> weaponData = GetWeaponDataTable()->GetData();
 	for (const FWeaponData wd : weaponData)
@@ -131,7 +131,7 @@ FWeaponData USurvivalGameInstance::GetWeaponData(int32 itemID)
 	return {};
 }
 
-FMeleeWeaponData USurvivalGameInstance::GetMeleeWeaponData(int32 weaponID)
+FMeleeWeaponData UBaseGameInstance::GetMeleeWeaponData(int32 weaponID)
 {
 	for (const FMeleeWeaponData wd : GetMeleeWeaponData()->GetData())
 	{
@@ -141,7 +141,7 @@ FMeleeWeaponData USurvivalGameInstance::GetMeleeWeaponData(int32 weaponID)
 	return {};
 }
 
-FRangedWeaponData USurvivalGameInstance::GetRangedWeaponData(int32 weaponID)
+FRangedWeaponData UBaseGameInstance::GetRangedWeaponData(int32 weaponID)
 {
 	for (const FRangedWeaponData wd : GetRangedWeaponData()->GetData())
 	{
@@ -151,7 +151,7 @@ FRangedWeaponData USurvivalGameInstance::GetRangedWeaponData(int32 weaponID)
 	return {};
 }
 
-FProjectileWeaponData USurvivalGameInstance::GetProjectileWeaponData(int32 rangedWeaponID)
+FProjectileWeaponData UBaseGameInstance::GetProjectileWeaponData(int32 rangedWeaponID)
 {
 	for (const FProjectileWeaponData wd : GetProjectileWeaponData()->GetData())
 	{
@@ -162,7 +162,7 @@ FProjectileWeaponData USurvivalGameInstance::GetProjectileWeaponData(int32 range
 }
 
 
-FArmourData USurvivalGameInstance::GetArmourData(int32 armourID)
+FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 {
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
 	{
@@ -172,12 +172,12 @@ FArmourData USurvivalGameInstance::GetArmourData(int32 armourID)
 	return {};
 }
 
-FContainerData USurvivalGameInstance::GetContainerDataByID(int32 containerID)
+FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 {
 	return GetContainerData()->GetData().FindChecked(containerID);
 }
 
-FArmourData USurvivalGameInstance::GetArmourDataByItemID(int32 itemID)
+FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 {
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
 	{
@@ -187,7 +187,7 @@ FArmourData USurvivalGameInstance::GetArmourDataByItemID(int32 itemID)
 	return {};
 }
 
-FLoadoutData USurvivalGameInstance::GetLoadoutData(int32 entityID)
+FLoadoutData UBaseGameInstance::GetLoadoutData(int32 entityID)
 {
 	for (const FLoadoutData ld : GetLoadoutTableData()->GetData())
 	{
@@ -197,7 +197,7 @@ FLoadoutData USurvivalGameInstance::GetLoadoutData(int32 entityID)
 	return {};
 }
 
-TArray<FInstanceItemData> USurvivalGameInstance::GetInventoryItems(int32 instanceContainerID)
+TArray<FInstanceItemData> UBaseGameInstance::GetInventoryItems(int32 instanceContainerID)
 {
 	TArray<FInstanceItemData> data;
 	for(TTuple<int32, FInstanceItemData>& iid : instanceItems)
@@ -208,13 +208,13 @@ TArray<FInstanceItemData> USurvivalGameInstance::GetInventoryItems(int32 instanc
 	return data;
 }
 
-void USurvivalGameInstance::Init()
+void UBaseGameInstance::Init()
 {
 	Super::Init();
 	LoadTableData();
 }
 
-URPGEventManager* USurvivalGameInstance::GetEventManager()
+URPGEventManager* UBaseGameInstance::GetEventManager()
 {
 	if (eventManager == NULL) 
 	{
@@ -224,7 +224,7 @@ URPGEventManager* USurvivalGameInstance::GetEventManager()
 	return eventManager;
 }
 
-UItemDataTable* USurvivalGameInstance::GetItemDataTable()
+UItemDataTable* UBaseGameInstance::GetItemDataTable()
 {
 	if (ItemData == NULL)
 	{
@@ -234,7 +234,7 @@ UItemDataTable* USurvivalGameInstance::GetItemDataTable()
 	return ItemData;
 }
 
-UWeaponDataTable* USurvivalGameInstance::GetWeaponDataTable()
+UWeaponDataTable* UBaseGameInstance::GetWeaponDataTable()
 {
 	if (WeaponData == NULL)
 	{
@@ -244,7 +244,7 @@ UWeaponDataTable* USurvivalGameInstance::GetWeaponDataTable()
 	return WeaponData;
 }
 
-URangedWeaponDataTable* USurvivalGameInstance::GetRangedWeaponData()
+URangedWeaponDataTable* UBaseGameInstance::GetRangedWeaponData()
 {
 	if (rangedWeaponData == NULL)
 	{
@@ -254,7 +254,7 @@ URangedWeaponDataTable* USurvivalGameInstance::GetRangedWeaponData()
 	return rangedWeaponData;
 }
 
-UProjectileWeaponDataTable* USurvivalGameInstance::GetProjectileWeaponData()
+UProjectileWeaponDataTable* UBaseGameInstance::GetProjectileWeaponData()
 {
 	if (projectileWeaponData == NULL)
 	{
@@ -264,7 +264,7 @@ UProjectileWeaponDataTable* USurvivalGameInstance::GetProjectileWeaponData()
 	return projectileWeaponData;
 }
 
-UMeleeWeaponDataTable* USurvivalGameInstance::GetMeleeWeaponData()
+UMeleeWeaponDataTable* UBaseGameInstance::GetMeleeWeaponData()
 {
 	if (meleeWeaponData == NULL)
 	{
@@ -274,7 +274,7 @@ UMeleeWeaponDataTable* USurvivalGameInstance::GetMeleeWeaponData()
 	return meleeWeaponData;
 }
 
-UArmourDataTable* USurvivalGameInstance::GetArmourDataTable()
+UArmourDataTable* UBaseGameInstance::GetArmourDataTable()
 {
 	if (armourDataTable == NULL)
 	{
@@ -284,7 +284,7 @@ UArmourDataTable* USurvivalGameInstance::GetArmourDataTable()
 	return armourDataTable;
 }
 
-ULoadoutTableData* USurvivalGameInstance::GetLoadoutTableData()
+ULoadoutTableData* UBaseGameInstance::GetLoadoutTableData()
 {
 	if (loadoutTableData == NULL)
 	{
@@ -294,7 +294,7 @@ ULoadoutTableData* USurvivalGameInstance::GetLoadoutTableData()
 	return loadoutTableData;
 }
 
-UContainerTableData* USurvivalGameInstance::GetContainerData()
+UContainerTableData* UBaseGameInstance::GetContainerData()
 {
 	if (containerData == NULL)
 	{

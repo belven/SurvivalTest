@@ -18,21 +18,26 @@ public:
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void SetupInputComponent() override;
 	void OnPrimaryAction();
-
-protected:
-	virtual void BeginPlay() override;
-
-public:
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 	void LoadInventories();
 
-	UPROPERTY(BlueprintAssignable, Category = "Interaction")
+	ABaseCharacter* GetBaseCharacter() const { return baseCharacter; }
+	void SetBaseCharacter(ABaseCharacter* inBaseCharacter) { this->baseCharacter = inBaseCharacter; }
+
+	UPROPERTY()
 		FOnUseItem OnUseItem;
+protected:
+	virtual void BeginPlay() override;
+
+private:
 
 	UPROPERTY()
 		TSubclassOf<UUserWidget> inventoryWidgetClass;
 
 	UPROPERTY()
 		UInventoryUI* inventoryWidget;
+
+	UPROPERTY()
+		ABaseCharacter* baseCharacter;
 };

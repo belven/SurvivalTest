@@ -25,7 +25,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	USurvivalGameInstance* GetGame();
+	UBaseGameInstance* GetGame();
 	void CreateLootboxData();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
@@ -51,5 +51,5 @@ protected:
 	UItemContainer* container;
 
 	UPROPERTY()
-	USurvivalGameInstance* gameIn;
+	UBaseGameInstance* gameIn;
 };

@@ -2,35 +2,34 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "SurvivalTest/Items/ItemContainer.h"
-#include "InventoryUI.generated.h"
+#include "ItemContainerUI.generated.h"
 
 class UBaseGameInstance;
-class ABasePlayerController;
 
 UCLASS()
-class SURVIVALTEST_API UInventoryUI : public UUserWidget
+class SURVIVALTEST_API UItemContainerUI : public UUserWidget
 {
 	GENERATED_BODY()
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
 		void GenerateInventory();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		ABasePlayerController* GetController() const { return controller; }
+		UItemContainer* GetContainer() const { return container; }
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetController(ABasePlayerController* inController) { this->controller = inController; }
+		void SetContainer(UItemContainer* inContainer) { container = inContainer; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UBaseGameInstance* GetBaseGameInstance() const { return gameInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetBaseGameInstance(UBaseGameInstance* inGameInstance) { this->gameInstance = inGameInstance; }
+		void SetBaseGameInstance(UBaseGameInstance* inGameInstance) { gameInstance = inGameInstance; }
 
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		TArray<UItemContainer*> GetContainers();
 private:
 	UPROPERTY()
-		ABasePlayerController* controller;
+		UItemContainer* container;
 
 	UPROPERTY()
 		UBaseGameInstance* gameInstance;

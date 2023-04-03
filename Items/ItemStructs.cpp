@@ -1,6 +1,6 @@
 #include "ItemStructs.h"
 
-#include "SurvivalTest/SurvivalGameInstance.h"
+#include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ItemDataTable.h"
 
 
@@ -92,7 +92,7 @@ bool UItemStructs::GetBoolean(FString value)
 	return value.Equals("true") ? true : false;
 }
 
-FItemData UItemStructs::GetRandomItemData(USurvivalGameInstance* game)
+FItemData UItemStructs::GetRandomItemData(UBaseGameInstance* game)
 {
 	TArray<FItemData> itemData = game->GetItemDataTable()->GetData();
 	FItemData id = itemData[FMath::RandRange(0, itemData.Num() - 1)];

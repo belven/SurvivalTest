@@ -4,12 +4,12 @@
 #include "RangedWeapon.h"
 #include "Weapon.h"
 #include "Kismet/GameplayStatics.h"
-#include "../SurvivalGameInstance.h"
+#include "../BaseGameInstance.h"
 
 UWeapon* UWeaponCreator::CreateWeapon(const int32 itemID, const UWorld* world)
 {
 	UWeapon* weaponOut = NULL;
-	USurvivalGameInstance* gameIn = GameInstance(world);
+	UBaseGameInstance* gameIn = GameInstance(world);
 	const FItemData id = gameIn->GetItemData(itemID);
 
 	if (id.type == EItemType::Weapon) {

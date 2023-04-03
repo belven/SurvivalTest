@@ -2,7 +2,7 @@
 #include "CoreMinimal.h"
 #include "Item.h"
 #include "ItemStructs.h"
-#include "SurvivalTest/SurvivalGameInstance.h"
+#include "SurvivalTest/BaseGameInstance.h"
 #include "Armour.generated.h"
 
 class UItemContainer;
@@ -16,8 +16,8 @@ public:
 	FArmourData GetData() const { return data; }
 	void SetData(FArmourData inData) { this->data = inData; }
 
-	static UArmour* CreateArmour(int32 itemID, USurvivalGameInstance* game);
-	static UArmour* LoadArmour(int32 armourInstanceID, USurvivalGameInstance* game);
+	static UArmour* CreateArmour(int32 itemID, UBaseGameInstance* game);
+	static UArmour* LoadArmour(int32 armourInstanceID, UBaseGameInstance* game);
 
 	FInstanceArmourData GetInstanceArmourData() const { return instanceArmourData; }
 	void SetInstanceArmourData(FInstanceArmourData inContainerData) { this->instanceArmourData = inContainerData; }

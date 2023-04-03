@@ -6,7 +6,7 @@
 #include "Events/RPGEventManager.h"
 #include "BaseCharacter.h"
 #include "Damagable.h"
-#include "SurvivalGameInstance.h"
+#include "BaseGameInstance.h"
 #include "AI/NavigationSystemBase.h"
 #include "Components/SplineComponent.h"
 #include "EnvironmentQuery/EnvQuery.h"

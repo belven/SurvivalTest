@@ -13,7 +13,7 @@ class USceneComponent;
 class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
-class USurvivalGameInstance;
+class UBaseGameInstance;
 class UArmour;
 class USphereComponent;
 
@@ -77,7 +77,7 @@ public:
 	FORCEINLINE void SetEquippedWeapon(UWeapon* weapon) { equippedWeapon = weapon; equippedWeapon->SetOwner(this); }
 	void EquipArmour(UArmour* armour);
 
-	USurvivalGameInstance* GetBaseGameInstance();
+	UBaseGameInstance* GetBaseGameInstance();
 
 	virtual void ChangeHealth(FHealthChange& health_change) override;
 	virtual bool IsDead() override { return currentStats.health <= 0; };
@@ -102,6 +102,18 @@ protected:
 	UPROPERTY()
 		USphereComponent* interactionSphere;
 
+public:
+	TArray<IInteractable*> GetOverlappingInteractables() const
+	{
+		return overlappingInteractables;
+	}
+
+	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables)
+	{
+		this->overlappingInteractables = inOverlappingInteractables;
+	}
+
+protected:
 	TArray<IInteractable*> overlappingInteractables;
 
 	UPROPERTY()
@@ -127,5 +139,5 @@ protected:
 	UPROPERTY()
 		FCharacterStats maxStats;
 	UPROPERTY()
-		USurvivalGameInstance* gameInstance;
+		UBaseGameInstance* gameInstance;
 };

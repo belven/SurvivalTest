@@ -20,7 +20,7 @@ enum class  EFaction : uint8 {
 	End
 };
 
-class USurvivalGameInstance;
+class UBaseGameInstance;
 
 UINTERFACE(MinimalAPI)
 class UTeam : public UInterface
@@ -32,6 +32,6 @@ class SURVIVALTEST_API ITeam
 {
 	GENERATED_BODY()
 public:
-	virtual ERelationshipType GetRelationship(ITeam* other, USurvivalGameInstance* instance);
+	virtual ERelationshipType GetRelationship(ITeam* other, UBaseGameInstance* instance);
 	virtual EFaction GetFaction() { return EFaction::Synths;  }
 };

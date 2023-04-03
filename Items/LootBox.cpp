@@ -1,6 +1,6 @@
 #include "LootBox.h"
 
-#include "SurvivalTest/SurvivalGameInstance.h"
+#include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
 
 ALootBox::ALootBox()
@@ -29,7 +29,7 @@ void ALootBox::Highlight(bool activate)
 	boxMeshComp->SetRenderCustomDepth(activate);
 }
 
-USurvivalGameInstance* ALootBox::GetGame()
+UBaseGameInstance* ALootBox::GetGame()
 {
 	if (!gameIn)
 		gameIn = GameInstance(GetWorld());

@@ -1,6 +1,10 @@
 #include "BasePlayerController.h"
 #include "GameFramework/Character.h"
 #include "UI/InventoryUI.h"
+#include "SurvivalTest/BaseGameInstance.h"
+#include "SurvivalTest/BaseCharacter.h"
+
+class ABaseCharacter;
 
 ABasePlayerController::ABasePlayerController() : Super() {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(
@@ -20,6 +24,8 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 void ABasePlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
+
+	baseCharacter = Cast<ABaseCharacter>(aPawn);
 
 	InputComponent->BindAction("Jump", IE_Pressed, GetCharacter(), &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, GetCharacter(), &ACharacter::StopJumping);
@@ -52,6 +58,8 @@ void ABasePlayerController::BeginPlay()
 		inventoryWidget = CreateWidget<UInventoryUI>(this, inventoryWidgetClass);
 		inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		inventoryWidget->AddToViewport();
+		inventoryWidget->SetBaseGameInstance(GameInstance(GetWorld()));
+		inventoryWidget->SetController(this);
 	}
 }
 
@@ -76,10 +84,12 @@ void ABasePlayerController::LoadInventories()
 	if (inventoryWidget) {
 		if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden) {
 			inventoryWidget->SetVisibility(ESlateVisibility::Visible);
+			inventoryWidget->GenerateInventory();
 		}
 		else
 		{
 			inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		}
+		
 	}
 }

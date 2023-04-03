@@ -1,9 +1,9 @@
 #include "Armour.h"
 #include "ItemContainer.h"
-#include "SurvivalTest/SurvivalGameInstance.h"
+#include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
-UArmour* UArmour::CreateArmour(int32 itemID, USurvivalGameInstance* game)
+UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game)
 {
 	FArmourData armourData = game->GetArmourDataByItemID(itemID);
 
@@ -39,7 +39,7 @@ UArmour* UArmour::CreateArmour(int32 itemID, USurvivalGameInstance* game)
 	return armour;
 }
 
-UArmour* UArmour::LoadArmour(int32 armourInstanceID, USurvivalGameInstance* game)
+UArmour* UArmour::LoadArmour(int32 armourInstanceID, UBaseGameInstance* game)
 {
 	UArmour* armour = NewObject<UArmour>();
 	FInstanceArmourData acd = game->GetArmourInstances().FindChecked(armourInstanceID);

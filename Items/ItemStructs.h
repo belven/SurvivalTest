@@ -40,14 +40,23 @@ struct FLoadoutData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 entityID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	ECharacterType type;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 weaponID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 headArmourID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 chestArmourID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 legsArmourID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 health;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 moveSpeed;
 };
 
@@ -56,11 +65,16 @@ struct FItemData
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	int32 ID;
-	FString name;
-	FString mesh;
-	EItemType type;
-	int32 maxStack;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FString name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		FString mesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		EItemType type;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+		int32 maxStack;
 
 	FItemData() : ID(0), type(EItemType::Consumable), maxStack(0) {	}
 	FItemData(int32 id, const FString& name, EItemType type, int32 maxStack, FString mesh)
@@ -79,13 +93,20 @@ struct FWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	int32 ID;
-	int32 itemID;
-	EWeaponType type;
-	float useRate;
-	float healthChange;
-	bool heals;
-	int32 range;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 itemID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		EWeaponType type;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		float useRate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		float healthChange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		bool heals;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 range;
 };
 
 USTRUCT(BlueprintType)
@@ -93,8 +114,11 @@ struct FMeleeWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 weaponID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float cleaveRadius;
 };
 
@@ -103,10 +127,15 @@ struct FProjectileWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 rangedWeaponID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	FString projectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 magazineSize;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float reloadSpeed;
 };
 
@@ -115,8 +144,11 @@ struct FRangedWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 weaponID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float accuracy;
 };
 
@@ -127,7 +159,7 @@ enum class  EContainerType : uint8 {
 	End
 };
 
-class USurvivalGameInstance;
+class UBaseGameInstance;
 
 UCLASS()
 class SURVIVALTEST_API UItemStructs : public UObject
@@ -141,7 +173,7 @@ public:
 	static ECharacterType GetCharacterType(FString typeName);
 	static EContainerType GetContainerType(FString typeName);
 	static bool GetBoolean(FString value);
-	static FItemData GetRandomItemData(USurvivalGameInstance* game);
+	static FItemData GetRandomItemData(UBaseGameInstance* game);
 };
 
 USTRUCT(BlueprintType)
@@ -149,10 +181,15 @@ struct FArmourData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	int32 itemID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	int32 containerID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	int32 resistance;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	EArmourSlot slot;
 };
 
@@ -161,8 +198,11 @@ struct FContainerData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 slots = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FString name;
 };
 
@@ -172,8 +212,11 @@ struct FInstanceContainerData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	EContainerType type;
 };
 
@@ -182,8 +225,11 @@ struct FInstanceBoxData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 boxID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
 };
 
@@ -192,9 +238,13 @@ struct FInstanceArmourData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 armourID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 instancedItemDataID = UItemStructs::InvalidInt;
 };
 
@@ -203,10 +253,15 @@ struct FInstanceItemData
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 itemID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 amount = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 slot = UItemStructs::InvalidInt;
 
 	friend bool operator==(const FInstanceItemData& lhs, const FInstanceItemData& rhs)
