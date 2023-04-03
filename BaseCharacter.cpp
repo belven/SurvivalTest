@@ -193,6 +193,13 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
 	{
 		stat = 0;
 		currentStats.health -= healthDamage * deltaSeconds;
+
+		if (IsDead())
+		{
+			SetActorHiddenInGame(true);
+			SetActorEnableCollision(false);
+			UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, NULL);
+		}
 	}
 }
 

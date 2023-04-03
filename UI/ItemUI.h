@@ -16,6 +16,9 @@ public:
 		void UpdateItemDetails();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		UTexture2D* GetItemIcon();
+
+		UFUNCTION(BlueprintCallable, Category = "Inventory")
 		FItemData GetItemData() const { return itemData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")

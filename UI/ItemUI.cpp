@@ -6,3 +6,8 @@ void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemD
 	SetInstanceItemData(inInstanceData);
 	UpdateItemDetails();
 }
+
+UTexture2D* UItemUI::GetItemIcon()
+{
+	return LoadObject<UTexture2D>(this, *GetItemData().mesh);
+}
