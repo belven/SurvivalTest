@@ -4,6 +4,7 @@
 #include "Team.h"
 #include "GameFramework/Character.h"
 #include "Items/Weapon.h"
+#include "Interactable.h"
 #include "BaseCharacter.generated.h"
 
 class UInputComponent;
@@ -14,6 +15,7 @@ class UAnimMontage;
 class USoundBase;
 class USurvivalGameInstance;
 class UArmour;
+class USphereComponent;
 
 USTRUCT(BlueprintType)
 struct FCharacterStats
@@ -59,13 +61,15 @@ class ABaseCharacter : public ACharacter, public IDamagable, public ITeam
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
+	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 	ABaseCharacter();
 
 	//USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-	
-	FCharacterStats GetCurrentStats() const	{		return currentStats;	}
-		FCharacterStats GetMaxStats() const	{		return maxStats;	}
+
+	FCharacterStats GetCurrentStats() const { return currentStats; }
+	FCharacterStats GetMaxStats() const { return maxStats; }
 
 	virtual void Tick(float DeltaSeconds) override;
 
@@ -83,11 +87,22 @@ public:
 	void SetFaction(EFaction inFaction) { faction = inFaction; }
 	float GetDamageAfterResistance(float damage);
 	int32 GetDamageResistance();
+	void GetOverlapsOnSpawn();
+	void AddInteractable(IInteractable* inter);
+	void RemoveInteractable(IInteractable* inter);
+
+	UFUNCTION()
+		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 protected:
 	virtual void BeginPlay() override;
 	void SetupLoadout();
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
+
+	UPROPERTY()
+		USphereComponent* interactionSphere;
+
+	TArray<IInteractable*> overlappingInteractables;
 
 	UPROPERTY()
 		UWeapon* equippedWeapon;

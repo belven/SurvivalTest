@@ -6,13 +6,16 @@
 ALootBox::ALootBox()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	boxMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
+	boxMeshComp->SetCustomDepthStencilValue(2);
 }
 
 void ALootBox::BeginPlay()
 {
 	Super::BeginPlay();
 	CreateLootboxData();
+	if (boxMesh)
+		boxMeshComp->SetStaticMesh(boxMesh);
 }
 
 void ALootBox::Interact(ABasePlayerController* instigator)
@@ -20,9 +23,15 @@ void ALootBox::Interact(ABasePlayerController* instigator)
 
 }
 
+void ALootBox::Highlight(bool activate)
+{
+	isHighlighted = activate;
+	boxMeshComp->SetRenderCustomDepth(activate);
+}
+
 USurvivalGameInstance* ALootBox::GetGame()
 {
-	if(!gameIn)
+	if (!gameIn)
 		gameIn = GameInstance(GetWorld());
 	return gameIn;
 }
@@ -42,11 +51,11 @@ void ALootBox::CreateLootboxData()
 	ibd.containerInstanceID = icd.ID;
 	ibd.boxID = boxID;
 	GetGame()->GetInstancedBoxes().Add(ibd.ID, ibd);
-	
+
 
 	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerID), icd);
 
-	for(int32 i = 0; i < itemQuantity - 1; i++)
+	for (int32 i = 0; i < itemQuantity - 1; i++)
 	{
 		FItemData id = UItemStructs::GetRandomItemData(GetGame());
 		container->GetItems().AddUnique(CreateLoot(id));
@@ -56,7 +65,7 @@ void ALootBox::CreateLootboxData()
 FInstanceItemData ALootBox::CreateLoot(FItemData id)
 {
 	FInstanceItemData iid;
-	if(id.ID != UItemStructs::InvalidInt)
+	if (id.ID != UItemStructs::InvalidInt)
 	{
 		iid.ID = GetGame()->GetNextInstanceItemDataID();
 		iid.amount = FMath::RandRange(1, id.maxStack);
@@ -72,4 +81,15 @@ void ALootBox::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ALootBox::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	if (boxMesh) {
+		boxMeshComp->SetStaticMesh(boxMesh);
+		boxMeshComp->RegisterComponent();
+		boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		RootComponent->AttachToComponent(boxMeshComp, FAttachmentTransformRules::KeepRelativeTransform);
+	}
 }

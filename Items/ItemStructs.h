@@ -66,9 +66,9 @@ public:
 	FItemData(int32 id, const FString& name, EItemType type, int32 maxStack, FString mesh)
 		: ID(id),
 		name(name),
+		mesh(mesh),
 		type(type),
-		maxStack(maxStack),
-		mesh(mesh)
+		maxStack(maxStack)
 	{
 	}
 

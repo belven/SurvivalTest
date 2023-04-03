@@ -71,15 +71,15 @@ void UTP_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void UTP_WeaponComponent::AttachWeapon(ABaseCharacter* TargetCharacter)
 {
-	Character = TargetCharacter;
-	if (Character != nullptr)
-	{
-		// Attach the weapon to the First Person Character
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		GetOwner()->AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("GripPoint")));
+	//Character = TargetCharacter;
+	//if (Character != nullptr && Character->GetController()->IsA(ABasePlayerController::StaticClass()))
+	//{
+	//	// Attach the weapon to the First Person Character
+	//	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+	//	GetOwner()->AttachToComponent(Character->GetMesh(), AttachmentRules, FName(TEXT("GripPoint")));
 
-		ABasePlayerController* con = Cast<ABasePlayerController>(Character->GetController());
-		// Register so that Fire is called every time the character tries to use the item being held
-		con->OnUseItem.AddDynamic(this, &UTP_WeaponComponent::Fire);
-	}
+	//	ABasePlayerController* con = Cast<ABasePlayerController>(Character->GetController());
+	//	// Register so that Fire is called every time the character tries to use the item being held
+	//	con->OnUseItem.AddDynamic(this, &UTP_WeaponComponent::Fire);
+	//}
 }

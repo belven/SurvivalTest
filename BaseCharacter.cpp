@@ -12,6 +12,7 @@
 #include "Items/WeaponCreator.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "SurvivalGameInstance.h"
+#include "Components/SphereComponent.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -23,6 +24,14 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 150.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	interactionSphere->InitSphereRadius(500.0f);
+	interactionSphere->SetupAttachment(GetCapsuleComponent());
+	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
+	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
+	interactionSphere->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	interactionSphere->CanCharacterStepUpOn = ECB_No;
 
 	//// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	//Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
@@ -52,6 +61,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SetupLoadout();
+	GetOverlapsOnSpawn();
 }
 
 void ABaseCharacter::SetupLoadout()
@@ -127,6 +137,49 @@ int32  ABaseCharacter::GetDamageResistance() {
 	}
 
 	return total;
+}
+
+void ABaseCharacter::GetOverlapsOnSpawn()
+{
+	TArray<AActor*> actors;
+	interactionSphere->GetOverlappingActors(actors);
+
+	for (AActor* actor : actors) {
+		if (actor->Implements<UInteractable>())
+		{
+			AddInteractable(Cast<IInteractable>(actor));
+		}
+	}
+}
+
+void ABaseCharacter::AddInteractable(IInteractable* inter)
+{
+	inter->Highlight(true);
+	overlappingInteractables.AddUnique(inter);
+}
+
+void ABaseCharacter::RemoveInteractable(IInteractable* inter)
+{
+	inter->Highlight(false);
+	overlappingInteractables.Remove(inter);
+}
+
+void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor->Implements<UInteractable>())
+	{
+		AddInteractable(Cast<IInteractable>(OtherActor));
+	}
+}
+
+void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,
+	UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+{
+	if (otherActor->Implements<UInteractable>())
+	{
+		RemoveInteractable(Cast<IInteractable>(otherActor));
+	}
 }
 
 void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds)

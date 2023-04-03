@@ -13,7 +13,8 @@ class UInteractable : public UInterface
 
 class SURVIVALTEST_API IInteractable
 {
-	GENERATED_BODY()		
+	GENERATED_BODY()
 public:
 	virtual void Interact(ABasePlayerController* instigator) = 0;
+	virtual void Highlight(bool activate) = 0;
 };
