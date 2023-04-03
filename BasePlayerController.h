@@ -13,6 +13,9 @@ class SURVIVALTEST_API ABasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+	UFUNCTION()
+		void ContainersUpdated();
+
 	ABasePlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;

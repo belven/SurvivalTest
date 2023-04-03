@@ -17,6 +17,8 @@ class UBaseGameInstance;
 class UArmour;
 class USphereComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
+
 USTRUCT(BlueprintType)
 struct FCharacterStats
 {
@@ -64,6 +66,8 @@ public:
 	UFUNCTION()
 	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 	ABaseCharacter();
+
+	FOnContainersUpdated OnContainersUpdated;
 
 	//USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }

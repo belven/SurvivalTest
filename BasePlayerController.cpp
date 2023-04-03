@@ -16,6 +16,12 @@ ABasePlayerController::ABasePlayerController() : Super() {
 	}
 }
 
+void ABasePlayerController::ContainersUpdated()
+{
+	if (inventoryWidget && inventoryWidget->GetVisibility() == ESlateVisibility::Visible) 
+			inventoryWidget->GenerateInventory();
+}
+
 void ABasePlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -26,6 +32,7 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
+	baseCharacter->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
 
 	InputComponent->BindAction("Jump", IE_Pressed, GetCharacter(), &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, GetCharacter(), &ACharacter::StopJumping);

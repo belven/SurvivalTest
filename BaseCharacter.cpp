@@ -156,12 +156,14 @@ void ABaseCharacter::AddInteractable(IInteractable* inter)
 {
 	inter->Highlight(true);
 	overlappingInteractables.AddUnique(inter);
+	OnContainersUpdated.Broadcast();
 }
 
 void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
 	inter->Highlight(false);
 	overlappingInteractables.Remove(inter);
+	OnContainersUpdated.Broadcast();
 }
 
 void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
