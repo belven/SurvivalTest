@@ -1,23 +1,19 @@
 #include "ItemContainer.h"
 #include "../BaseGameInstance.h"
+#include "SurvivalTest/Tables/ItemDataTable.h"
 
 UItemContainer::UItemContainer() : Super() {
 
 }
 
 UItemContainer* UItemContainer::CreateItemContainer(FContainerData inContainerData,
-	FInstanceContainerData inInstanceContainerData)
+	FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame)
 {
 	UItemContainer* ic = NewObject<UItemContainer>();
 	ic->SetContainerData(inContainerData);
 	ic->SetInstanceContainerData(inInstanceContainerData);
+	ic->game = inGame;
 	return ic;
-}
-
-
-UBaseGameInstance* UItemContainer::GetGame()
-{
-	return GameInstance(GetWorld());
 }
 
 void UItemContainer::DataTableChanged() {
@@ -29,9 +25,9 @@ FString UItemContainer::GetItemName(int32 itemID)
 	return GetGame()->GetItemData(itemID).name;
 }
 
-int32 UItemContainer::GetNextInventoryID()
+int32 UItemContainer::GetNextItemID()
 {
-	return 1;
+	return GetGame()->GetNextInstanceItemDataID();
 }
 
 int32 UItemContainer::GetItemStackSize(int32 itemID)
@@ -41,13 +37,13 @@ int32 UItemContainer::GetItemStackSize(int32 itemID)
 
 bool UItemContainer::HasSpace(FInstanceItemData item)
 {
-	return item.GetRemainingSpace(GetGame()->GetItemData(item.itemID).maxStack) > 1;
+	return item.GetRemainingSpace(GetGame()->GetItemData(item.itemID).maxStack) > 0;
 }
 
 FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inItem) {
-	for (FInstanceItemData item : items) {
+	for (FInstanceItemData item : GetItems()) {
 		// Finds the first item with space available and a matching name
-		if (GetItemName(item.itemID).Equals(GetItemName(inItem.itemID)) && HasSpace(item)) {
+		if (item.itemID == inItem.itemID && HasSpace(item)) {
 			return item;
 		}
 	}
@@ -59,39 +55,46 @@ FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inI
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
-FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd) {
+FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<int32>& ids) {
 	bool itemAdded = false;
 
 	// Are we adding a whole item, i.e. an item that is at it's max stack size? If so, just add it
-	if (HasSpace() && itemToAdd.GetRemainingSpace(GetItemStackSize(itemToAdd.itemID)) == 0) {
-		FInstanceItemData tempItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
-		items.Add(tempItem);
-		itemToAdd.amount = 0;
-		itemAdded = true;
-	}
-	else
-	{
-		FInstanceItemData existingItem = GetExistingItemWithSpace(itemToAdd);
-
-		// Check all existing matching items to see if they have space
-		while (itemToAdd.amount > 0 && existingItem.isValid()) {
-			existingItem.TakeFrom(itemToAdd);
-
-			// Try to find another item to add to
-			existingItem = GetExistingItemWithSpace(itemToAdd);
+	if (HasSpace()) {
+		const int32 stackSize = GetItemStackSize(itemToAdd.itemID);
+		if (itemToAdd.amount == stackSize) {
+			FInstanceItemData tempItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextItemID(), instanceContainerData.ID);
+			tempItem.amount = itemToAdd.amount;
+			game->GetInstancedItems().Add(tempItem.ID, tempItem);
+			ids.Add(tempItem.ID);
+			itemToAdd.amount = 0;
 			itemAdded = true;
 		}
+		else
+		{
+			FInstanceItemData existingItem = GetExistingItemWithSpace(itemToAdd);
 
-		// Keep adding new items until we're either full or added all items
-		while (itemToAdd.amount > 0 && HasSpace()) {
-			// Make a new item
-			FInstanceItemData newItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextInventoryID());
-			newItem.amount = 0;
-			newItem.TakeFrom(itemToAdd);
+			// Check all existing matching items to see if they have space
+			while (itemToAdd.amount > 0 && existingItem.isValid()) {
+				existingItem.TakeFrom(itemToAdd, stackSize);
 
-			// Add the new item
-			items.Add(newItem);
-			itemAdded = true;
+				// Try to find another item to add to
+				existingItem = GetExistingItemWithSpace(itemToAdd);
+				game->GetInstancedItems().Add(existingItem.ID, existingItem);
+				itemAdded = true;
+			}
+
+			// Keep adding new items until we're either full or added all items
+			while (itemToAdd.amount > 0 && HasSpace()) {
+				// Make a new item
+				FInstanceItemData newItem = itemToAdd.CopyItem(GetNextEmptySpace(), GetNextItemID(), instanceContainerData.ID);
+				newItem.amount = 0;
+				newItem.TakeFrom(itemToAdd, stackSize);
+
+				// Add the new item
+				ids.Add(newItem.ID);
+				game->GetInstancedItems().Add(newItem.ID, newItem);
+				itemAdded = true;
+			}
 		}
 	}
 
@@ -119,7 +122,7 @@ int32 UItemContainer::GetNextEmptySpace() {
 
 void UItemContainer::RemoveFilledSlots(TArray<int32>& slots)
 {
-	for(FInstanceItemData iid : items)
+	for (FInstanceItemData iid : GetItems())
 	{
 		slots.Remove(iid.slot);
 	}
@@ -129,7 +132,7 @@ void UItemContainer::RemoveFilledSlots(TArray<int32>& slots)
 bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove) {
 	TArray<FInstanceItemData> itemsToRemove;
 
-	for (FInstanceItemData item : items) {
+	for (FInstanceItemData item : GetItems()) {
 		int32 amountToTake = itemToRemove.amount;
 
 		// Check if the IDs match
@@ -155,7 +158,7 @@ bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove) {
 
 	if (itemsToRemove.Num() > 0) {
 		for (FInstanceItemData ii : itemsToRemove) {
-			items.Remove(ii);
+			game->GetInstancedItems().Remove(ii.ID);
 		}
 	}
 
@@ -172,7 +175,7 @@ bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove) {
 /* Returns the total amount of items for the given id */
 int32 UItemContainer::GetItemAmount(int32 id) {
 	int32 total = 0;
-	for (FInstanceItemData item : items) {
+	for (FInstanceItemData item : GetItems()) {
 		if (item.itemID == id) {
 			total += item.amount;
 		}

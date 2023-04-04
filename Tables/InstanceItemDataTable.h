@@ -13,5 +13,5 @@ class SURVIVALTEST_API UInstanceItemDataTable : public UCSVTable
 	TArray<FInstanceItemData >& GetData() { return instanceItemData; }
 private:
 	TArray<FInstanceItemData > instanceItemData;
-	
+
 };

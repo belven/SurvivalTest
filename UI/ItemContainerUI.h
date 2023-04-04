@@ -25,7 +25,13 @@ public:
 		UBaseGameInstance* GetBaseGameInstance() const { return gameInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	FString GetContainerName();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void SetBaseGameInstance(UBaseGameInstance* inGameInstance) { gameInstance = inGameInstance; }
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UItemContainer* GetItemContainerForArmour(FInstanceItemData data);
 
 private:
 	UPROPERTY()

@@ -44,6 +44,8 @@ public:
 	FArmourData GetArmourData(int32 armourID);
 	FContainerData GetContainerDataByID(int32 containerID);
 
+	FInstanceItemData CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID);
+
 	FArmourData GetArmourDataByItemID(int32 itemID);
 
 	FLoadoutData GetLoadoutData(int32 entityID);
@@ -69,6 +71,7 @@ public:
 	int32 GetNextInstanceArmourDataID();
 
 	int32 GetNextInstanceContainerDataID();
+	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
 
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return instanceItems; }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }

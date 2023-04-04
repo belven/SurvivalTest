@@ -46,7 +46,7 @@ protected:
 	FInstanceContainerData icd;
 	FInstanceBoxData ibd;
 	bool isHighlighted = false;
-
+	
 	UPROPERTY()
 	UItemContainer* container;
 

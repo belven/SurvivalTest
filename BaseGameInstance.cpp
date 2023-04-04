@@ -96,6 +96,21 @@ int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 	return instanceContainerDataID;
 }
 
+TArray<FInstanceItemData> UBaseGameInstance::GetInstancedItemsForContainer(int32 instanceContainerID)
+{
+	TArray<FInstanceItemData> items;
+	TArray<FInstanceItemData> itemsFound;
+
+	GetInstancedItems().GenerateValueArray(items);
+
+	for (FInstanceItemData iid : items)
+	{
+		if (iid.containerInstanceID == instanceContainerID)
+			itemsFound.Add(iid);
+	}
+	return itemsFound;
+}
+
 void UBaseGameInstance::LoadTableData()
 {
 	LoadTableFromFile(GetItemDataTable());
@@ -187,6 +202,19 @@ FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 	return GetContainerData()->GetData().FindChecked(containerID);
 }
 
+FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot,
+	int32 containerInstanceID)
+{
+	FInstanceItemData data;
+	data.ID = GetNextInstanceItemDataID();
+	data.amount = amount;
+	data.containerInstanceID = containerInstanceID;
+	data.itemID = itemID;
+	data.slot = slot;
+	GetInstancedItems().Add(data.ID, data);
+	return data;
+}
+
 FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 {
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
@@ -210,7 +238,7 @@ FLoadoutData UBaseGameInstance::GetLoadoutData(int32 entityID)
 TArray<FInstanceItemData> UBaseGameInstance::GetInventoryItems(int32 instanceContainerID)
 {
 	TArray<FInstanceItemData> data;
-	for(TTuple<int32, FInstanceItemData>& iid : instanceItems)
+	for (TTuple<int32, FInstanceItemData>& iid : instanceItems)
 	{
 		if (iid.Value.containerInstanceID == instanceContainerID)
 			data.Add(iid.Value);
@@ -226,7 +254,7 @@ void UBaseGameInstance::Init()
 
 URPGEventManager* UBaseGameInstance::GetEventManager()
 {
-	if (eventManager == NULL) 
+	if (eventManager == NULL)
 	{
 		eventManager = NewObject<URPGEventManager>();
 	}

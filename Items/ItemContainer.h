@@ -16,20 +16,17 @@ class SURVIVALTEST_API UItemContainer : public UObject
 public:
 	UItemContainer();
 
-	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData);
+	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void DataTableChanged();
 	FString GetItemName(int32 itemID);
-	int32 GetNextInventoryID();
+	int32 GetNextItemID();
 	int32 GetItemStackSize(int32 itemID);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		TArray<FInstanceItemData>& GetItems() { return items; }
-
-	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		void SetItems(TArray<FInstanceItemData> newVal) { items = newVal; }
-
+		TArray<FInstanceItemData> GetItems() { return game->GetInstancedItemsForContainer(instanceContainerData.ID); }
+	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		bool HasSpace(FInstanceItemData item);
 
@@ -37,7 +34,7 @@ public:
 		FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		FInstanceItemData AddItem(FInstanceItemData itemToAdd);
+		FInstanceItemData AddItem(FInstanceItemData itemToAdd, TArray<int32>& ids);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		bool RemoveItem(FInstanceItemData itemToRemove);
@@ -50,8 +47,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void SetMaxItemCount(int32 newVal) { maxItemCount = newVal; }
-	
-		bool HasSpace() { return items.Num() < GetMaxItemCount(); }
+
+	bool HasSpace() { return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < GetMaxItemCount(); }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		int32 GetNextEmptySpace();
@@ -79,18 +76,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void SetContainerData(FContainerData inContainerData) { this->containerData = inContainerData; }
 
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		UBaseGameInstance* GetGame() { return game; }
+
 private:
 	UPROPERTY()
 		FContainerData containerData;
 
 	UPROPERTY()
-		FInstanceContainerData instanceContainerData;
+		UBaseGameInstance* game;
 
 	UPROPERTY()
-		TArray<FInstanceItemData> items;
-
+		FInstanceContainerData instanceContainerData;
+	
 	UPROPERTY()
 		int32 maxItemCount = 10;
 
-	UBaseGameInstance* GetGame();
 };

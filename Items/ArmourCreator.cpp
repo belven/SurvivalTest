@@ -20,6 +20,7 @@ void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UAr
 {
 	// Get Armour Data by ItemID
 	FArmourData armourData = game->GetArmourDataByItemID(itemID);
+	FItemData id = game->GetItemData(itemID);
 
 	// Create a new instance of container
 	// Get the next ID from the table
@@ -29,6 +30,7 @@ void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UAr
 	icd.ID = instanceContainerDataID;
 	icd.containerID = armourData.containerID;
 	icd.type = EContainerType::Armour;
+	icd.name = id.name;
 	game->GetInstancedContainers().Add(icd.ID, icd);
 
 	// Create a new Armour instance based on the container instance

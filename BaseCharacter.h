@@ -16,6 +16,7 @@ class USoundBase;
 class UBaseGameInstance;
 class UArmour;
 class USphereComponent;
+class UItemContainer;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
 
@@ -64,7 +65,7 @@ class ABaseCharacter : public ACharacter, public IDamagable, public ITeam
 
 public:
 	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 	ABaseCharacter();
 
 	FOnContainersUpdated OnContainersUpdated;
@@ -95,29 +96,24 @@ public:
 	void AddInteractable(IInteractable* inter);
 	void RemoveInteractable(IInteractable* inter);
 
+	TArray<IInteractable*> GetOverlappingInteractables() const { return overlappingInteractables; }
+	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
+
+	UItemContainer* GetInventory() const { return inventory; }
+	void SetInventory(UItemContainer* inInventory) { inventory = inInventory; }
+
 	UFUNCTION()
 		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 protected:
+	bool inCombat;
 	virtual void BeginPlay() override;
 	void SetupLoadout();
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
 
 	UPROPERTY()
 		USphereComponent* interactionSphere;
-
-public:
-	TArray<IInteractable*> GetOverlappingInteractables() const
-	{
-		return overlappingInteractables;
-	}
-
-	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables)
-	{
-		this->overlappingInteractables = inOverlappingInteractables;
-	}
-
-protected:
+	
 	TArray<IInteractable*> overlappingInteractables;
 
 	UPROPERTY()
@@ -137,8 +133,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 		FCharacterStats currentStats;
-
-	bool inCombat;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+		UItemContainer* inventory;
 
 	UPROPERTY()
 		FCharacterStats maxStats;

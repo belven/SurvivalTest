@@ -13,6 +13,7 @@
 #include "Perception/AIPerceptionSystem.h"
 #include "BaseGameInstance.h"
 #include "Components/SphereComponent.h"
+#include "Items/ItemContainer.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -69,6 +70,8 @@ void ABaseCharacter::SetupLoadout()
 	const FLoadoutData ld = GetBaseGameInstance()->GetLoadoutData(1);
 
 	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
+
+	inventory = UItemContainer::CreateItemContainer({}, {}, GetBaseGameInstance());
 
 	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld(), UItemStructs::InvalidInt));
 	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld(), UItemStructs::InvalidInt));

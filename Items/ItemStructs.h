@@ -220,6 +220,16 @@ public:
 		FString name = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 		EContainerType type;
+
+	friend bool operator==(const FInstanceContainerData& lhs, const FInstanceContainerData& rhs)
+	{
+		return lhs.ID == rhs.ID;
+	}
+
+	friend bool operator!=(const FInstanceContainerData& lhs, const FInstanceContainerData& rhs)
+	{
+		return !(lhs == rhs);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -281,18 +291,19 @@ public:
 		return ID != UItemStructs::InvalidInt;
 	}
 
-	void TakeFrom(FInstanceItemData& itemToAdd)
+	void TakeFrom(FInstanceItemData& itemToAdd, int32 stackSize)
 	{
-		amount += itemToAdd.amount;
-		itemToAdd.amount = 0;
+		int32 amountToTake = FMath::Min(stackSize, itemToAdd.amount);
+		amount += amountToTake;
+		itemToAdd.amount -= amountToTake;
 	}
 
-	FInstanceItemData CopyItem(int32 emptySlot, int32 nextID)
+	FInstanceItemData CopyItem(int32 emptySlot, int32 nextID, int32 instanceContainerID)
 	{
 		FInstanceItemData newData = {};
 		newData.ID = nextID;
 		newData.itemID = itemID;
-		newData.containerInstanceID = containerInstanceID;
+		newData.containerInstanceID = instanceContainerID;
 		newData.amount = 0;
 		newData.slot = emptySlot;
 		return newData;
