@@ -30,8 +30,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void SetItems(TArray<FInstanceItemData> newVal) { items = newVal; }
 
-	bool HasSpace(FInstanceItemData item);
-	FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		bool HasSpace(FInstanceItemData item);
+
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		FInstanceItemData AddItem(FInstanceItemData itemToAdd);
@@ -47,8 +50,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void SetMaxItemCount(int32 newVal) { maxItemCount = newVal; }
-
-	UFUNCTION(BlueprintCallable, Category = "Item Container")
+	
 		bool HasSpace() { return items.Num() < GetMaxItemCount(); }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
@@ -68,9 +70,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		FContainerData GetContainerData() const { return containerData; }
 
-	FInstanceContainerData GetInstanceContainerData() const { return instanceContainerData; }
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		FInstanceContainerData GetInstanceContainerData() const { return instanceContainerData; }
 
-	void SetInstanceContainerData(FInstanceContainerData inInstanceContainerData) { this->instanceContainerData = inInstanceContainerData; }
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+		void SetInstanceContainerData(FInstanceContainerData inInstanceContainerData) { this->instanceContainerData = inInstanceContainerData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		void SetContainerData(FContainerData inContainerData) { this->containerData = inContainerData; }

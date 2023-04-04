@@ -76,6 +76,16 @@ int32 UBaseGameInstance::GetNextInstanceBoxDataID()
 	return instanceBoxDataID;
 }
 
+int32 UBaseGameInstance::GetNextInstanceArmourDataID()
+{
+	int32 instanceArmourDataID = 0;
+	if (GetInstancedArmour().Num() > 0)
+	{
+		instanceArmourDataID = GetInstancedArmour()[GetInstancedArmour().Num() - 1].ID + 1;
+	}
+	return instanceArmourDataID;
+}
+
 int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 {
 	int32 instanceContainerDataID = 0;

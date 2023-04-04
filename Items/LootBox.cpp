@@ -1,5 +1,6 @@
 #include "LootBox.h"
 
+#include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
 
@@ -43,6 +44,7 @@ void ALootBox::CreateLootboxData()
 	icd.ID = instanceContainerDataID;
 	icd.containerID = containerID;
 	icd.type = EContainerType::Box;
+	icd.name = "Loot Box " + FString::FromInt(boxID);
 	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
 
 	int32 instanceBoxDataID = GetGame()->GetNextInstanceBoxDataID();
@@ -58,7 +60,16 @@ void ALootBox::CreateLootboxData()
 	for (int32 i = 0; i < itemQuantity - 1; i++)
 	{
 		FItemData id = UItemStructs::GetRandomItemData(GetGame());
-		container->GetItems().AddUnique(CreateLoot(id));
+		FInstanceItemData iid = CreateLoot(id);
+
+		if(id.type == EItemType::Armour)
+		{
+			UArmour* armourMade = UArmour::CreateArmour(id.ID, GetGame());
+
+			GetGame()->GetInstancedArmour().FindChecked(armourMade->GetInstanceArmourData().ID).instancedItemDataID = iid.ID;
+		}
+
+		container->GetItems().AddUnique(iid);
 	}
 }
 

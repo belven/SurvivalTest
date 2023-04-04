@@ -24,9 +24,13 @@ public:
 
 	UItemContainer* GetContainer() const { return container; }
 	void SetContainer(UItemContainer* inContainer) { this->container = inContainer; }
+
+	FInstanceContainerData GetInstanceContainerData() const { return instanceContainerData; }
+	void SetInstanceItemData(FInstanceContainerData inInstanceContainerData) { instanceContainerData = inInstanceContainerData; }
 private:
 	FArmourData data;
 	FInstanceArmourData instanceArmourData;
+	FInstanceContainerData instanceContainerData;
 
 	UPROPERTY()
 		UItemContainer* container;

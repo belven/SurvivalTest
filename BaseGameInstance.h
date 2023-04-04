@@ -66,12 +66,13 @@ public:
 
 	int32 GetNextInstanceItemDataID();
 	int32 GetNextInstanceBoxDataID();
+	int32 GetNextInstanceArmourDataID();
 
 	int32 GetNextInstanceContainerDataID();
 
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return instanceItems; }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
-	TMap<int32, FInstanceArmourData>& GetArmourInstances() { return armourInstances; }
+	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;

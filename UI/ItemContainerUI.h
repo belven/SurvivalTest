@@ -16,10 +16,10 @@ public:
 		void GenerateInventory();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UItemContainer* GetContainer() const { return container; }
+		UItemContainer* GetItemContainer() const { return container; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetContainer(UItemContainer* inContainer) { container = inContainer; }
+		void SetItemContainer(UItemContainer* inContainer) { container = inContainer; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UBaseGameInstance* GetBaseGameInstance() const { return gameInstance; }
