@@ -16,7 +16,7 @@ public:
 	FArmourData GetData() const { return data; }
 	void SetData(FArmourData inData) { this->data = inData; }
 
-	static UArmour* CreateArmour(int32 itemID, UBaseGameInstance* game);
+	static UArmour* CreateArmour(int32 itemID, UBaseGameInstance* game, int32 instanceItemDataID);
 	static UArmour* LoadArmour(int32 armourInstanceID, UBaseGameInstance* game);
 
 	FInstanceArmourData GetInstanceArmourData() const { return instanceArmourData; }

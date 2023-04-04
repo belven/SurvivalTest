@@ -5,18 +5,18 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
-UArmour* UArmourCreator::CreateArmour(int32 itemID, UWorld* world)
+UArmour* UArmourCreator::CreateArmour(int32 itemID, UWorld* world, int32 instanceItemDataID)
 {
 	UArmour* a = NULL;
 	UBaseGameInstance* gameIn = GameInstance(world);
 	const FItemData id = gameIn->GetItemData(itemID);
 	
-	a  = UArmour::CreateArmour(itemID, gameIn);
+	a  = UArmour::CreateArmour(itemID, gameIn, instanceItemDataID);
 	a->SetItemData(id);
 	return a;
 }
 
-void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UArmour* armour)
+void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UArmour* armour, int32 instanceItemDataID)
 {
 	// Get Armour Data by ItemID
 	FArmourData armourData = game->GetArmourDataByItemID(itemID);
@@ -38,6 +38,7 @@ void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UAr
 	acd.ID = armourContainerDataID;
 	acd.armourID = armourData.ID;
 	acd.containerInstanceID = icd.ID;
+	acd.instancedItemDataID = instanceItemDataID;
 	game->GetInstancedArmour().Add(acd.ID, acd);
 
 	armour->SetData(armourData);

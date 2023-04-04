@@ -4,10 +4,10 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
-UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game)
+UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 instanceItemDataID)
 {
 	UArmour* armour = NewObject<UArmour>();
-	UArmourCreator::CreateArmourData(itemID, game, armour);
+	UArmourCreator::CreateArmourData(itemID, game, armour, instanceItemDataID);
 	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armour->GetData().containerID);
 	armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData()));
 	return armour;

@@ -64,9 +64,7 @@ void ALootBox::CreateLootboxData()
 
 		if(id.type == EItemType::Armour)
 		{
-			UArmour* armourMade = UArmour::CreateArmour(id.ID, GetGame());
-
-			GetGame()->GetInstancedArmour().FindChecked(armourMade->GetInstanceArmourData().ID).instancedItemDataID = iid.ID;
+			UArmour::CreateArmour(id.ID, GetGame(), iid.ID);			
 		}
 
 		container->GetItems().AddUnique(iid);

@@ -70,9 +70,9 @@ void ABaseCharacter::SetupLoadout()
 
 	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
 
-	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld()));
-	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld()));
-	EquipArmour(UArmourCreator::CreateArmour(ld.legsArmourID, GetWorld()));
+	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld(), UItemStructs::InvalidInt));
+	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld(), UItemStructs::InvalidInt));
+	EquipArmour(UArmourCreator::CreateArmour(ld.legsArmourID, GetWorld(), UItemStructs::InvalidInt));
 }
 
 void ABaseCharacter::EquipArmour(UArmour* armour)
