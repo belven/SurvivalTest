@@ -11,12 +11,30 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armour->GetData().containerID);
 	armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
 
-	FInstanceItemData testData;
-	testData.itemID = 1;
-	testData.amount = 3;
+	bool spawnedArmour = false;
 
-	TArray<int32> ids;
-	armour->GetContainer()->AddItem(testData, ids);
+	for (int i = 0; i < 3; i++) {
+		TArray<int32> ids;
+		FInstanceItemData testData;
+		FItemData id = UItemStructs::GetRandomItemData(game);
+		testData.itemID = id.ID;
+		testData.amount = 1;
+
+		if (id.type != EItemType::Armour)
+		{
+			armour->GetContainer()->AddItem(testData, ids);
+		} else
+		{
+			i--;
+		}
+	/*	else if (!spawnedArmour)
+		{
+			armour->GetContainer()->AddItem(testData, ids);
+			UArmour::CreateArmour(id.ID, game, ids[0]);
+			spawnedArmour = true;
+		}*/
+	}
+
 	return armour;
 }
 

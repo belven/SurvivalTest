@@ -20,6 +20,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void SetupInputComponent() override;
+	void ShowCursor();
 	void OnPrimaryAction();
 	void MoveForward(float Val);
 	void MoveRight(float Val);

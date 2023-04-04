@@ -1,4 +1,6 @@
 #include "BasePlayerController.h"
+
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 #include "UI/InventoryUI.h"
 #include "SurvivalTest/BaseGameInstance.h"
@@ -48,8 +50,14 @@ void ABasePlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ABasePlayerController::OnPrimaryAction);
 	InputComponent->BindAction("Load Inventories", IE_Pressed, this, &ABasePlayerController::LoadInventories);
+	InputComponent->BindAction("Show Cursor", IE_Pressed, this, &ABasePlayerController::ShowCursor);
 	InputComponent->BindAxis("Move Forward / Backward", this, &ABasePlayerController::MoveForward);
 	InputComponent->BindAxis("Move Right / Left", this, &ABasePlayerController::MoveRight);
+}
+
+void ABasePlayerController::ShowCursor()
+{
+	bShowMouseCursor = !bShowMouseCursor;	
 }
 
 void ABasePlayerController::OnPrimaryAction()
@@ -92,11 +100,13 @@ void ABasePlayerController::LoadInventories()
 		if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden) {
 			inventoryWidget->SetVisibility(ESlateVisibility::Visible);
 			inventoryWidget->GenerateInventory();
+			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, inventoryWidget);
 		}
 		else
 		{
 			inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+			UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
 		}
-		
+		ShowCursor();
 	}
 }

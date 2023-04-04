@@ -45,12 +45,7 @@ void ALootBox::CreateLootboxData()
 	icd.containerID = containerID;
 	icd.type = EContainerType::Box;
 	icd.name = "Loot Box " + FString::FromInt(boxID);
-	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
-
-
-	FInstanceContainerData data = GetGame()->GetInstancedContainers().FindChecked(icd.ID);
-	data.name = "Changed data name";
-	GetGame()->GetInstancedContainers().Add(data.ID, data);
+	GetGame()->GetInstancedContainers().Add(icd.ID, icd);	
 
 	int32 instanceBoxDataID = GetGame()->GetNextInstanceBoxDataID();
 	
