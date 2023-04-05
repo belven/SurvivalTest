@@ -45,7 +45,7 @@ void ABaseProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	ABaseCharacter* us = healthChange.source;
 
-	if (OtherActor != NULL && OtherActor != this && OtherActor != us && us != NULL)
+	if (OtherActor != NULL && OtherActor != this && OtherActor != us && us != NULL && OtherComp->GetName().Equals("CollisionCylinder"))
 	{
 		if (OtherActor->Implements<UDamagable>())
 		{

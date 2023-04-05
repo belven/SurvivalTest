@@ -3,6 +3,16 @@
 #include "Components/ShapeComponent.h"
 #include "DrawDebugHelpers.h"
 #include "MissionArea.h"
+#include "SurvivalTest/BaseCharacter.h"
+#include <NavigationSystem.h>
+
+#include "SurvivalTest/BasePlayerController.h"
+
+AMission::AMission()
+{
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("Blueprint'/Game/FirstPerson/Blueprints/AI.AI_C'"));
+	AIClass = PlayerPawnClassFinder.Class;
+}
 
 void AMission::BeginPlay()
 {
@@ -10,27 +20,12 @@ void AMission::BeginPlay()
 	boxSize = 1000;
 	boxHeight = 1000;
 
-	//if (size == 1)
-	//{
-	//	SpawnBox(actorLocation);
-	//}
-	//else if (size == 2)
-	//{
-	//	for(int x = actorLocation.X - boxSize; x != actorLocation.X + boxSize *2; x += boxSize)
-	//	{
-	//		for (int y = actorLocation.Y - boxSize; y != actorLocation.Y + boxSize * 2; y += boxSize)
-	//		{
-	//			SpawnBox(FVector(x, y, actorLocation.Z + (boxHeight)));
-	//		}
-	//	}
-	//}
-
 	boxSize = 1000;
 	boxHeight = 1000;
 
 	int locationOffset = 0;
 
-	if(size % 2 == 0)
+	if (size % 2 == 0)
 	{
 		locationOffset = (boxSize / 2);
 	}
@@ -43,7 +38,7 @@ void AMission::BeginPlay()
 
 	for (int indexX = 0; indexX < size; indexX++)
 	{
-		int y = actorLocation.Y - (boxSize * (size /2)) - locationOffset;
+		int y = actorLocation.Y - (boxSize * (size / 2)) - locationOffset;
 		x += boxSize;
 
 		for (int indexY = 0; indexY < size; indexY++)
@@ -56,7 +51,7 @@ void AMission::BeginPlay()
 
 bool AMission::HasPlayers()
 {
-	for(auto& box : players)
+	for (auto& box : players)
 	{
 		if (box.Value > 0)
 			return true;
@@ -71,19 +66,49 @@ void AMission::SpawnBox(FVector location)
 
 	AMissionArea* area = GetWorld()->SpawnActor<AMissionArea>(location, GetActorRotation(), params);
 	FVector extent = FVector(boxSize / 2, boxSize / 2, boxHeight);
-	area->GetBox()->InitBoxExtent(extent);
+	area->GetBox()->SetBoxExtent(extent);
 	missionArea.Add(area);
 	area->GetBox()->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMission::BeginOverlap);
 	area->GetBox()->OnComponentEndOverlap.AddUniqueDynamic(this, &AMission::EndOverlap);
 	DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
 }
 
-void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex)
 {
-	players.FindOrAdd(Cast<AMissionArea>(overlappedComponent->GetOwner()))--;
+	if (IsPlayer(OtherActor, OtherComp)) {
+		players.FindOrAdd(Cast<AMissionArea>(overlappedComponent->GetOwner()))--;
+
+		if (!HasPlayers())
+		{
+			FActorSpawnParameters params;
+			params.Owner = this;
+			FNavLocation location;
+
+			for (int i = 0; i < enemyAmount; ++i)
+			{
+				UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
+				nav->GetRandomPointInNavigableRadius(GetActorLocation(), size * (boxSize / 2), location);
+
+				GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
+			}
+		}
+	}
+}
+
+bool AMission::IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp)
+{
+	// TODO find better way to check for player
+	if (inActor->IsA(ABaseCharacter::StaticClass()) && inOtherComp->GetName().Equals("CollisionCylinder"))
+	{
+		ABaseCharacter* character = Cast<ABaseCharacter>(inActor);
+
+		return character->GetController()->IsA(ABasePlayerController::StaticClass());
+	}
+	return false;
 }
 
 void AMission::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	players.FindOrAdd(Cast<AMissionArea>(OverlappedComponent->GetOwner()))++;
+	if (IsPlayer(OtherActor, OtherComp))
+		players.FindOrAdd(Cast<AMissionArea>(OverlappedComponent->GetOwner()))++;
 }
