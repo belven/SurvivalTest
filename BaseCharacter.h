@@ -64,8 +64,6 @@ class ABaseCharacter : public ACharacter, public IDamagable, public ITeam
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
-		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 	ABaseCharacter();
 
 	FOnContainersUpdated OnContainersUpdated;
@@ -101,6 +99,9 @@ public:
 
 	UItemContainer* GetInventory() const { return inventory; }
 	void SetInventory(UItemContainer* inInventory) { inventory = inInventory; }
+
+	UFUNCTION()
+		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
 	UFUNCTION()
 		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
