@@ -12,6 +12,7 @@
 #include "Items/WeaponCreator.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "BaseGameInstance.h"
+#include "Items/Weapon.h"
 #include "BasePlayerController.h"
 #include "Components/SphereComponent.h"
 #include "Items/ItemContainer.h"
@@ -74,6 +75,12 @@ void ABaseCharacter::SetupLoadout()
 	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld(), UItemStructs::InvalidInt));
 	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld(), UItemStructs::InvalidInt));
 	EquipArmour(UArmourCreator::CreateArmour(ld.legsArmourID, GetWorld(), UItemStructs::InvalidInt));
+}
+
+void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
+{
+	equippedWeapon = weapon;
+	equippedWeapon->SetOwner(this);
 }
 
 void ABaseCharacter::EquipArmour(UArmour* armour)

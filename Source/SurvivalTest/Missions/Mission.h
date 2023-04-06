@@ -1,7 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Engine/TargetPoint.h" 	
-#include "Engine/TriggerBox.h"
 #include "Mission.generated.h"
 
 class AMissionArea;

@@ -3,8 +3,8 @@
 #include "Damagable.h"
 #include "Team.h"
 #include "GameFramework/Character.h"
-#include "Items/Weapon.h"
 #include "Interactable.h"
+#include "Items/ItemStructs.h"
 #include "BaseCharacter.generated.h"
 
 class UInputComponent;
@@ -17,6 +17,7 @@ class UBaseGameInstance;
 class UArmour;
 class USphereComponent;
 class UItemContainer;
+class UWeapon;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
 
@@ -79,11 +80,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	FORCEINLINE UWeapon* GetEquippedWeapon() { return equippedWeapon; }
-	FORCEINLINE void SetEquippedWeapon(UWeapon* weapon)
-	{
-		equippedWeapon = weapon;
-		equippedWeapon->SetOwner(this);
-	}
+	void SetEquippedWeapon(UWeapon* weapon);
 
 	void EquipArmour(UArmour* armour);
 

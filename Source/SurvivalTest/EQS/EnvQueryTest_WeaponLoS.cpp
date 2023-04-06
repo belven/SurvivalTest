@@ -4,6 +4,7 @@
 #include "Components/CapsuleComponent.h"
 #include "EnvironmentQuery/Items/EnvQueryItemType_VectorBase.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "SurvivalTest/Items/Weapon.h"
 
 #define mSphereTraceMulti(start, end, radius, hits) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, ETraceTypeQuery::TraceTypeQuery1, true, ignore, EDrawDebugTrace::None, hits, true);
 

@@ -83,7 +83,7 @@ void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* Othe
 
 		if (!HasPlayers() && spawnMission)
 		{
-			mSetTimerWorld(GetWorld(), TimerHandle_CheckNoPlayers, &AMission::SpawnMission, 3.0f);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle_CheckNoPlayers, this, &AMission::SpawnMission, 3.0f);
 		}
 	}
 }
@@ -122,6 +122,7 @@ void AMission::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	if (IsPlayer(OtherActor, OtherComp))
 	{
+		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_CheckNoPlayers);
 		players.FindOrAdd(Cast<AMissionArea>(OverlappedComponent->GetOwner()))++;
 	}
 }
