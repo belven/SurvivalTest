@@ -13,28 +13,28 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 
 	bool spawnedArmour = false;
 
-	//for (int i = 0; i < 3; i++) // TODO remove test data!
-	//{
-	//	TArray<int32> ids;
-	//	FInstanceItemData testData;
-	//	FItemData id = UItemStructs::GetRandomItemData(game);
-	//	testData.itemID = id.ID;
-	//	testData.amount = 1;
+	for (int i = 0; i < 4; i++) // TODO remove test data!
+	{
+		TArray<int32> ids;
+		FInstanceItemData testData;
+		FItemData id = UItemStructs::GetRandomItemData(game);
+		testData.itemID = id.ID;
+		testData.amount = FMath::RandRange(1, id.maxStack);
 
-	//	if (id.type != EItemType::Armour)
-	//	{
-	//		armour->GetContainer()->AddItem(testData, ids);
-	//	}
-	//	else
-	//	{
-	//		i--;
-	//	}
-	//}
-	TArray<int32> ids;
-	FInstanceItemData testData;
-	testData.itemID = 1;
-	testData.amount = 10;
-	testData = armour->GetContainer()->AddItem(testData, ids);
+		if (id.type != EItemType::Armour)
+		{
+			armour->GetContainer()->AddItem(testData, ids);
+		}
+		else
+		{
+			i--;
+		}
+	}
+	//TArray<int32> ids;
+	//FInstanceItemData testData;
+	//testData.itemID = 1;
+	//testData.amount = 10;
+	//testData = armour->GetContainer()->AddItem(testData, ids);
 
 	return armour;
 }

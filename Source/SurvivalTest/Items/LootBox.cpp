@@ -7,7 +7,7 @@
 ALootBox::ALootBox()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	boxMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
+	boxMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Loot Box Mesh"));
 	boxMeshComp->SetCustomDepthStencilValue(2);	
 }
 

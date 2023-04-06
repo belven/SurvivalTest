@@ -16,6 +16,8 @@ AMission::AMission()
 
 void AMission::BeginPlay()
 {
+	Super::BeginPlay();
+
 	const FVector actorLocation = GetActorLocation();
 	boxSize = 1000;
 	boxHeight = 1000;
