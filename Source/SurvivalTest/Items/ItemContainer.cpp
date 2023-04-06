@@ -154,6 +154,11 @@ TArray<int32> UItemContainer::GetEmptySlots()
 	return slotsLeft;
 }
 
+bool UItemContainer::HasSpace()
+{
+	 return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < containerData.slots; 
+}
+
 /* Searches through all current items and checks for an available validSlots, if any*/
 int32 UItemContainer::GetNextEmptySlot()
 {

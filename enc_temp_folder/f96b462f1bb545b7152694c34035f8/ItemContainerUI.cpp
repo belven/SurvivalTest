@@ -9,8 +9,7 @@ int32 UItemContainerUI::GetColumn()
 
 int32 UItemContainerUI::GetNextRowIndex()
 {
-	int32 nextRow = GetRow() + 1;
-	return (nextRow * 5) + 1;
+	return (GetRow() + 1) * 5 + 1;
 }
 
 void UItemContainerUI::GetGridData(int32& row, int32& column)
@@ -22,9 +21,9 @@ void UItemContainerUI::GetGridData(int32& row, int32& column)
 int32 UItemContainerUI::GetRow()
 {
 	int32 itemsPerRow = 5;
-	int32 rowMod = index % itemsPerRow;
-	int32 nearestRow = index - rowMod;	
-	return   nearestRow / itemsPerRow;
+	int32 numberOfItems = index - 1;
+	int32 rowMod = numberOfItems % itemsPerRow;
+	return numberOfItems > itemsPerRow ? (numberOfItems - rowMod) / 5 : 0;
 }
 
 FString UItemContainerUI::GetContainerName()

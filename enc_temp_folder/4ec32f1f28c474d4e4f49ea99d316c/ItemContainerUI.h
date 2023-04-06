@@ -34,12 +34,6 @@ public:
 		void ResetIndex() { index = 0; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetNextRowIndex() { index = GetNextRowIndex(); }
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void IncrementIndex() { index++; }
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UItemContainer* GetItemContainer() const { return container; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")

@@ -63,7 +63,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	void SetMaxItemCount(int32 newVal) { maxItemCount = newVal; }
 
-	bool HasSpace() { return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < GetMaxItemCount(); }
+	bool HasSpace();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetNextEmptySlot();
