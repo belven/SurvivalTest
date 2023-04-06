@@ -18,37 +18,39 @@ void AMission::BeginPlay()
 {
 	Super::BeginPlay();
 
-	const FVector actorLocation = GetActorLocation();
-	boxSize = 1000;
-	boxHeight = 1000;
+	//const FVector actorLocation = GetActorLocation();
+	//boxSize = 1000;
+	//boxHeight = 1000;
 
-	boxSize = 1000;
-	boxHeight = 1000;
+	//boxSize = 1000;
+	//boxHeight = 1000;
 
-	int locationOffset = 0;
+	//int locationOffset = 0;
 
-	if (size % 2 == 0)
-	{
-		locationOffset = (boxSize / 2);
-	}
-	else
-	{
-		locationOffset = boxSize;
-	}
+	//if (size % 2 == 0)
+	//{
+	//	locationOffset = (boxSize / 2);
+	//}
+	//else
+	//{
+	//	locationOffset = boxSize;
+	//}
 
-	int x = actorLocation.X - (boxSize * (size / 2)) - locationOffset;
+	//int x = actorLocation.X - (boxSize * (size / 2)) - locationOffset;
 
-	for (int indexX = 0; indexX < size; indexX++)
-	{
-		int y = actorLocation.Y - (boxSize * (size / 2)) - locationOffset;
-		x += boxSize;
+	//for (int indexX = 0; indexX < size; indexX++)
+	//{
+	//	int y = actorLocation.Y - (boxSize * (size / 2)) - locationOffset;
+	//	x += boxSize;
 
-		for (int indexY = 0; indexY < size; indexY++)
-		{
-			y += boxSize;
-			SpawnBox(FVector(x, y, actorLocation.Z + (boxHeight - 100)));
-		}
-	}
+	//	for (int indexY = 0; indexY < size; indexY++)
+	//	{
+	//		y += boxSize;
+	//		SpawnBox(FVector(x, y, actorLocation.Z + (boxHeight - 100)));
+	//	}
+	//}
+
+	SpawnBox(GetActorLocation());
 }
 
 bool AMission::HasPlayers()
@@ -115,7 +117,7 @@ bool AMission::IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp)
 	{
 		ABaseCharacter* character = Cast<ABaseCharacter>(inActor);
 
-		return character->GetController()->IsA(ABasePlayerController::StaticClass());
+		return character->GetController() && character->GetController()->IsA(ABasePlayerController::StaticClass());
 	}
 	return false;
 }

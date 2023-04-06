@@ -4,7 +4,7 @@ AMissionArea::AMissionArea()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	box = CreateDefaultSubobject<UBoxComponent>(TEXT("Mission Area Box"));
-	box->SetupAttachment(RootComponent);
+	RootComponent = box;
 }
 
 void AMissionArea::BeginPlay()

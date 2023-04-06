@@ -15,6 +15,10 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	AMainGrid();
 
+protected:
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
 	TArray<AGridSection*> gridSections;

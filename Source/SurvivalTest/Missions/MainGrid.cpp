@@ -4,10 +4,13 @@
 
 void AMainGrid::ClearGrid()
 {
+	
 	for(AGridSection* gs : gridSections)
 	{
-		if(gs)
+		if (gs) {
+			gs->DestroyConstructedComponents();
 			gs->Destroy();
+		}
 	}
 
 	gridSections.Empty(columnsAndRows * columnsAndRows);
@@ -16,10 +19,23 @@ void AMainGrid::ClearGrid()
 void AMainGrid::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
+	
+}
+
+AMainGrid::AMainGrid()
+{
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> cube(TEXT("StaticMesh'/Game/LevelPrototyping/Meshes/SM_Cube.SM_Cube'"));
+	mesh = cube.Object;
+}
+
+void AMainGrid::BeginPlay()
+{
+	Super::BeginPlay();
+
 	const FVector startLocation = FVector(0, 0, 0);
 	int32 halfBoxSize = boxSize / 2;
 	float startingDistance = boxSize * (columnsAndRows / 2);
-	
+
 	ClearGrid();
 
 	int locationOffset = boxSize;;
@@ -51,13 +67,14 @@ void AMainGrid::OnConstruction(const FTransform& Transform)
 			FVector extent = FVector(halfBoxSize, halfBoxSize, boxHeight);
 
 			// Increase from 0 z by height given, this might be pointless later and likely overriden by landscape generation etc.
-			double inZ = startLocation.Z + heightAboveGround;
+			// -1 for the 0.01 scale of 100 size of the cube, so it sits on 0 exactly
+			double inZ = startLocation.Z + heightAboveGround - 1;
 			FVector location = FVector(x, y, inZ);
 
 			// Create a grid section at the correct location
 			AGridSection* gs = AGridSection::CreateGridSection(GetWorld(), FGridSectionData(location, boxSize));
 			gs->GetGridSectionComp()->SetStaticMesh(mesh);
-			gs->GetGridSectionComp()->SetWorldScale3D(FVector(boxSize / 100, boxSize / 100, 0.5));
+			gs->GetGridSectionComp()->SetWorldScale3D(FVector(boxSize / 100, boxSize / 100, 0.01f));
 			gridSections.Add(gs);
 
 			DrawDebugBox(GetWorld(), location, extent, FColor::Blue, false, debugDuration);
@@ -65,8 +82,9 @@ void AMainGrid::OnConstruction(const FTransform& Transform)
 	}
 }
 
-AMainGrid::AMainGrid()
+void AMainGrid::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> cube(TEXT("StaticMesh'/Game/LevelPrototyping/Meshes/SM_Cube.SM_Cube'"));
-	mesh = cube.Object;
+	Super::EndPlay(EndPlayReason);
+
+	ClearGrid();
 }

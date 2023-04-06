@@ -15,10 +15,9 @@ void ALootBox::SetUpBox()
 {
 	if (boxMesh) {
 		boxMeshComp->SetStaticMesh(boxMesh);
-		boxMeshComp->RegisterComponent();
 		boxMeshComp->SetCollisionProfileName("Interaction");
 		boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		RootComponent->AttachToComponent(boxMeshComp, FAttachmentTransformRules::KeepRelativeTransform);
+		//RootComponent->AttachToComponent(boxMeshComp, FAttachmentTransformRules::KeepRelativeTransform);
 	}
 }
 

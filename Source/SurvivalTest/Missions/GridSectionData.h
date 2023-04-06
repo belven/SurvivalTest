@@ -24,7 +24,11 @@ struct FGridSectionData
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "World Grid")
 	int32 sectionSize;
 
-	FVector CornerLocation() { return centerLocation - (sectionSize / 2); }
+	FVector CornerLocation()
+	{
+		float xY =  sectionSize / 2;
+		return FVector(centerLocation.X - xY, centerLocation.Y - xY, 0);
+	}
 };
 
 UCLASS()
