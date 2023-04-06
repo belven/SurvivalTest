@@ -8,11 +8,11 @@ const int32 UItemStructs::InvalidInt = -1;
 
 EWeaponType UItemStructs::GetWeaponType(FString typeName)
 {
-	if(typeName.Equals("Melee"))
+	if (typeName.Equals("Melee"))
 	{
 		return EWeaponType::Melee;
 	}
-	else if (typeName.Equals("Projectile"))
+	if (typeName.Equals("Projectile"))
 	{
 		return EWeaponType::Projectile;
 	}
@@ -25,32 +25,32 @@ EItemType UItemStructs::GetItemType(FString typeName)
 	{
 		return EItemType::Weapon;
 	}
-	else if (typeName.Equals("Consumable"))
+	if (typeName.Equals("Consumable"))
 	{
 		return EItemType::Consumable;
 	}
-	else if (typeName.Equals("Armour"))
+	if (typeName.Equals("Armour"))
 	{
 		return EItemType::Armour;
 	}
 	return EItemType::Consumable;
 }
 
-EArmourSlot UItemStructs::GetArmourSlot(FString typeName)
+EGearType UItemStructs::GetArmourSlot(FString typeName)
 {
 	if (typeName.Equals("Chest"))
 	{
-		return EArmourSlot::Chest;
+		return EGearType::Chest;
 	}
-	else if (typeName.Equals("Head"))
+	if (typeName.Equals("Head"))
 	{
-		return EArmourSlot::Head;
+		return EGearType::Head;
 	}
-	else if (typeName.Equals("Legs"))
+	if (typeName.Equals("Legs"))
 	{
-		return EArmourSlot::Legs;
+		return EGearType::Legs;
 	}
-	return EArmourSlot::Head;
+	return EGearType::Head;
 }
 
 ECharacterType UItemStructs::GetCharacterType(FString typeName)
@@ -59,15 +59,15 @@ ECharacterType UItemStructs::GetCharacterType(FString typeName)
 	{
 		return ECharacterType::Player;
 	}
-	else if (typeName.Equals("Ally"))
+	if (typeName.Equals("Ally"))
 	{
 		return ECharacterType::Ally;
 	}
-	else if (typeName.Equals("Enemy"))
+	if (typeName.Equals("Enemy"))
 	{
 		return ECharacterType::Enemy;
 	}
-	else if (typeName.Equals("Neutral"))
+	if (typeName.Equals("Neutral"))
 	{
 		return ECharacterType::Neutral;
 	}
@@ -80,7 +80,7 @@ EContainerType UItemStructs::GetContainerType(FString typeName)
 	{
 		return EContainerType::Armour;
 	}
-	else if (typeName.Equals("Box"))
+	if (typeName.Equals("Box"))
 	{
 		return EContainerType::Box;
 	}

@@ -54,7 +54,9 @@ bool AMission::HasPlayers()
 	for (auto& box : players)
 	{
 		if (box.Value > 0)
+		{
 			return true;
+		}
 	}
 	return false;
 }
@@ -75,22 +77,31 @@ void AMission::SpawnBox(FVector location)
 
 void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex)
 {
-	if (IsPlayer(OtherActor, OtherComp)) {
+	if (IsPlayer(OtherActor, OtherComp))
+	{
 		players.FindOrAdd(Cast<AMissionArea>(overlappedComponent->GetOwner()))--;
 
-		if (!HasPlayers())
+		if (!HasPlayers() && spawnMission)
 		{
-			FActorSpawnParameters params;
-			params.Owner = this;
-			FNavLocation location;
+			mSetTimerWorld(GetWorld(), TimerHandle_CheckNoPlayers, &AMission::SpawnMission, 3.0f);
+		}
+	}
+}
 
-			for (int i = 0; i < enemyAmount; ++i)
-			{
-				UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
-				nav->GetRandomPointInNavigableRadius(GetActorLocation(), size * (boxSize / 2), location);
+void AMission::SpawnMission()
+{
+	if (!HasPlayers() && spawnMission)
+	{
+		FActorSpawnParameters params;
+		params.Owner = this;
+		FNavLocation location;
 
-				GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
-			}
+		for (int i = 0; i < enemyAmount; ++i)
+		{
+			UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
+			nav->GetRandomPointInNavigableRadius(GetActorLocation(), size * (boxSize / 2), location);
+
+			GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
 		}
 	}
 }
@@ -110,5 +121,7 @@ bool AMission::IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp)
 void AMission::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (IsPlayer(OtherActor, OtherComp))
+	{
 		players.FindOrAdd(Cast<AMissionArea>(OverlappedComponent->GetOwner()))++;
+	}
 }

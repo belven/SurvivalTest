@@ -27,7 +27,7 @@ void ABaseHUD::DrawStats()
 
 void ABaseHUD::DrawStatBar(float startX, float startY, float lineOffset, FString text, float value, FLinearColor lineColour, float lineLength, float lineThickness)
 {
-	TArray< FStringFormatArg > args;
+	TArray<FStringFormatArg> args;
 	args.Add(FStringFormatArg(text));
 	float lineX = startX;
 	float lineY = startY;
@@ -41,5 +41,7 @@ void ABaseHUD::DrawStatBar(float startX, float startY, float lineOffset, FString
 	DrawLine(lineX, lineY, lineX + lineLength, lineY, FLinearColor::Gray, lineThickness);
 
 	if (value > 0)
+	{
 		DrawLine(lineX, lineY, lineX + (lineLength * value), lineY, lineColour, lineThickness);
+	}
 }

@@ -63,6 +63,8 @@ public:
 	UArmourDataTable* GetArmourDataTable();
 	ULoadoutTableData* GetLoadoutTableData();
 	UContainerTableData* GetContainerData();
+	EGearType GetGearTypeForItem(int32 itemID);
+	void AddUpdateInstanceItemData(const FInstanceItemData& inData);
 
 	static TArray<FString> CleanData(TArray<FString> strings);
 

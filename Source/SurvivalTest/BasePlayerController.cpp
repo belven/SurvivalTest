@@ -8,9 +8,9 @@
 
 class ABaseCharacter;
 
-ABasePlayerController::ABasePlayerController() : Super() {
-	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(
-		TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
+ABasePlayerController::ABasePlayerController() : Super()
+{
+	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
 	if (inventoryWidgetClassFound.Class != nullptr)
 	{
@@ -20,8 +20,8 @@ ABasePlayerController::ABasePlayerController() : Super() {
 
 void ABasePlayerController::ContainersUpdated()
 {
-	if (inventoryWidget && inventoryWidget->GetVisibility() == ESlateVisibility::Visible) 
-			inventoryWidget->GenerateInventory();
+	if (inventoryWidget && inventoryWidget->GetVisibility() == ESlateVisibility::Visible)
+		inventoryWidget->GenerateInventory();
 }
 
 void ABasePlayerController::PlayerTick(float DeltaTime)
@@ -57,7 +57,7 @@ void ABasePlayerController::SetupInputComponent()
 
 void ABasePlayerController::ShowCursor()
 {
-	bShowMouseCursor = !bShowMouseCursor;	
+	bShowMouseCursor = !bShowMouseCursor;
 }
 
 void ABasePlayerController::OnPrimaryAction()
@@ -69,7 +69,8 @@ void ABasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (inventoryWidgetClass) {
+	if (inventoryWidgetClass)
+	{
 		inventoryWidget = CreateWidget<UInventoryUI>(this, inventoryWidgetClass);
 		inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		inventoryWidget->AddToViewport();
@@ -96,8 +97,10 @@ void ABasePlayerController::MoveRight(float Val)
 
 void ABasePlayerController::LoadInventories()
 {
-	if (inventoryWidget) {
-		if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden) {
+	if (inventoryWidget)
+	{
+		if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
+		{
 			inventoryWidget->SetVisibility(ESlateVisibility::Visible);
 			inventoryWidget->GenerateInventory();
 			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, inventoryWidget);

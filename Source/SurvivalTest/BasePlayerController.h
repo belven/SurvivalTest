@@ -7,14 +7,16 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
 
 class UInventoryUI;
+class ABaseCharacter;
 
 UCLASS()
 class SURVIVALTEST_API ABasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
 public:
 	UFUNCTION()
-		void ContainersUpdated();
+	void ContainersUpdated();
 
 	ABasePlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
@@ -30,18 +32,18 @@ public:
 	void SetBaseCharacter(ABaseCharacter* inBaseCharacter) { this->baseCharacter = inBaseCharacter; }
 
 	UPROPERTY()
-		FOnUseItem OnUseItem;
+	FOnUseItem OnUseItem;
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY()
+	TSubclassOf<UUserWidget> inventoryWidgetClass;
 
 	UPROPERTY()
-		TSubclassOf<UUserWidget> inventoryWidgetClass;
+	UInventoryUI* inventoryWidget;
 
 	UPROPERTY()
-		UInventoryUI* inventoryWidget;
-
-	UPROPERTY()
-		ABaseCharacter* baseCharacter;
+	ABaseCharacter* baseCharacter;
 };

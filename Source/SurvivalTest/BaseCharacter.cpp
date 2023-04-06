@@ -12,6 +12,7 @@
 #include "Items/WeaponCreator.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "BaseGameInstance.h"
+#include "BasePlayerController.h"
 #include "Components/SphereComponent.h"
 #include "Items/ItemContainer.h"
 
@@ -51,11 +52,8 @@ ABaseCharacter::ABaseCharacter()
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
 	interactionSphere->SetupAttachment(GetCapsuleComponent());
-	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
-	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
-	interactionSphere->SetCollisionResponseToChannel(ECC_EngineTraceChannel1, ECR_Ignore);
+	//interactionSphere->SetCollisionResponseToChannel(ECC_EngineTraceChannel1, ECR_Ignore);
 	interactionSphere->SetCollisionProfileName("Interaction");
-
 	ResetStats();
 }
 
@@ -63,7 +61,6 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SetupLoadout();
-	GetOverlapsOnSpawn();
 }
 
 void ABaseCharacter::SetupLoadout()
@@ -86,8 +83,10 @@ void ABaseCharacter::EquipArmour(UArmour* armour)
 
 UBaseGameInstance* ABaseCharacter::GetBaseGameInstance()
 {
-	if (gameInstance == NULL)
+	if (gameInstance == nullptr)
+	{
 		gameInstance = GameInstance(GetWorld());
+	}
 	return gameInstance;
 }
 
@@ -105,10 +104,12 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 		mEventTriggered(GetBaseGameInstance(), mCreateCombatStateEvent(this, csc));
 	}
 
-	if (health_change.heals) {
+	if (health_change.heals)
+	{
 		currentStats.health += health_change.changeAmount;
 	}
-	else {
+	else
+	{
 		health_change.changeAmount = GetDamageAfterResistance(health_change.changeAmount);
 		currentStats.health -= health_change.changeAmount;
 	}
@@ -119,17 +120,19 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 	{
 		SetActorHiddenInGame(true);
 		SetActorEnableCollision(false);
-		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, NULL);
+		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 	}
 }
 
-float  ABaseCharacter::GetDamageAfterResistance(float damage) {
+float ABaseCharacter::GetDamageAfterResistance(float damage)
+{
 	const float resistance = 100.0f + GetDamageResistance();
 	const float damageReduction = 100.0f / resistance;
 	return damage * damageReduction;
 }
 
-int32  ABaseCharacter::GetDamageResistance() {
+int32 ABaseCharacter::GetDamageResistance()
+{
 	int32 total = 0;
 
 	TArray<UArmour*> armour;
@@ -148,7 +151,8 @@ void ABaseCharacter::GetOverlapsOnSpawn()
 	TArray<AActor*> actors;
 	interactionSphere->GetOverlappingActors(actors);
 
-	for (AActor* actor : actors) {
+	for (AActor* actor : actors)
+	{
 		if (actor->Implements<UInteractable>())
 		{
 			AddInteractable(Cast<IInteractable>(actor));
@@ -170,8 +174,7 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 	OnContainersUpdated.Broadcast();
 }
 
-void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->Implements<UInteractable>())
 	{
@@ -179,8 +182,7 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
-void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor,
-	UPrimitiveComponent* otherComp, int32 otherBodyIndex)
+void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
 	if (otherActor->Implements<UInteractable>())
 	{
@@ -190,7 +192,8 @@ void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor
 
 void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds)
 {
-	if (stat > 0) {
+	if (stat > 0)
+	{
 		stat -= drainRate * deltaSeconds;
 	}
 	else
@@ -202,8 +205,24 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
 		{
 			SetActorHiddenInGame(true);
 			SetActorEnableCollision(false);
-			UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, NULL);
+			UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 		}
+	}
+}
+
+void ABaseCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (NewController->IsA(ABasePlayerController::StaticClass()))
+	{
+		interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
+		interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
+		GetOverlapsOnSpawn();
+	}
+	else
+	{
+		interactionSphere->DestroyComponent();
 	}
 }
 

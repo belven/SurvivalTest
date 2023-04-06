@@ -89,7 +89,7 @@ FInstanceItemData ALootBox::CreateLoot(FItemData id)
 		iid.amount = FMath::RandRange(1, id.maxStack);
 		iid.containerInstanceID = icd.ID;
 		iid.itemID = id.ID;
-		iid.slot = container->GetNextEmptySpace();
+		iid.slot = container->GetNextEmptySlot();
 	}
 	return iid;
 }

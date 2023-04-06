@@ -15,7 +15,6 @@
 
 UBaseGameInstance::UBaseGameInstance()
 {
-
 }
 
 void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
@@ -29,14 +28,15 @@ void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
 
 		FFileHelper::LoadFileToString(FileContent, *path);
 
-		const TCHAR* Terminators[] = { L"\r", L"\n" };
-		const TCHAR* CSVDelimiters[] = { TEXT(","), TEXT("\t") };
+		const TCHAR* Terminators[] = {L"\r", L"\n"};
+		const TCHAR* CSVDelimiters[] = {TEXT(","), TEXT("\t")};
 
 		TArray<FString> CSVLines;
 		FileContent.ParseIntoArray(CSVLines, Terminators, 2);
 
 		TArray<FString> temp_array;
-		for (int i = 0; i < CSVLines.Num(); i++) {
+		for (int i = 0; i < CSVLines.Num(); i++)
+		{
 			temp_array.Empty();
 			CSVLines[i].ParseIntoArray(temp_array, CSVDelimiters, 2);
 			parsedCSV.Add(CleanData(temp_array));
@@ -106,7 +106,9 @@ TArray<FInstanceItemData> UBaseGameInstance::GetInstancedItemsForContainer(int32
 	for (FInstanceItemData iid : items)
 	{
 		if (iid.containerInstanceID == instanceContainerID)
+		{
 			itemsFound.Add(iid);
+		}
 	}
 	return itemsFound;
 }
@@ -125,7 +127,7 @@ void UBaseGameInstance::LoadTableData()
 
 UFactionManager* UBaseGameInstance::GetFactionManager()
 {
-	if (factionManager == NULL)
+	if (factionManager == nullptr)
 	{
 		factionManager = NewObject<UFactionManager>();
 	}
@@ -140,7 +142,9 @@ FItemData UBaseGameInstance::GetItemData(int32 itemID)
 	for (const FItemData id : itemData)
 	{
 		if (id.ID == itemID)
+		{
 			return id;
+		}
 	}
 	return {};
 }
@@ -151,7 +155,9 @@ FWeaponData UBaseGameInstance::GetWeaponData(int32 itemID)
 	for (const FWeaponData wd : weaponData)
 	{
 		if (wd.itemID == itemID)
+		{
 			return wd;
+		}
 	}
 	return {};
 }
@@ -161,7 +167,9 @@ FMeleeWeaponData UBaseGameInstance::GetMeleeWeaponData(int32 weaponID)
 	for (const FMeleeWeaponData wd : GetMeleeWeaponData()->GetData())
 	{
 		if (wd.weaponID == weaponID)
+		{
 			return wd;
+		}
 	}
 	return {};
 }
@@ -171,7 +179,9 @@ FRangedWeaponData UBaseGameInstance::GetRangedWeaponData(int32 weaponID)
 	for (const FRangedWeaponData wd : GetRangedWeaponData()->GetData())
 	{
 		if (wd.weaponID == weaponID)
+		{
 			return wd;
+		}
 	}
 	return {};
 }
@@ -181,7 +191,9 @@ FProjectileWeaponData UBaseGameInstance::GetProjectileWeaponData(int32 rangedWea
 	for (const FProjectileWeaponData wd : GetProjectileWeaponData()->GetData())
 	{
 		if (wd.rangedWeaponID == rangedWeaponID)
+		{
 			return wd;
+		}
 	}
 	return {};
 }
@@ -192,7 +204,9 @@ FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
 	{
 		if (ad.ID == armourID)
+		{
 			return ad;
+		}
 	}
 	return {};
 }
@@ -203,7 +217,7 @@ FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 }
 
 FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot,
-	int32 containerInstanceID)
+                                                           int32 containerInstanceID)
 {
 	FInstanceItemData data;
 	data.ID = GetNextInstanceItemDataID();
@@ -220,7 +234,9 @@ FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 	for (const FArmourData ad : GetArmourDataTable()->GetData())
 	{
 		if (ad.itemID == itemID)
+		{
 			return ad;
+		}
 	}
 	return {};
 }
@@ -230,7 +246,9 @@ FLoadoutData UBaseGameInstance::GetLoadoutData(int32 entityID)
 	for (const FLoadoutData ld : GetLoadoutTableData()->GetData())
 	{
 		if (ld.entityID == entityID)
+		{
 			return ld;
+		}
 	}
 	return {};
 }
@@ -241,7 +259,9 @@ TArray<FInstanceItemData> UBaseGameInstance::GetInventoryItems(int32 instanceCon
 	for (TTuple<int32, FInstanceItemData>& iid : instanceItems)
 	{
 		if (iid.Value.containerInstanceID == instanceContainerID)
+		{
 			data.Add(iid.Value);
+		}
 	}
 	return data;
 }
@@ -254,7 +274,7 @@ void UBaseGameInstance::Init()
 
 URPGEventManager* UBaseGameInstance::GetEventManager()
 {
-	if (eventManager == NULL)
+	if (eventManager == nullptr)
 	{
 		eventManager = NewObject<URPGEventManager>();
 	}
@@ -264,7 +284,7 @@ URPGEventManager* UBaseGameInstance::GetEventManager()
 
 UItemDataTable* UBaseGameInstance::GetItemDataTable()
 {
-	if (ItemData == NULL)
+	if (ItemData == nullptr)
 	{
 		ItemData = NewObject<UItemDataTable>();
 	}
@@ -274,7 +294,7 @@ UItemDataTable* UBaseGameInstance::GetItemDataTable()
 
 UWeaponDataTable* UBaseGameInstance::GetWeaponDataTable()
 {
-	if (WeaponData == NULL)
+	if (WeaponData == nullptr)
 	{
 		WeaponData = NewObject<UWeaponDataTable>();
 	}
@@ -284,7 +304,7 @@ UWeaponDataTable* UBaseGameInstance::GetWeaponDataTable()
 
 URangedWeaponDataTable* UBaseGameInstance::GetRangedWeaponData()
 {
-	if (rangedWeaponData == NULL)
+	if (rangedWeaponData == nullptr)
 	{
 		rangedWeaponData = NewObject<URangedWeaponDataTable>();
 	}
@@ -294,7 +314,7 @@ URangedWeaponDataTable* UBaseGameInstance::GetRangedWeaponData()
 
 UProjectileWeaponDataTable* UBaseGameInstance::GetProjectileWeaponData()
 {
-	if (projectileWeaponData == NULL)
+	if (projectileWeaponData == nullptr)
 	{
 		projectileWeaponData = NewObject<UProjectileWeaponDataTable>();
 	}
@@ -304,7 +324,7 @@ UProjectileWeaponDataTable* UBaseGameInstance::GetProjectileWeaponData()
 
 UMeleeWeaponDataTable* UBaseGameInstance::GetMeleeWeaponData()
 {
-	if (meleeWeaponData == NULL)
+	if (meleeWeaponData == nullptr)
 	{
 		meleeWeaponData = NewObject<UMeleeWeaponDataTable>();
 	}
@@ -314,7 +334,7 @@ UMeleeWeaponDataTable* UBaseGameInstance::GetMeleeWeaponData()
 
 UArmourDataTable* UBaseGameInstance::GetArmourDataTable()
 {
-	if (armourDataTable == NULL)
+	if (armourDataTable == nullptr)
 	{
 		armourDataTable = NewObject<UArmourDataTable>();
 	}
@@ -324,7 +344,7 @@ UArmourDataTable* UBaseGameInstance::GetArmourDataTable()
 
 ULoadoutTableData* UBaseGameInstance::GetLoadoutTableData()
 {
-	if (loadoutTableData == NULL)
+	if (loadoutTableData == nullptr)
 	{
 		loadoutTableData = NewObject<ULoadoutTableData>();
 	}
@@ -334,10 +354,39 @@ ULoadoutTableData* UBaseGameInstance::GetLoadoutTableData()
 
 UContainerTableData* UBaseGameInstance::GetContainerData()
 {
-	if (containerData == NULL)
+	if (containerData == nullptr)
 	{
 		containerData = NewObject<UContainerTableData>();
 	}
 
 	return containerData;
+}
+
+EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)
+{
+	FItemData id = GetItemData(itemID);
+
+	if (id.type == EItemType::Armour)
+	{
+		FArmourData ad = GetArmourDataByItemID(itemID);
+		return ad.slot;
+	}
+	else if (id.type == EItemType::Weapon)
+	{
+
+	}
+
+
+	return EGearType::End;
+}
+
+/**
+ * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
+ *
+ * @param inData The data we're adding or updating, it will match on ID of the data
+ *
+ */
+void UBaseGameInstance::AddUpdateInstanceItemData(const FInstanceItemData& inData)
+{
+	GetInstancedItems().Add(inData.ID, inData);
 }

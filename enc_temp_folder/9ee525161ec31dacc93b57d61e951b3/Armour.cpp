@@ -32,9 +32,9 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 	//}
 	TArray<int32> ids;
 	FInstanceItemData testData;
-	testData.itemID = 0;
+	testData.itemID = 1;
 	testData.amount = 5;
-	testData = armour->GetContainer()->AddItem(testData, ids);
+	armour->GetContainer()->AddItem(testData, ids);
 
 	return armour;
 }

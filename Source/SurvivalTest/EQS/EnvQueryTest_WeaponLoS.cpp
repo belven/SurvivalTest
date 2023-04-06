@@ -60,14 +60,16 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 		FVector ItemLocation = GetItemLocation(QueryInstance, It.GetIndex());
 
 		// Check we have a weapon Equipped, this should always be the case
-		if (controllerBaseCharacter->GetEquippedWeapon() != NULL) {
+		if (controllerBaseCharacter->GetEquippedWeapon() != nullptr)
+		{
 			float dist = FVector::Dist(targetLocation, ItemLocation);
 			float range = controllerBaseCharacter->GetEquippedWeapon()->GetWeaponData().range;
 			bool inRange = dist < range;
 
 			// Check if the Item Location and our target location are within range of each other
 			// item location is a single grid point and target is the AIs current target
-			if (inRange) {
+			if (inRange)
+			{
 				TArray<FHitResult> hits;
 
 				// Add some height to Sphere trace, otherwise it will collide with objects on the ground
@@ -78,21 +80,19 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 
 				bool canSee = true;
 
-				for(FHitResult hit : hits)
+				for (FHitResult hit : hits)
 				{
 					// Did we hit something?
-					if(hit.bBlockingHit)
+					if (hit.bBlockingHit)
 					{
 						// If we hit something that's not are target FIRST, then there's something else in the way and we should invalidate that location
-						if (hit.GetActor() != Cast<AActor>(con->GetTarget())) {
+						if (hit.GetActor() != Cast<AActor>(con->GetTarget()))
+						{
 							canSee = false;
 							break;
 						}
 						// If this is the case, we hit our target first, so stop checking line of sight
-						else
-						{
-							break;
-						}
+						break;
 					}
 				}
 

@@ -7,11 +7,11 @@
 
 UArmour* UArmourCreator::CreateArmour(int32 itemID, UWorld* world, int32 instanceItemDataID)
 {
-	UArmour* a = NULL;
+	UArmour* a = nullptr;
 	UBaseGameInstance* gameIn = GameInstance(world);
 	const FItemData id = gameIn->GetItemData(itemID);
-	
-	a  = UArmour::CreateArmour(itemID, gameIn, instanceItemDataID);
+
+	a = UArmour::CreateArmour(itemID, gameIn, instanceItemDataID);
 	a->SetItemData(id);
 	return a;
 }

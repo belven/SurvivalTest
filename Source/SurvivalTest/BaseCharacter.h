@@ -136,11 +136,15 @@ protected:
 	UWeapon* equippedWeapon;
 
 	UPROPERTY()
-	TMap<EArmourSlot, UArmour*> equippedArmour;
+	TMap<EGearType, UArmour*> equippedArmour;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Factions, meta = (AllowPrivateAccess = "true"))
 	EFaction faction;
 
+public:
+	virtual void PossessedBy(AController* NewController) override;
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
 
