@@ -70,11 +70,49 @@ void ABaseCharacter::SetupLoadout()
 
 	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
 
-	inventory = UItemContainer::CreateItemContainer({}, {}, GetBaseGameInstance());
+	int32 instanceContainerDataID = GetBaseGameInstance()->GetNextInstanceContainerDataID();
 
-	EquipArmour(UArmourCreator::CreateArmour(ld.headArmourID, GetWorld(), UItemStructs::InvalidInt));
-	EquipArmour(UArmourCreator::CreateArmour(ld.chestArmourID, GetWorld(), UItemStructs::InvalidInt));
-	EquipArmour(UArmourCreator::CreateArmour(ld.legsArmourID, GetWorld(), UItemStructs::InvalidInt));
+	FContainerData cd = GetBaseGameInstance()->GetContainerDataByID(3);
+
+	FInstanceContainerData icd;
+	icd.ID = instanceContainerDataID;
+	icd.containerID = cd.ID;
+	icd.type = EContainerType::Player;
+	icd.name = cd.name;
+	GetBaseGameInstance()->GetInstancedContainers().Add(icd.ID, icd);
+	inventory = UItemContainer::CreateItemContainer(cd, icd, GetBaseGameInstance());
+
+	CreateNewItemForInventory(ld.headArmourID, EGearType::Head);
+	CreateNewItemForInventory(ld.chestArmourID, EGearType::Chest);
+	CreateNewItemForInventory(ld.legsArmourID, EGearType::Legs);
+}
+
+int32 ABaseCharacter::GetSlotForGear(EGearType type)
+{
+	switch (type)
+	{
+	case EGearType::Head: return 1;
+	case EGearType::Chest: return 2;
+	case EGearType::Legs: return 3;
+	case EGearType::Primary_Weapon: return 4;
+	case EGearType::Secondary_Weapon: return 5;
+	case EGearType::Sidearm: return 6;
+	case EGearType::Bag: return 7;
+	case EGearType::Vest: return 8;
+	default: return 9;
+	}
+}
+
+void ABaseCharacter::CreateNewItemForInventory(int32 armourID, EGearType type)
+{
+	TArray<int32> ids;
+	FInstanceItemData id;
+	id.itemID = armourID;
+	id.amount = 1;
+	id.slot = GetSlotForGear(type);
+	inventory->AddItem(id, ids);
+
+	EquipArmour(UArmourCreator::CreateArmour(armourID, GetWorld(), ids[0]));
 }
 
 void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)

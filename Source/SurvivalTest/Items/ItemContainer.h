@@ -19,6 +19,23 @@ public:
 	TArray<int32> validSlots;
 };
 
+USTRUCT(BlueprintType)
+struct FItemDataPair
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FItemDataPair() {}
+
+	FItemDataPair(const FInstanceItemData& inIid, const FItemData& inID)
+		: id(inID),
+		  iid(inIid)
+	{
+	}
+
+	FItemData id;
+	FInstanceItemData iid;
+};
+
 UCLASS(Blueprintable)
 class SURVIVALTEST_API UItemContainer : public UObject
 {
@@ -58,10 +75,7 @@ public:
 	int32 GetItemAmount(int32 id);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	int32 GetMaxItemCount() { return maxItemCount; }
-
-	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void SetMaxItemCount(int32 newVal) { maxItemCount = newVal; }
+	int32 GetMaxItemCount() { return containerData.slots; }
 
 	bool HasSpace();
 
@@ -97,6 +111,7 @@ public:
 	bool IsValidForSlot(int32 slot, EGearType inType);
 	int32 FindNextEmptyValidSlot(EGearType inType);
 
+	void UpdateDebugItemsList();
 private:
 	UPROPERTY()
 	TMap<EGearType, FValidSlots> validSlots;
@@ -110,6 +125,6 @@ private:
 	UPROPERTY()
 	FInstanceContainerData instanceContainerData;
 
-	UPROPERTY()
-	int32 maxItemCount = 10;
+	// Debug helper data TODO find a better way to do this
+		TArray<FItemDataPair>  lastUpdatedItems;
 };

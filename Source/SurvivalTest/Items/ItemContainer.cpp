@@ -134,6 +134,8 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 		}
 	}
 
+	UpdateDebugItemsList();
+
 	if (itemAdded)
 	{
 		OnItemAdded.Broadcast(itemToAdd);
@@ -222,6 +224,16 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 	return GetNextEmptySlot();
 }
 
+void UItemContainer::UpdateDebugItemsList()
+{
+	 TArray<FInstanceItemData> data = GetGame()->GetInventoryItems(instanceContainerData.ID);
+	 lastUpdatedItems.Empty();
+
+	 for (FInstanceItemData iid : data) {
+		 lastUpdatedItems.Add(FItemDataPair(iid, GetGame()->GetItemData(iid.itemID)));
+	 }
+}
+
 /* This will reduce the an items amount by the given item if found */
 bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 {
@@ -264,6 +276,7 @@ bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 	}
 
 	OnItemRemoved.Broadcast(itemToRemove);
+	UpdateDebugItemsList();
 
 	if (itemToRemove.amount == 0)
 	{

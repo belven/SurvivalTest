@@ -122,6 +122,8 @@ protected:
 	bool inCombat;
 	virtual void BeginPlay() override;
 	void SetupLoadout();
+	int32 GetSlotForGear(EGearType type);
+	void CreateNewItemForInventory(int32 armourID, EGearType type);
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
 
 	UPROPERTY()

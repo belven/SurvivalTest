@@ -28,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		TArray<UItemContainer*> GetContainers();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		UItemContainer* GetPlayerInventory();
 private:
 	UPROPERTY()
 		ABasePlayerController* controller;

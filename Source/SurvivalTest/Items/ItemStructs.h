@@ -174,6 +174,7 @@ enum class EContainerType : uint8
 {
 	Box,
 	Armour,
+	Player,
 	End
 };
 

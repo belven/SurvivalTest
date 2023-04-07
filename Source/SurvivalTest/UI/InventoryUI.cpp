@@ -19,3 +19,8 @@ TArray<UItemContainer*> UInventoryUI::GetContainers()
 	}
 	return containers;
 }
+
+UItemContainer* UInventoryUI::GetPlayerInventory()
+{
+	return GetController()->GetBaseCharacter()->GetInventory();
+}
