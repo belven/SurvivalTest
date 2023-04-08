@@ -50,6 +50,15 @@ FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inI
 
 void UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData data)
 {
+	//FItemData id = game->GetItemData(data.itemID);
+
+	//if(id.type == EItemType::Armour)
+	//{
+	//	FInstanceArmourData iad = game->GetInstancedArmourByContainerID(data.containerInstanceID);
+	//	//iad.containerInstanceID = GetInstanceContainerData().ID;
+	//	game->AddUpdateData(iad);
+	//}
+
 	data.containerInstanceID = GetInstanceContainerData().ID;
 	game->AddUpdateData(data);
 
@@ -68,7 +77,6 @@ int32 UItemContainer::GetNextSlotForItem(int32 itemID)
 * else it will create a new item with the remaining amount and set the one found to StackSize
 *
 *@param ids the list of new InstanceItemData ids created in the database
-*@param itemToAdd the items to add to the inventory, typically only item creation will run this method, for instance, when first creating items from a loot box
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */

@@ -81,7 +81,7 @@ int32 UBaseGameInstance::GetNextInstanceArmourDataID()
 	int32 instanceArmourDataID = 0;
 	if (GetInstancedArmour().Num() > 0)
 	{
-		instanceArmourDataID = GetInstancedArmour()[GetInstancedArmour().Num() - 1].ID + 1;
+		instanceArmourDataID = GetInstancedArmour().FindChecked(GetInstancedArmour().Num() - 1).ID + 1;
 	}
 	return instanceArmourDataID;
 }
