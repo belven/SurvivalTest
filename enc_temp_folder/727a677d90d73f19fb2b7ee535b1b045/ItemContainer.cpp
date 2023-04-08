@@ -35,6 +35,19 @@ bool UItemContainer::HasSpace(FInstanceItemData item)
 	return item.GetRemainingSpace(GetGame()->GetItemData(item.itemID).maxStack) > 0;
 }
 
+FInstanceItemData UItemContainer::GetItemAtSlot(int32 slot)
+{
+	FInstanceItemData id;
+
+	for (FInstanceItemData item : GetItems())
+	{
+		if (item.slot == slot)
+			return id;
+	}
+
+	return id;
+}
+
 FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inItem)
 {
 	for (FInstanceItemData item : GetItems())
@@ -48,35 +61,36 @@ FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inI
 	return FInstanceItemData();
 }
 
-void UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData data)
+void UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData data, int32 droppedSlot)
 {
-	//FItemData id = game->GetItemData(data.itemID);
+	if (HasSpace())
+	{
+		data.slot = droppedSlot;
+		FInstanceItemData existingItem = GetItemAtSlot(data.slot);
 
-	//if(id.type == EItemType::Armour)
-	//{
-	//	FInstanceArmourData iad = game->GetInstancedArmourByContainerID(data.containerInstanceID);
-	//	//iad.containerInstanceID = GetInstanceContainerData().ID;
-	//	game->AddUpdateData(iad);
-	//}
+		if (existingItem.ID != UItemStructs::InvalidInt)
+			data.slot = GetNextSlotForItem(data.itemID);
 
-	data.containerInstanceID = GetInstanceContainerData().ID;
-	game->AddUpdateData(data);
+		data.containerInstanceID = GetInstanceContainerData().ID;
+		game->AddUpdateData(data);
 
-	other->OnItemRemoved.Broadcast(data);
-	OnItemAdded.Broadcast(data);
-	UpdateDebugItemsList();
+		other->OnItemRemoved.Broadcast(data);
+		OnItemAdded.Broadcast(data);
+		UpdateDebugItemsList();
+	}
 }
 
 int32 UItemContainer::GetNextSlotForItem(int32 itemID)
 {
 	EGearType gearType = GetGame()->GetGearTypeForItem(itemID);
-	return  gearType != EGearType::End ? FindNextEmptyValidSlot(gearType) : GetNextEmptySlot();;
+	return gearType != EGearType::End ? FindNextEmptyValidSlot(gearType) : GetNextEmptySlot();;
 }
 
 /** Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
 * else it will create a new item with the remaining amount and set the one found to StackSize
 *
 *@param ids the list of new InstanceItemData ids created in the database
+*@param itemToAdd the items to add to the inventory, typically only item creation will run this method, for instance, when first creating items from a loot box
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
@@ -92,7 +106,8 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 		const int32 stackSize = GetItemStackSize(itemToAdd.itemID);
 		if (itemToAdd.amount == stackSize)
 		{
-			if (emptySlot != UItemStructs::InvalidInt) {
+			if (emptySlot != UItemStructs::InvalidInt)
+			{
 				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
 				newItem.amount = itemToAdd.amount;
 				game->AddUpdateData(newItem);
@@ -122,7 +137,8 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 				// Get the next slot, taking into account invalid slot locations
 				emptySlot = GetNextSlotForItem(itemToAdd.itemID);
 
-				if (emptySlot != UItemStructs::InvalidInt) {
+				if (emptySlot != UItemStructs::InvalidInt)
+				{
 					// Make a new item
 					FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
 					newItem.amount = 0;
@@ -166,7 +182,7 @@ TArray<int32> UItemContainer::GetEmptySlots()
 
 bool UItemContainer::HasSpace()
 {
-	 return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < containerData.slots; 
+	return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < containerData.slots;
 }
 
 /* Searches through all current items and checks for an available validSlots, if any*/
@@ -234,12 +250,13 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 
 void UItemContainer::UpdateDebugItemsList()
 {
-	 TArray<FInstanceItemData> data = GetGame()->GetInventoryItems(instanceContainerData.ID);
-	 lastUpdatedItems.Empty();
+	TArray<FInstanceItemData> data = GetGame()->GetInventoryItems(instanceContainerData.ID);
+	lastUpdatedItems.Empty();
 
-	 for (FInstanceItemData iid : data) {
-		 lastUpdatedItems.Add(FItemDataPair(iid, GetGame()->GetItemData(iid.itemID)));
-	 }
+	for (FInstanceItemData iid : data)
+	{
+		lastUpdatedItems.Add(FItemDataPair(iid, GetGame()->GetItemData(iid.itemID)));
+	}
 }
 
 /* This will reduce the an items amount by the given item if found */

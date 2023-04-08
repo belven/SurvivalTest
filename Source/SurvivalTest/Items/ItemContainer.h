@@ -61,13 +61,16 @@ public:
 	void UpdateDebugItemsList();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void TransferItem(UItemContainer* other, FInstanceItemData data);
+	void TransferItem(UItemContainer* other, FInstanceItemData data, int32 droppedSlot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	TArray<FInstanceItemData> GetItems() { return game->GetInstancedItemsForContainer(instanceContainerData.ID); }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	bool HasSpace(FInstanceItemData item);
+
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+	FInstanceItemData GetItemAtSlot(int32 slot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
