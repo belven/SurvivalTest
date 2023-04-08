@@ -111,7 +111,6 @@ void ABaseCharacter::CreateNewItemForInventory(int32 armourID, EGearType type)
 	id.amount = 1;
 	id.slot = GetSlotForGear(type);
 	inventory->AddItem(id, ids);
-
 	EquipArmour(UArmourCreator::CreateArmour(armourID, GetWorld(), ids[0]));
 }
 
@@ -225,6 +224,16 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		AddInteractable(Cast<IInteractable>(OtherActor));
 	}
+}
+
+void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
+{
+	OnContainersUpdated.Broadcast();
+}
+
+void ABaseCharacter::ItemRemoved(FInstanceItemData inItem)
+{
+	OnContainersUpdated.Broadcast();
 }
 
 void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)

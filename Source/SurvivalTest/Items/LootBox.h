@@ -23,6 +23,12 @@ public:
 	virtual void Highlight(bool activate) override;
 	FInstanceItemData CreateLoot(FItemData id);
 
+	UFUNCTION()
+		void ItemAdded(FInstanceItemData inItem);
+
+	UFUNCTION()
+		void ItemRemoved(FInstanceItemData inItem);
+
 protected:
 	virtual void BeginPlay() override;
 

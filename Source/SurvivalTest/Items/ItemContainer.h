@@ -23,8 +23,11 @@ USTRUCT(BlueprintType)
 struct FItemDataPair
 {
 	GENERATED_USTRUCT_BODY()
+
 public:
-	FItemDataPair() {}
+	FItemDataPair()
+	{
+	}
 
 	FItemDataPair(const FInstanceItemData& inIid, const FItemData& inID)
 		: id(inID),
@@ -46,11 +49,19 @@ public:
 
 	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame);
 
-	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void DataTableChanged();
 	FString GetItemName(int32 itemID);
 	int32 GetNextItemID();
 	int32 GetItemStackSize(int32 itemID);
+	int32 GetNextSlotForItem(int32 itemID);
+	TArray<int32> GetEmptySlots();
+	bool HasSpace();
+	void RemoveFilledSlots(TArray<int32>& slots);
+	bool IsValidForSlot(int32 slot, EGearType inType);
+	int32 FindNextEmptyValidSlot(EGearType inType);
+	void UpdateDebugItemsList();
+
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
+	void TransferItem(UItemContainer* other, FInstanceItemData data);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	TArray<FInstanceItemData> GetItems() { return game->GetInstancedItemsForContainer(instanceContainerData.ID); }
@@ -60,14 +71,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
-	void TransferItem(UItemContainer other, FInstanceItemData data);
-	int32 GetNextSlotForItem(int32 itemID);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData AddItem(FInstanceItemData itemToAdd, TArray<int32>& ids);
-
-	TArray<int32> GetEmptySlots();
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	bool RemoveItem(FInstanceItemData itemToRemove);
 
@@ -76,14 +83,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetMaxItemCount() { return containerData.slots; }
-
-	bool HasSpace();
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetNextEmptySlot();
-
-	void RemoveFilledSlots(TArray<int32>& slots);
-
+	
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 	FItemRemoved OnItemRemoved;
 
@@ -108,10 +111,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	UBaseGameInstance* GetGame() { return game; }
 
-	bool IsValidForSlot(int32 slot, EGearType inType);
-	int32 FindNextEmptyValidSlot(EGearType inType);
-
-	void UpdateDebugItemsList();
 private:
 	UPROPERTY()
 	TMap<EGearType, FValidSlots> validSlots;
@@ -126,5 +125,5 @@ private:
 	FInstanceContainerData instanceContainerData;
 
 	// Debug helper data TODO find a better way to do this
-		TArray<FItemDataPair>  lastUpdatedItems;
+	TArray<FItemDataPair> lastUpdatedItems;
 };

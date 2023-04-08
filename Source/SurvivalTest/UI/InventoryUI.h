@@ -7,7 +7,7 @@
 class UBaseGameInstance;
 class ABasePlayerController;
 
-UCLASS()
+UCLASS(Blueprintable)
 class SURVIVALTEST_API UInventoryUI : public UUserWidget
 {
 	GENERATED_BODY()

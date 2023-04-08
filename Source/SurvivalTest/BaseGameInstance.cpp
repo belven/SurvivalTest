@@ -198,6 +198,18 @@ FProjectileWeaponData UBaseGameInstance::GetProjectileWeaponData(int32 rangedWea
 	return {};
 }
 
+FInstanceArmourData UBaseGameInstance::GetInstancedArmourByContainerID(int32 inContainerInstanceID)
+{
+	for (auto& ad : GetInstancedArmour())
+	{
+		if (ad.Value.containerInstanceID == inContainerInstanceID)
+		{
+			return ad.Value;
+		}
+	}
+	return {};
+}
+
 
 FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 {
@@ -386,7 +398,19 @@ EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)
  * @param inData The data we're adding or updating, it will match on ID of the data
  *
  */
-void UBaseGameInstance::AddUpdateInstanceItemData(const FInstanceItemData& inData)
+void UBaseGameInstance::AddUpdateData(const FInstanceArmourData& inData)
+{
+	GetInstancedArmour().Add(inData.ID, inData);
+}
+
+
+/**
+ * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
+ *
+ * @param inData The data we're adding or updating, it will match on ID of the data
+ *
+ */
+void UBaseGameInstance::AddUpdateData(const FInstanceItemData& inData)
 {
 	GetInstancedItems().Add(inData.ID, inData);
 }

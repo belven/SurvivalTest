@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Items/ItemStructs.h"
 #include "BasePlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);

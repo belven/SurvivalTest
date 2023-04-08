@@ -15,10 +15,6 @@ UItemContainer* UItemContainer::CreateItemContainer(FContainerData inContainerDa
 	return ic;
 }
 
-void UItemContainer::DataTableChanged()
-{
-}
-
 FString UItemContainer::GetItemName(int32 itemID)
 {
 	return GetGame()->GetItemData(itemID).name;
@@ -52,11 +48,22 @@ FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inI
 	return FInstanceItemData();
 }
 
-void UItemContainer::TransferItem(UItemContainer other, FInstanceItemData data)
+void UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData data)
 {
-	TArray<int32> ids;
-	other.AddItem(data, ids);
-	game->AddUpdateInstanceItemData(data);
+	FItemData id = game->GetItemData(data.itemID);
+
+	if(id.type == EItemType::Armour)
+	{
+		FInstanceArmourData iad = game->GetInstancedArmourByContainerID(data.containerInstanceID);
+		iad.containerInstanceID = GetInstanceContainerData().ID;
+		game->AddUpdateData(iad);
+	}
+
+	data.containerInstanceID = GetInstanceContainerData().ID;
+	game->AddUpdateData(data);
+
+	other->OnItemRemoved.Broadcast(data);
+	OnItemAdded.Broadcast(data);
 }
 
 int32 UItemContainer::GetNextSlotForItem(int32 itemID)
@@ -87,7 +94,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 			if (emptySlot != UItemStructs::InvalidInt) {
 				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
 				newItem.amount = itemToAdd.amount;
-				game->AddUpdateInstanceItemData(newItem);
+				game->AddUpdateData(newItem);
 				ids.Add(newItem.ID);
 				itemToAdd.amount = 0;
 				itemAdded = true;
@@ -122,7 +129,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 
 					// Add the new item
 					ids.Add(newItem.ID);
-					game->AddUpdateInstanceItemData(newItem);
+					game->AddUpdateData(newItem);
 					itemAdded = true;
 				}
 				// We found no more valid slots for the item
@@ -273,9 +280,9 @@ bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 		{
 			game->GetInstancedItems().Remove(ii.ID);
 		}
+		OnItemRemoved.Broadcast(itemToRemove);
 	}
 
-	OnItemRemoved.Broadcast(itemToRemove);
 	UpdateDebugItemsList();
 
 	if (itemToRemove.amount == 0)

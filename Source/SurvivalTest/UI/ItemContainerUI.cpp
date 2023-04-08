@@ -27,6 +27,13 @@ int32 UItemContainerUI::GetRow()
 	return   nearestRow / itemsPerRow;
 }
 
+void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
+{
+	container = inContainer;
+	container->OnItemRemoved.AddUniqueDynamic(this, &UItemContainerUI::ItemRemoved);
+	container->OnItemAdded.AddUniqueDynamic(this, &UItemContainerUI::ItemAdded);
+}
+
 FString UItemContainerUI::GetContainerName()
 {
 	return GetBaseGameInstance()->GetInstancedContainers().FindChecked(container->GetInstanceContainerData().ID).name;
@@ -51,4 +58,14 @@ UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData da
 
 	UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd, gameInstance);
 	return ic;
+}
+
+void UItemContainerUI::ItemAdded(FInstanceItemData inItem)
+{
+	GenerateInventory();
+}
+
+void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
+{
+	GenerateInventory();
 }

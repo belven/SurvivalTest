@@ -1,9 +1,11 @@
 #include "ItemUI.h"
+#include "SurvivalTest/Items/ItemContainer.h"
 
-void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemData)
+void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemData, UItemContainer* inItemContainer)
 {
 	SetItemData(inItemData);
 	SetInstanceItemData(inInstanceData);
+	SetItemContainer(inItemContainer);
 	UpdateItemDetails();
 }
 

@@ -6,7 +6,7 @@
 
 class UBaseGameInstance;
 
-UCLASS()
+UCLASS(Blueprintable)
 class SURVIVALTEST_API UItemContainerUI : public UUserWidget
 {
 	GENERATED_BODY()
@@ -43,7 +43,7 @@ public:
 		UItemContainer* GetItemContainer() const { return container; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetItemContainer(UItemContainer* inContainer) { container = inContainer; }
+		void SetItemContainer(UItemContainer* inContainer);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UBaseGameInstance* GetBaseGameInstance() const { return gameInstance; }
@@ -56,6 +56,12 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UItemContainer* GetItemContainerForArmour(FInstanceItemData data);
+
+	UFUNCTION()
+		void ItemAdded(FInstanceItemData inItem);
+
+	UFUNCTION()
+		void ItemRemoved(FInstanceItemData inItem);
 
 private:
 	UPROPERTY()

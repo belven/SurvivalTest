@@ -4,34 +4,44 @@
 #include <SurvivalTest/Items/ItemStructs.h>
 #include "ItemUI.generated.h"
 
-UCLASS()
+class UItemContainer;
+
+UCLASS(Blueprintable)
 class SURVIVALTEST_API UItemUI : public UUserWidget
 {
 	GENERATED_BODY()
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemData);
+	void UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemData, UItemContainer* inItemContainer);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		void UpdateItemDetails();
+	void UpdateItemDetails();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UTexture2D* GetItemIcon();
-
-		UFUNCTION(BlueprintCallable, Category = "Inventory")
-		FItemData GetItemData() const { return itemData; }
+	UTexture2D* GetItemIcon();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetItemData(FItemData inItemData) { itemData = inItemData; }
+	FItemData GetItemData() const { return itemData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		FInstanceItemData GetInstanceItemData() const { return instanceItemData; }
+	void SetItemData(FItemData inItemData) { itemData = inItemData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetInstanceItemData(FInstanceItemData inInstanceItemData) { instanceItemData = inInstanceItemData; }
+	FInstanceItemData GetInstanceItemData() const { return instanceItemData; }
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SetInstanceItemData(FInstanceItemData inInstanceItemData) { instanceItemData = inInstanceItemData; }
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		UItemContainer* GetItemContainer() const { return itemContainer; }
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SetItemContainer(UItemContainer* inItemContainer) { itemContainer = inItemContainer; }
 
 private:
-		FItemData itemData;
-		FInstanceItemData instanceItemData;
-
+	UPROPERTY()
+		UItemContainer* itemContainer;
+	FItemData itemData;
+	FInstanceItemData instanceItemData;
 };
