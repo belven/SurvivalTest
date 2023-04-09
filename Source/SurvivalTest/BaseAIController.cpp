@@ -14,6 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Missions/PatrolPath.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -38,8 +39,8 @@ ABaseAIController::ABaseAIController() : Super()
 		FindWeaponLocationQuery = playerLocationQuery.Object;
 	}
 
-	//currentPath = NULL;
-	//currentPathPoint = 0;
+	currentPath = NULL;
+	currentPathPoint = 0;
 }
 
 void ABaseAIController::LookAt(FVector lookAtLocation)
@@ -157,54 +158,54 @@ void ABaseAIController::Tick(float DeltaTime)
 	}
 }
 
-//void ABaseAIController::Patrol()
-//{
-//	// Check if we aren't moving or we have an invalid Path
-//	// (the currentPathPoint is set to -1 when we didn't find any patrol paths in the world)
-//	if(GetPathFollowingComponent()->GetStatus() != EPathFollowingStatus::Moving && currentPathPoint > -1)
-//	{
-//		// Do we already have a patrol path
-//		if(currentPath == NULL)
-//		{
-//			// Get the first patrol path from the game instance
-//			currentPath = GameInstance(GetWorld())->paths[0];
-//
-//			// Check if the path is valid
-//			if(currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
-//			{
-//				currentPath = NULL;
-//
-//				// Set path point to -1, as there aren't any valid patrol paths and we don't keep checking every tick
-//				currentPathPoint = -1;
-//			}
-//			else
-//			{
-//				currentPathPoint = 0;				
-//			}
-//		}
-//
-//		if (currentPath != NULL)
-//		{
-//			// Get the spline of the patrol path
-//			const USplineComponent* spline = currentPath->GetSpline();
-//
-//			// Ensure the path point doesn't exceed the amount of points
-//			if(currentPathPoint > spline->GetNumberOfSplinePoints() - 1)
-//			{
-//				currentPathPoint = 0;
-//			}
-//
-//			// Get the next spline point to move to
-//			const FVector loc = spline->GetLocationAtSplinePoint(currentPathPoint, ESplineCoordinateSpace::World);
-//
-//			// Move to the spline point
-//			MoveToLocation(loc);
-//
-//			// Increment the path point, to move onto the next one
-//			currentPathPoint++;
-//		}
-//	}
-//}
+void ABaseAIController::Patrol()
+{
+	// Check if we aren't moving or we have an invalid Path
+	// (the currentPathPoint is set to -1 when we didn't find any patrol paths in the world)
+	if(GetPathFollowingComponent()->GetStatus() != EPathFollowingStatus::Moving && currentPathPoint > -1)
+	{
+		// Do we already have a patrol path
+		if(currentPath == NULL)
+		{
+			// Get the first patrol path from the game instance
+			currentPath = GameInstance(GetWorld())->paths[0];
+
+			// Check if the path is valid
+			if(currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
+			{
+				currentPath = NULL;
+
+				// Set path point to -1, as there aren't any valid patrol paths and we don't keep checking every tick
+				currentPathPoint = -1;
+			}
+			else
+			{
+				currentPathPoint = 0;				
+			}
+		}
+
+		if (currentPath != NULL)
+		{
+			// Get the spline of the patrol path
+			const USplineComponent* spline = currentPath->GetSpline();
+
+			// Ensure the path point doesn't exceed the amount of points
+			if(currentPathPoint > spline->GetNumberOfSplinePoints() - 1)
+			{
+				currentPathPoint = 0;
+			}
+
+			// Get the next spline point to move to
+			const FVector loc = spline->GetWorldLocationAtSplinePoint(currentPathPoint);
+
+			// Move to the spline point
+			MoveToLocation(loc);
+
+			// Increment the path point, to move onto the next one
+			currentPathPoint++;
+		}
+	}
+}
 
 void ABaseAIController::KillAI()
 {

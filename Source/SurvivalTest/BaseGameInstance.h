@@ -19,6 +19,7 @@ class ULoadoutTableData;
 class UFactionManager;
 class URPGEventManager;
 class UContainerTableData;
+class APatrolPath;
 
 UCLASS()
 class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
@@ -67,6 +68,7 @@ public:
 	void AddUpdateData(const FInstanceArmourData& inData);
 	void AddUpdateData(const FInstanceItemData& inData);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
+	FString GetContainerInstanceName(int32 containerID);
 
 	static TArray<FString> CleanData(TArray<FString> strings);
 
@@ -81,6 +83,8 @@ public:
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
+
+	TArray<APatrolPath*> paths;
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;

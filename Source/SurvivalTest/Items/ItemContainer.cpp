@@ -35,6 +35,11 @@ bool UItemContainer::HasSpace(FInstanceItemData item)
 	return item.GetRemainingSpace(GetGame()->GetItemData(item.itemID).maxStack) > 0;
 }
 
+
+/**
+ *
+ *
+ */
 FInstanceItemData UItemContainer::GetItemAtSlot(int32 slot)
 {
 	FInstanceItemData id;
@@ -63,27 +68,57 @@ FInstanceItemData UItemContainer::GetExistingItemWithSpace(FInstanceItemData inI
 
 void UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData data, int32 droppedSlot)
 {
+	// Can't move items if we don't have space
+	// TODO need to change this to check for adding parts of items, such as resources
 	if (HasSpace())
 	{
-		data.slot = droppedSlot;
-		FInstanceItemData existingItem = GetItemAtSlot(data.slot);
+		// Get the item, if any, at the slot we've dropped the item onto
+		FInstanceItemData existingItem = GetItemAtSlot(droppedSlot);
 
+		// If the ID isn't -1, then we have an item in the slot
 		if (existingItem.ID != UItemStructs::InvalidInt)
-			data.slot = GetNextSlotForItem(data.itemID);
+		{
+			data.slot = GetNextEmptySlotForItem(data.itemID);
+		}
+		// If the ID is -1, then we don't have an item in the slot
+		else
+		{
+			data.slot = droppedSlot;
+		}
 
-		data.containerInstanceID = GetInstanceContainerData().ID;
-		game->AddUpdateData(data);
+		// If we found a valid slot then transfer the item
+		if (data.slot != UItemStructs::InvalidInt)
+		{
+			// Set the containerInstanceID to this container, this will move the item to belong to us
+			data.containerInstanceID = GetInstanceContainerData().ID;
 
-		other->OnItemRemoved.Broadcast(data);
-		OnItemAdded.Broadcast(data);
-		UpdateDebugItemsList();
+			// Update the data in the database
+			game->AddUpdateData(data);
+
+			// Tell our listeners that we've made changes, so things like UI can be updated
+			other->OnItemRemoved.Broadcast(data);
+			OnItemAdded.Broadcast(data);
+			UpdateDebugItemsList();
+		}
 	}
 }
 
-int32 UItemContainer::GetNextSlotForItem(int32 itemID)
+/**
+ * Gets the next slot for an item, taking into account the possibility of it having a EGearType,
+ * and therefore possibly being invalid for our inventory. E.g. a weapon might not going into a rucksack, or bullets in a medical case
+ *
+ *@param itemID the ID of the FItemData we want to check
+ *
+ *@return The next valid empty slot found, if any. 
+ */
+int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 {
+	// Get the slot that the gear should go into, gear type is things like Legs, chest, primary weapon and bag
 	EGearType gearType = GetGame()->GetGearTypeForItem(itemID);
-	return gearType != EGearType::End ? FindNextEmptyValidSlot(gearType) : GetNextEmptySlot();;
+
+	// If the gear type isn't End, then we found a slot for the item type, therefore we need to see if we have valid slots for the item
+	// Otherwise, we found no gear type and can simply add the item to the next empty slot
+	return gearType != EGearType::End ? FindNextEmptyValidSlot(gearType) : GetNextEmptySlot();
 }
 
 /** Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
@@ -101,7 +136,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 	// Are we adding a whole item, i.e. an item that is at it's max stack size? If so, just add it
 	if (HasSpace())
 	{
-		int32 emptySlot = GetNextSlotForItem(itemToAdd.itemID);
+		int32 emptySlot = GetNextEmptySlotForItem(itemToAdd.itemID);
 
 		const int32 stackSize = GetItemStackSize(itemToAdd.itemID);
 		if (itemToAdd.amount == stackSize)
@@ -135,7 +170,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 			while (itemToAdd.amount > 0 && HasSpace())
 			{
 				// Get the next slot, taking into account invalid slot locations
-				emptySlot = GetNextSlotForItem(itemToAdd.itemID);
+				emptySlot = GetNextEmptySlotForItem(itemToAdd.itemID);
 
 				if (emptySlot != UItemStructs::InvalidInt)
 				{
@@ -185,7 +220,11 @@ bool UItemContainer::HasSpace()
 	return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < containerData.slots;
 }
 
-/* Searches through all current items and checks for an available validSlots, if any*/
+/**
+ *Searches through all current items and checks for an available validSlots, if any
+ *
+ * @return The zero indexed slot found, with no items stored OR UItemStructs::InvalidInt, if none is found
+ */
 int32 UItemContainer::GetNextEmptySlot()
 {
 	TArray<int32> slotsLeft = GetEmptySlots();
@@ -198,6 +237,12 @@ int32 UItemContainer::GetNextEmptySlot()
 	return UItemStructs::InvalidInt;
 }
 
+/**
+ *Helper method that loops through our items and removes slots from the list, for existing items in that slot.
+ *
+ *@param slots The slot positions you want to remove if they are full
+ *
+ */
 void UItemContainer::RemoveFilledSlots(TArray<int32>& slots)
 {
 	for (FInstanceItemData iid : GetItems())
@@ -206,20 +251,40 @@ void UItemContainer::RemoveFilledSlots(TArray<int32>& slots)
 	}
 }
 
+/**
+ *Checks through validSlots, to see if the slot we're checking, is a valid location to store an item of a specific gear type
+ *Don't want to store guns in a medical case etc.
+ *
+ *@param slot The slot we're checking
+ *@param inType the gear type 
+ *
+ *@return True if the slot chosen can support the type of gear
+ */
 bool UItemContainer::IsValidForSlot(int32 slot, EGearType inType)
 {
+	// Do we have any valid slots set?
 	if (validSlots.Num() > 0)
 	{
+		// Get the array of valid slots based on the gear type
 		FValidSlots* slots = validSlots.Find(inType);
+
+		// Check the valid slots found, if any, and return true if the slot we're checking is valid for that type of gear
 		if (slots && slots->validSlots.Contains(slot))
 		{
 			return true;
 		}
+
+		// Either there were no slots defined for that gear type or no valid slots were found for the gear type at all
 		return false;
 	}
+
+	// If we have no validSlots, then all slots are considered valid. It's easier to assume all good, as most containers will allow everything 
 	return true;
 }
 
+/**
+ *
+ */
 int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 {
 	// Do we have any valid slots defined?
@@ -238,6 +303,7 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 			}
 		}
 
+		// Return the first empty slot
 		if (emptySlots.Num() > 0)
 		{
 			return emptySlots[0];
@@ -245,6 +311,8 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 
 		return UItemStructs::InvalidInt;
 	}
+
+	// If there are no valid slots defined just get the next empty slot
 	return GetNextEmptySlot();
 }
 
@@ -259,8 +327,15 @@ void UItemContainer::UpdateDebugItemsList()
 	}
 }
 
-/* This will reduce the an items amount by the given item if found */
-bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
+/**
+ *This will reduce the an items amount by the given item if found
+ *
+ *@param itemToRemove The item type and amount to remove.
+ *The amount could be more than the stack size, if we're removing a lot of items at once
+ *
+ *@return The itemToRemove with the new amount, in case any are left over
+ */
+FInstanceItemData UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 {
 	TArray<FInstanceItemData> itemsToRemove;
 
@@ -292,8 +367,10 @@ bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 		}
 	}
 
+	// Do we have items to remove?
 	if (itemsToRemove.Num() > 0)
 	{
+		// Remove item data from the database
 		for (FInstanceItemData ii : itemsToRemove)
 		{
 			game->GetInstancedItems().Remove(ii.ID);
@@ -302,21 +379,23 @@ bool UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 	}
 
 	UpdateDebugItemsList();
-
-	if (itemToRemove.amount == 0)
-	{
-		return true;
-	}
-	return false;
+	
+	return itemToRemove;
 }
 
-/* Returns the total amount of items for the given id */
-int32 UItemContainer::GetItemAmount(int32 id)
+/**
+ *Returns the total amount of items for the given item ID
+ *
+ *@param itemID the ID of the item type to look for
+ *
+ *@return The amount of items found, if any, of the type of item
+ */
+int32 UItemContainer::GetItemAmount(int32 itemID)
 {
 	int32 total = 0;
 	for (FInstanceItemData item : GetItems())
 	{
-		if (item.itemID == id)
+		if (item.itemID == itemID)
 		{
 			total += item.amount;
 		}

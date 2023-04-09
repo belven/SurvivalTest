@@ -12,6 +12,7 @@
 #include "Tables/ProjectileWeaponDataTable.h"
 #include "Tables/RangedWeaponDataTable.h"
 #include "Tables/WeaponDataTable.h"
+#include "Missions/PatrolPath.h"
 
 UBaseGameInstance::UBaseGameInstance()
 {
@@ -210,6 +211,11 @@ FInstanceArmourData UBaseGameInstance::GetInstancedArmourByContainerID(int32 inC
 	return {};
 }
 
+FString UBaseGameInstance::GetContainerInstanceName(int32 containerID)
+{
+	return GetInstancedContainers().FindChecked(containerID).name;
+}
+
 
 FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 {
@@ -228,8 +234,7 @@ FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 	return GetContainerData()->GetData().FindChecked(containerID);
 }
 
-FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot,
-                                                           int32 containerInstanceID)
+FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID)
 {
 	FInstanceItemData data;
 	data.ID = GetNextInstanceItemDataID();
@@ -385,9 +390,7 @@ EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)
 	}
 	else if (id.type == EItemType::Weapon)
 	{
-
 	}
-
 
 	return EGearType::End;
 }

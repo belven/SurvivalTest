@@ -52,7 +52,7 @@ public:
 	FString GetItemName(int32 itemID);
 	int32 GetNextItemID();
 	int32 GetItemStackSize(int32 itemID);
-	int32 GetNextSlotForItem(int32 itemID);
+	int32 GetNextEmptySlotForItem(int32 itemID);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
 	void RemoveFilledSlots(TArray<int32>& slots);
@@ -79,10 +79,10 @@ public:
 	FInstanceItemData AddItem(FInstanceItemData itemToAdd, TArray<int32>& ids);
 	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	bool RemoveItem(FInstanceItemData itemToRemove);
+	FInstanceItemData RemoveItem(FInstanceItemData itemToRemove);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	int32 GetItemAmount(int32 id);
+	int32 GetItemAmount(int32 itemID);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetMaxItemCount() { return containerData.slots; }

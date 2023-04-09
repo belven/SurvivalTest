@@ -1,4 +1,3 @@
-
 #pragma once
 #include "CoreMinimal.h"
 #include "AIController.h"
@@ -11,7 +10,7 @@ class ABaseCharacter;
 class IDamagable;
 class UAISenseConfig_Sight;
 class UEnvQuery;
-//class APatrolPath;
+class APatrolPath;
 
 #define mAsBaseCharacter(character) Cast<ABaseCharacter>(character)
 
@@ -19,17 +18,18 @@ UCLASS()
 class SURVIVALTEST_API ABaseAIController : public AAIController, public IEventListener
 {
 	GENERATED_BODY()
+
 public:
 	ABaseAIController();
 
 	UFUNCTION()
-		void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
+	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 	void MoveToCombatLocation();
 
 	virtual void Tick(float DeltaTime) override;
-	//void Patrol();
+	void Patrol();
 	void KillAI();
 	void CalculateCombat();
 	void AttackLocation(FVector FireDirection);
@@ -40,29 +40,29 @@ public:
 
 	FVector GetLastKnowLocation() { return lastKnowLocation; }
 
-	IDamagable* GetTarget() { return  target; }
+	IDamagable* GetTarget() { return target; }
 
 	ABaseCharacter* GetBaseCharacter() { return AICharacter; }
+
 private:
 	IDamagable* target;
 	FVector lastKnowLocation;
 	bool canSee = false;
 
 	UPROPERTY()
-		UAISenseConfig_Sight* sightConfig;
+	UAISenseConfig_Sight* sightConfig;
 
 	UPROPERTY()
-		ABaseCharacter* AICharacter;
+	ABaseCharacter* AICharacter;
 
 	UPROPERTY()
-		UEnvQuery* FindWeaponLocationQuery;
+	UEnvQuery* FindWeaponLocationQuery;
 
 	UPROPERTY()
-		FEnvQueryRequest FindViableCombatLocationRequest;
+	FEnvQueryRequest FindViableCombatLocationRequest;
 
-	/*UPROPERTY()
-		 APatrolPath* currentPath;
+	UPROPERTY()
+	APatrolPath* currentPath;
 
 	int32 currentPathPoint;
-*/
 };
