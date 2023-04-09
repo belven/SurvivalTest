@@ -21,30 +21,33 @@ void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UAr
 	// Get Armour Data by ItemID
 	FArmourData armourData = game->GetArmourDataByItemID(itemID);
 	FItemData id = game->GetItemData(itemID);
-
-	// Create a new instance of container
-	// Get the next ID from the table
-	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
-
-	FInstanceContainerData icd;
-	icd.ID = instanceContainerDataID;
-	icd.containerID = armourData.containerID;
-	icd.type = EContainerType::Armour;
-	icd.name = id.name;
-	game->GetInstancedContainers().Add(icd.ID, icd);
-
-	// Create a new Armour instance based on the container instance
-	int32 armourContainerDataID = game->GetNextInstanceArmourDataID();
-
-	FInstanceArmourData acd;
-	acd.ID = armourContainerDataID;
-	acd.armourID = armourData.ID;
-	acd.containerInstanceID = icd.ID;
-	acd.instancedItemDataID = instanceItemDataID;
-	game->GetInstancedArmour().Add(acd.ID, acd);
-
 	armour->SetData(armourData);
-	armour->SetItemData(game->GetItemData(itemID));
-	armour->SetInstanceItemData(icd);
-	armour->SetInstanceArmourData(acd);
+	armour->SetItemData(id);
+	FContainerData cd = game->GetContainerDataByID(armourData.containerID);
+
+	if (cd.slots > 0) {
+		// Create a new instance of container
+		// Get the next ID from the table
+		int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
+
+		FInstanceContainerData icd;
+		icd.ID = instanceContainerDataID;
+		icd.containerID = armourData.containerID;
+		icd.type = EContainerType::Armour;
+		icd.name = id.name;
+		game->GetInstancedContainers().Add(icd.ID, icd);
+
+		// Create a new Armour instance based on the container instance
+		int32 armourContainerDataID = game->GetNextInstanceArmourDataID();
+
+		FInstanceArmourData acd;
+		acd.ID = armourContainerDataID;
+		acd.armourID = armourData.ID;
+		acd.containerInstanceID = icd.ID;
+		acd.instancedItemDataID = instanceItemDataID;
+		game->AddUpdateData(acd);
+
+		armour->SetInstanceItemData(icd);
+		armour->SetInstanceArmourData(acd);
+	}
 }

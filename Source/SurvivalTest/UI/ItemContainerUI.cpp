@@ -23,8 +23,8 @@ int32 UItemContainerUI::GetRow()
 {
 	int32 itemsPerRow = 5;
 	int32 rowMod = index % itemsPerRow;
-	int32 nearestRow = index - rowMod;	
-	return   nearestRow / itemsPerRow;
+	int32 nearestRow = index - rowMod;
+	return nearestRow / itemsPerRow;
 }
 
 void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
@@ -42,22 +42,28 @@ FString UItemContainerUI::GetContainerName()
 UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData data)
 {
 	FInstanceArmourData iadFound;
-	TArray<FInstanceArmourData> armour;
-	gameInstance->GetInstancedArmour().GenerateValueArray(armour);
+	FArmourData ad = GetBaseGameInstance()->GetArmourDataByItemID(data.itemID);
+	FContainerData cd = GetBaseGameInstance()->GetContainerDataByID(ad.containerID);
 
-	for (FInstanceArmourData iad : armour)
+	if (cd.slots > 0)
 	{
-		if (iad.instancedItemDataID == data.ID)
+		TArray<FInstanceArmourData> armour;
+		gameInstance->GetInstancedArmour().GenerateValueArray(armour);
+
+		for (FInstanceArmourData iad : armour)
 		{
-			iadFound = iad;
+			if (iad.instancedItemDataID == data.ID)
+			{
+				iadFound = iad;
+			}
 		}
+
+		FInstanceContainerData icd = gameInstance->GetInstancedContainers().FindChecked(iadFound.containerInstanceID);
+
+		UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd, gameInstance);
+		return ic;
 	}
-
-	FInstanceContainerData icd = gameInstance->GetInstancedContainers().FindChecked(iadFound.containerInstanceID);
-	FContainerData cd = gameInstance->GetContainerData()->GetData().FindOrAdd(icd.containerID);
-
-	UItemContainer* ic = UItemContainer::CreateItemContainer(cd, icd, gameInstance);
-	return ic;
+	return nullptr;
 }
 
 void UItemContainerUI::ItemAdded(FInstanceItemData inItem)

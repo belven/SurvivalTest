@@ -9,33 +9,36 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 	UArmour* armour = NewObject<UArmour>();
 	UArmourCreator::CreateArmourData(itemID, game, armour, instanceItemDataID);
 	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armour->GetData().containerID);
-	armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
 
-	bool spawnedArmour = false;
+	if (cd.slots > 0) {
 
-	for (int i = 0; i < 4; i++) // TODO remove test data!
-	{
-		TArray<int32> ids;
-		FInstanceItemData testData;
-		FItemData id = UItemStructs::GetRandomItemData(game);
-		testData.itemID = id.ID;
-		testData.amount = FMath::RandRange(1, id.maxStack);
+		armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
 
-		if (id.type != EItemType::Armour)
+		bool spawnedArmour = false;
+
+		for (int i = 0; i < 4; i++) // TODO remove test data!
 		{
-			armour->GetContainer()->AddItem(testData, ids);
+			TArray<int32> ids;
+			FInstanceItemData testData;
+			FItemData id = UItemStructs::GetRandomItemData(game);
+			testData.itemID = id.ID;
+			testData.amount = FMath::RandRange(1, id.maxStack);
+
+			if (id.type != EItemType::Armour)
+			{
+				armour->GetContainer()->AddItem(testData, ids);
+			}
+			else
+			{
+				i--;
+			}
 		}
-		else
-		{
-			i--;
-		}
+		//TArray<int32> ids;
+		//FInstanceItemData testData;
+		//testData.itemID = 1;
+		//testData.amount = 10;
+		//testData = armour->GetContainer()->AddItem(testData, ids);
 	}
-	//TArray<int32> ids;
-	//FInstanceItemData testData;
-	//testData.itemID = 1;
-	//testData.amount = 10;
-	//testData = armour->GetContainer()->AddItem(testData, ids);
-
 	return armour;
 }
 
