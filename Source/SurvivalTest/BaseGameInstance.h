@@ -43,6 +43,7 @@ public:
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
 	FArmourData GetArmourData(int32 armourID);
+	FContainerData GetContainerDataName(FString containerName);
 	FContainerData GetContainerDataByID(int32 containerID);
 
 	FInstanceItemData CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID);

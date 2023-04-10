@@ -229,6 +229,16 @@ FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 	return {};
 }
 
+FContainerData UBaseGameInstance::GetContainerDataName(FString containerName)
+{
+	for (auto& cd : GetContainerData()->GetData())
+	{
+		if (cd.Value.name.Equals(containerName))
+			return cd.Value;
+	}
+	return {};
+}
+
 FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 {
 	return GetContainerData()->GetData().FindChecked(containerID);

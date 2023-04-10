@@ -383,13 +383,6 @@ FInstanceItemData UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 	return itemToRemove;
 }
 
-/**
- *Returns the total amount of items for the given item ID
- *
- *@param itemID the ID of the item type to look for
- *
- *@return The amount of items found, if any, of the type of item
- */
 int32 UItemContainer::GetItemAmount(int32 itemID)
 {
 	int32 total = 0;

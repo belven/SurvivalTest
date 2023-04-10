@@ -19,6 +19,10 @@
 
 float ABaseCharacter::interactionRadius = 500;
 
+/**
+ *Clears the current stats and sets them back to the max they started with.
+ *
+ */
 void ABaseCharacter::ResetStats()
 {
 	maxStats.health = 100.0f;
@@ -36,6 +40,13 @@ void ABaseCharacter::ResetStats()
 	maxStats.hungerLossRate = maxStats.hunger / (dayLengthSeconds * 3.0f);
 	maxStats.restLossRate = maxStats.rest / (dayLengthSeconds * 5.0f);
 
+	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	interactionSphere->InitSphereRadius(interactionRadius);
+	interactionSphere->SetupAttachment(GetCapsuleComponent());
+	interactionSphere->SetCollisionProfileName("Interaction");
+	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
+	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
+
 	currentStats.CopyStats(maxStats);
 }
 
@@ -50,11 +61,7 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 150.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	interactionSphere->InitSphereRadius(interactionRadius);
-	interactionSphere->SetupAttachment(GetCapsuleComponent());
-	//interactionSphere->SetCollisionResponseToChannel(ECC_EngineTraceChannel1, ECR_Ignore);
-	interactionSphere->SetCollisionProfileName("Interaction");
+	
 	ResetStats();
 }
 
@@ -64,6 +71,12 @@ void ABaseCharacter::BeginPlay()
 	SetupLoadout();
 }
 
+/**
+ * This method will load the starting gear for both players and AI.
+ *
+ * This will need to be updated so that players either load existing gear or a new starter set.
+ * AI will also need to have gear sets set in the database, so we can spawn them with specific gear based on the mission
+ */
 void ABaseCharacter::SetupLoadout()
 {
 	const FLoadoutData ld = GetBaseGameInstance()->GetLoadoutData(1);
@@ -71,8 +84,8 @@ void ABaseCharacter::SetupLoadout()
 	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
 
 	int32 instanceContainerDataID = GetBaseGameInstance()->GetNextInstanceContainerDataID();
-
-	FContainerData cd = GetBaseGameInstance()->GetContainerDataByID(3);
+	
+	FContainerData cd = GetBaseGameInstance()->GetContainerDataName("Character Inventory");
 
 	FInstanceContainerData icd;
 	icd.ID = instanceContainerDataID;
@@ -87,6 +100,14 @@ void ABaseCharacter::SetupLoadout()
 	CreateNewItemForInventory(ld.legsArmourID, EGearType::Legs);
 }
 
+
+/**
+ *Helper method defining the slots that are valid for specific types of gear
+ *
+ *This needs to be change to use validSlots in UItemContainer
+ *
+ *@param type The type of gear to get the slot for
+ */
 int32 ABaseCharacter::GetSlotForGear(EGearType type)
 {
 	switch (type)
@@ -103,6 +124,18 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
 	}
 }
 
+
+/**
+ * Currently used as a helper method, to add gear spawned from the loadouts.
+ *
+ * This needs to be changed so that gear equipped on a player, is added to an additional data table,
+ * that stores the players inventory, so on reload, they get the same gear back
+ *
+ *TODO change this to work with the new inventory system
+ *
+ * @param armourID the ID of the armour to add
+ * @param type The location of the gear to add
+ */
 void ABaseCharacter::CreateNewItemForInventory(int32 armourID, EGearType type)
 {
 	TArray<int32> ids;
@@ -114,17 +147,34 @@ void ABaseCharacter::CreateNewItemForInventory(int32 armourID, EGearType type)
 	EquipArmour(UArmourCreator::CreateArmour(armourID, GetWorld(), ids[0]));
 }
 
+/**
+ * Equips a weapon the character, setting the owner as well
+ *
+ *@param weapon The weapon to equip
+ */
 void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
 {
 	equippedWeapon = weapon;
 	equippedWeapon->SetOwner(this);
 }
 
+/**
+ *Equips the given armour to the character. Adds it the slot that is viable for the armour
+ *
+ *@param armour The armour to equip
+ *
+ * TODO make this work with the new inventory system. Maybe even remove the concept entirely from character and make a sub class of inventory?
+ */
 void ABaseCharacter::EquipArmour(UArmour* armour)
 {
 	equippedArmour.FindOrAdd(armour->GetData().slot, armour);
 }
 
+/**
+ * A simple getter for the UBaseGameInstance.
+ *
+ * TODO find a consistent means of doing this in all classes, as most now have GetWorld()
+ */
 UBaseGameInstance* ABaseCharacter::GetBaseGameInstance()
 {
 	if (gameInstance == nullptr)
@@ -134,6 +184,11 @@ UBaseGameInstance* ABaseCharacter::GetBaseGameInstance()
 	return gameInstance;
 }
 
+/**
+ * This is used to change the characters health, taking into account the type of change and possibly armour for damage reduction
+ *
+ * @param health_change The data related to the health change, the amount of change, the source of the damage etc.
+ */
 void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 {
 	mEventTriggered(GetBaseGameInstance(), mCreateHealthChangeEvent(this, health_change, true));
@@ -168,6 +223,15 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 	}
 }
 
+
+/**
+ *This method calculates damage taken after damage resistance applied.
+ *I.e. 20 resistance could reduce damage by 15% etc.
+ *
+ *@param damage The damage dealt to the character
+ *
+ *@return the damage taken after resistance is applied.
+ */
 float ABaseCharacter::GetDamageAfterResistance(float damage)
 {
 	const float resistance = 100.0f + GetDamageResistance();
@@ -175,6 +239,12 @@ float ABaseCharacter::GetDamageAfterResistance(float damage)
 	return damage * damageReduction;
 }
 
+/**
+ *Totals up all the damage resistances for currently equipped armour
+ *
+ *@return The total amount of damage resistance
+ *
+ */
 int32 ABaseCharacter::GetDamageResistance()
 {
 	int32 total = 0;
@@ -190,6 +260,10 @@ int32 ABaseCharacter::GetDamageResistance()
 	return total;
 }
 
+/**
+ * This method gets all the UInteractable objects around the character on spawn.
+ * This is so we can highlight objects the player is near when they spawn in the game
+ */
 void ABaseCharacter::GetOverlapsOnSpawn()
 {
 	TArray<AActor*> actors;
@@ -204,6 +278,12 @@ void ABaseCharacter::GetOverlapsOnSpawn()
 	}
 }
 
+/**
+ * Adds a given IInteractable to our interactable list
+ *
+ * @param inter The interactable to add
+ *
+ */
 void ABaseCharacter::AddInteractable(IInteractable* inter)
 {
 	inter->Highlight(true);
@@ -211,6 +291,12 @@ void ABaseCharacter::AddInteractable(IInteractable* inter)
 	OnContainersUpdated.Broadcast();
 }
 
+/**
+ * Removes a given IInteractable from our interactable list
+ *
+ * @param inter The interactable to remove
+ *
+ */
 void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
 	inter->Highlight(false);
@@ -218,6 +304,10 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 	OnContainersUpdated.Broadcast();
 }
 
+/**
+ * This is typically triggered by the BeginOverlap of the interactionSphere.
+ * We use this to automate highlighting of in world actors, so the player can see them easier
+ */
 void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->Implements<UInteractable>())
@@ -226,16 +316,32 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
+/**
+ * An event listener for the players inventory that responds to items being added
+ *
+ *@param inItem The item added to the inventory
+ *
+ */
 void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 {
 	OnContainersUpdated.Broadcast();
 }
 
+/**
+ * An event listener for the players inventory that responds to items being removed
+ *
+ *@param inItem The item removed from the inventory
+ *
+ */
 void ABaseCharacter::ItemRemoved(FInstanceItemData inItem)
 {
 	OnContainersUpdated.Broadcast();
 }
 
+/**
+ * This is typically triggered by the BeginOverlap of the interactionSphere.
+ * We use this to automate highlighting of in world actors, so the player can see them easier
+ */
 void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex)
 {
 	if (otherActor->Implements<UInteractable>())
@@ -244,6 +350,16 @@ void ABaseCharacter::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor
 	}
 }
 
+/**
+ * This method is used to change a given stat over time, like food, water, rest etc.
+ *
+ * It's the same calculation for all stats currently, and therefore can be re-used for each, given the parameters
+ *
+ * @param stat The stat to change, typically from currentStats.Water etc.
+ * @param drainRate The amount of the stat that is lost per second
+ * @param healthDamage The amount of damage to do, if the stat is less than 0
+ * @param deltaSeconds The amount of time that has passed, often 0.02 something, about the same as the FPS
+ */
 void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds)
 {
 	if (stat > 0)
@@ -264,14 +380,20 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
 	}
 }
 
+/**
+ * This occurs when the character is taken over by a controller.
+ * We use this to determine if the character is a player or not.
+ * If they are a player, we can setup the listeners for the Overlap of the interactionSphere.
+ * Otherwise, we remove it entirely
+ *
+ * TODO find a better way to spawn the interactionSphere and set it up
+ */
 void ABaseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
 	if (NewController->IsA(ABasePlayerController::StaticClass()))
 	{
-		interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
-		interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
 		GetOverlapsOnSpawn();
 	}
 	else
@@ -280,6 +402,9 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
+/**
+ * Almost entirely used for passive stat draining like food and water.
+ */
 void ABaseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
