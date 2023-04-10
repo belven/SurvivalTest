@@ -119,7 +119,7 @@ public:
 	void SetContainerData(FContainerData inContainerData) { this->containerData = inContainerData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	UBaseGameInstance* GetGame() { return game; }
+		UBaseGameInstance* GetGame();
 
 private:
 	UPROPERTY()

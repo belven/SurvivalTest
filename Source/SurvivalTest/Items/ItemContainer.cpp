@@ -93,7 +93,7 @@ void UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData data,
 			data.containerInstanceID = GetInstanceContainerData().ID;
 
 			// Update the data in the database
-			game->AddUpdateData(data);
+			GetGame()->AddUpdateData(data);
 
 			// Tell our listeners that we've made changes, so things like UI can be updated
 			other->OnItemRemoved.Broadcast(data);
@@ -145,7 +145,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 			{
 				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
 				newItem.amount = itemToAdd.amount;
-				game->AddUpdateData(newItem);
+				GetGame()->AddUpdateData(newItem);
 				ids.Add(newItem.ID);
 				itemToAdd.amount = 0;
 				itemAdded = true;
@@ -162,7 +162,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 
 				// Try to find another item to add to
 				existingItem = GetExistingItemWithSpace(itemToAdd);
-				game->GetInstancedItems().Add(existingItem.ID, existingItem);
+				GetGame()->GetInstancedItems().Add(existingItem.ID, existingItem);
 				itemAdded = true;
 			}
 
@@ -181,7 +181,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 
 					// Add the new item
 					ids.Add(newItem.ID);
-					game->AddUpdateData(newItem);
+					GetGame()->AddUpdateData(newItem);
 					itemAdded = true;
 				}
 				// We found no more valid slots for the item
@@ -235,6 +235,11 @@ int32 UItemContainer::GetNextEmptySlot()
 	}
 
 	return UItemStructs::InvalidInt;
+}
+
+UBaseGameInstance* UItemContainer::GetGame()
+{
+	return game;
 }
 
 /**
@@ -373,7 +378,7 @@ FInstanceItemData UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 		// Remove item data from the database
 		for (FInstanceItemData ii : itemsToRemove)
 		{
-			game->GetInstancedItems().Remove(ii.ID);
+			GetGame()->GetInstancedItems().Remove(ii.ID);
 		}
 		OnItemRemoved.Broadcast(itemToRemove);
 	}
