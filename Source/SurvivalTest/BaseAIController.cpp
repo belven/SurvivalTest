@@ -56,7 +56,7 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 	AICharacter = mAsBaseCharacter(aPawn);
 	
-	AICharacter->GetBaseGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
+	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 3000;
 
 	// Set up sight config for AI perception
@@ -115,7 +115,7 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 		if (otherTeam != NULL) {
 
 			// Are we enemies with the perceived actor?
-			if (AICharacter->GetRelationship(otherTeam, AICharacter->GetBaseGameInstance()) == ERelationshipType::Enemy)
+			if (AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Enemy)
 			{
 				// Update our target and set that we can see them, we can assume that, if the actor is a team, it's also damagable
 				target = Cast<IDamagable>(Actor);
@@ -275,7 +275,7 @@ void ABaseAIController::FindNewTarget()
 
 			// Check if the actor is both damagable and an enemy
 			if (damagable->IsAlive()
-				&& AICharacter->GetRelationship(team, AICharacter->GetBaseGameInstance()) == ERelationshipType::Enemy)
+				&& AICharacter->GetRelationship(team, mGameInstance()) == ERelationshipType::Enemy)
 			{
 				// Move to the targets last known location
 				// As the target is set in here, the code in tick, in the canSee = false section, will update the lastKnowLocation to their current location

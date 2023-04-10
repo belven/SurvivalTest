@@ -83,9 +83,7 @@ public:
 	void SetEquippedWeapon(UWeapon* weapon);
 
 	void EquipArmour(UArmour* armour);
-
-	UBaseGameInstance* GetBaseGameInstance();
-
+	
 	virtual void ChangeHealth(FHealthChange& health_change) override;
 	virtual bool IsDead() override { return currentStats.health <= 0; };
 	virtual float GetCurrentHealth() override { return currentStats.health; }

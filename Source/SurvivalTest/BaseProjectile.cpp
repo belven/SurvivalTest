@@ -2,6 +2,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "BaseCharacter.h"
+#include "BaseGameInstance.h"
 #include "Damagable.h"
 #include "Team.h"
 
@@ -51,7 +52,7 @@ void ABaseProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		{
 			ITeam* hitTeam = Cast<ITeam>(OtherActor);
 
-			if (hitTeam->GetRelationship(us, us->GetBaseGameInstance()) == ERelationshipType::Enemy) {
+			if (hitTeam->GetRelationship(us, mGameInstance()) == ERelationshipType::Enemy) {
 				IDamagable* hit = Cast<IDamagable>(OtherActor);
 				hit->ChangeHealth(healthChange);
 				Destroy();

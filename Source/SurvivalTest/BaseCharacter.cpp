@@ -40,13 +40,6 @@ void ABaseCharacter::ResetStats()
 	maxStats.hungerLossRate = maxStats.hunger / (dayLengthSeconds * 3.0f);
 	maxStats.restLossRate = maxStats.rest / (dayLengthSeconds * 5.0f);
 
-	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	interactionSphere->InitSphereRadius(interactionRadius);
-	interactionSphere->SetupAttachment(GetCapsuleComponent());
-	interactionSphere->SetCollisionProfileName("Interaction");
-	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
-	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
-
 	currentStats.CopyStats(maxStats);
 }
 
@@ -61,6 +54,12 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 150.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	interactionSphere->InitSphereRadius(interactionRadius);
+	interactionSphere->SetupAttachment(GetCapsuleComponent());
+	interactionSphere->SetCollisionProfileName("Interaction");
+	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
+	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
 	
 	ResetStats();
 }
@@ -79,21 +78,21 @@ void ABaseCharacter::BeginPlay()
  */
 void ABaseCharacter::SetupLoadout()
 {
-	const FLoadoutData ld = GetBaseGameInstance()->GetLoadoutData(1);
+	const FLoadoutData ld = mGameInstance()->GetLoadoutData(1);
 
 	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
 
-	int32 instanceContainerDataID = GetBaseGameInstance()->GetNextInstanceContainerDataID();
+	int32 instanceContainerDataID = mGameInstance()->GetNextInstanceContainerDataID();
 	
-	FContainerData cd = GetBaseGameInstance()->GetContainerDataName("Character Inventory");
+	FContainerData cd = mGameInstance()->GetContainerDataName("Character Inventory");
 
 	FInstanceContainerData icd;
 	icd.ID = instanceContainerDataID;
 	icd.containerID = cd.ID;
 	icd.type = EContainerType::Player;
 	icd.name = cd.name;
-	GetBaseGameInstance()->GetInstancedContainers().Add(icd.ID, icd);
-	inventory = UItemContainer::CreateItemContainer(cd, icd, GetBaseGameInstance());
+	mGameInstance()->GetInstancedContainers().Add(icd.ID, icd);
+	inventory = UItemContainer::CreateItemContainer(cd, icd, mGameInstance());
 
 	CreateNewItemForInventory(ld.headArmourID, EGearType::Head);
 	CreateNewItemForInventory(ld.chestArmourID, EGearType::Chest);
@@ -171,27 +170,13 @@ void ABaseCharacter::EquipArmour(UArmour* armour)
 }
 
 /**
- * A simple getter for the UBaseGameInstance.
- *
- * TODO find a consistent means of doing this in all classes, as most now have GetWorld()
- */
-UBaseGameInstance* ABaseCharacter::GetBaseGameInstance()
-{
-	if (gameInstance == nullptr)
-	{
-		gameInstance = GameInstance(GetWorld());
-	}
-	return gameInstance;
-}
-
-/**
  * This is used to change the characters health, taking into account the type of change and possibly armour for damage reduction
  *
  * @param health_change The data related to the health change, the amount of change, the source of the damage etc.
  */
 void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 {
-	mEventTriggered(GetBaseGameInstance(), mCreateHealthChangeEvent(this, health_change, true));
+	mEventTriggered(mGameInstance(), mCreateHealthChangeEvent(this, health_change, true));
 
 	if (!inCombat && !health_change.heals)
 	{
@@ -200,7 +185,7 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 		csc.oldState = false;
 		csc.newState = true;
 		inCombat = true;
-		mEventTriggered(GetBaseGameInstance(), mCreateCombatStateEvent(this, csc));
+		mEventTriggered(mGameInstance(), mCreateCombatStateEvent(this, csc));
 	}
 
 	if (health_change.heals)

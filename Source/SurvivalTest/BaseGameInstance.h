@@ -7,6 +7,7 @@
 #include "BaseGameInstance.generated.h"
 
 #define GameInstance(world) Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(world))
+#define mGameInstance() Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))
 
 class UProjectileWeaponDataTable;
 class UMeleeWeaponDataTable;
