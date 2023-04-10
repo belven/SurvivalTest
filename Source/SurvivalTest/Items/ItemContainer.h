@@ -53,6 +53,7 @@ public:
 	int32 GetNextItemID();
 	int32 GetItemStackSize(int32 itemID);
 	int32 GetNextEmptySlotForItem(int32 itemID);
+	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
 	void RemoveFilledSlots(TArray<int32>& slots);
@@ -61,7 +62,7 @@ public:
 	void UpdateDebugItemsList();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void TransferItem(UItemContainer* other, FInstanceItemData data, int32 droppedSlot);
+	FInstanceItemData TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	TArray<FInstanceItemData> GetItems() { return game->GetInstancedItemsForContainer(instanceContainerData.ID); }
