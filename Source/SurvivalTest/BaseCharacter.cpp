@@ -11,6 +11,7 @@
 #include "Items/ArmourCreator.h"
 #include "Items/WeaponCreator.h"
 #include "Perception/AIPerceptionSystem.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "BaseGameInstance.h"
 #include "Items/Weapon.h"
 #include "BasePlayerController.h"
@@ -154,8 +155,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 	iid.itemID = itemID;
 	iid.amount = 1;
 	iid.slot = GetSlotForGear(mGameInstance()->GetGearTypeForItem(itemID));
-
-	// TODO figure a way to do this including AddItem
+	
 	if (inventory->AddItem(iid, ids).amount == 0) {
 		if (id.type == EItemType::Armour) {
 			EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
@@ -330,8 +330,7 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 {
 	FItemData id = mGameInstance()->GetItemData(inItem.itemID);
-
-	// TODO re-work the item data creation system
+	
 	if (id.type == EItemType::Armour) {
 		FInstanceArmourData iad = mGameInstance()->GetInstanceArmourDataByInstanceItemID(inItem.ID);
 		EquipArmour(UArmour::CreateArmour(inItem.itemID, mGameInstance(), inItem.ID));

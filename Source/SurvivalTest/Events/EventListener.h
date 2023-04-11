@@ -17,5 +17,5 @@ class SURVIVALTEST_API IEventListener
 
 public:
 	UFUNCTION()
-		virtual void EventTriggered(UBaseEvent* inEvent);
+		virtual void EventTriggered(UBaseEvent* inEvent) = 0;
 };

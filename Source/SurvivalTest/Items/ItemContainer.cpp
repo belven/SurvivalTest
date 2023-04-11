@@ -126,7 +126,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		EGearType existingIType = GetGame()->GetGearTypeForItem(existingItem.itemID);
 
 		// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
-		if (IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType)) {
+		if (existingItem.itemID != itemToTransfer.itemID && IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType)) {
 
 			// Switch the items in the containers
 			existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
@@ -157,14 +157,17 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 
 					for (FInstanceItemData iid : itemsFound)
 					{
-						if (itemToTransfer.amount > 0)
+						if (itemToTransfer.amount > 0 && iid.ID != itemToTransfer.ID)
 						{
-							iid.TakeFrom(iid, maxStack);
+							iid.TakeFrom(itemToTransfer, maxStack);
 
 							// Update each amount increase
 							GetGame()->AddUpdateData(iid);
 						}
 					}
+
+					if (itemToTransfer.amount == 0)
+						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
 				}
 				// If there are no existing items, just get the next valid slot
 				else

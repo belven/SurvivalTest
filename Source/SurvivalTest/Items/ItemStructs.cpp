@@ -66,13 +66,17 @@ EItemType UItemStructs::GetItemType(FString typeName)
 	{
 		return EItemType::Weapon;
 	}
-	if (typeName.Equals("Consumable"))
+	else	if (typeName.Equals("Consumable"))
 	{
 		return EItemType::Consumable;
 	}
-	if (typeName.Equals("Armour"))
+	else	if (typeName.Equals("Armour"))
 	{
 		return EItemType::Armour;
+	}
+	else	if (typeName.Equals("Resource"))
+	{
+		return EItemType::Resource;
 	}
 	return EItemType::Consumable;
 }

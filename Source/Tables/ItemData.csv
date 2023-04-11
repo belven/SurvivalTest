@@ -6,3 +6,5 @@
 "5","Chestpiece","Armour","Texture2D'/Game/FirstPerson/Icons/armor.armor'","1"
 "6","Legs","Armour","Texture2D'/Game/FirstPerson/Icons/legs.legs'","1"
 "7","Vest","Armour","Texture2D'/Game/FirstPerson/Icons/vest.vest'","1"
+"8","Wood","Resource","Texture2D'/Game/FirstPerson/Icons/wood.wood'","20"
+"9","Nails","Resource","Texture2D'/Game/FirstPerson/Icons/nails.nails'","20"

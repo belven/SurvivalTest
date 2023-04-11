@@ -17,6 +17,7 @@ enum class EItemType : uint8
 	Weapon,
 	Consumable,
 	Armour,
+	Resource,
 	End
 };
 
@@ -206,15 +207,15 @@ struct FArmourData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
-	int32 ID;
+	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
-	int32 itemID;
+	int32 itemID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
-	int32 containerID;
+	int32 containerID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
-	int32 resistance;
+	int32 resistance = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
-	EGearType slot;
+	EGearType slot = EGearType::End;
 };
 
 USTRUCT(BlueprintType)
@@ -226,7 +227,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	int32 slots = 10;
+	int32 slots = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FString name;
 };
@@ -245,7 +246,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FString name = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	EContainerType type;
+	EContainerType type = EContainerType::End;
 
 	friend bool operator==(const FInstanceContainerData& lhs, const FInstanceContainerData& rhs)
 	{
@@ -322,7 +323,8 @@ public:
 
 	void TakeFrom(FInstanceItemData& itemToAdd, int32 stackSize)
 	{
-		int32 amountToTake = FMath::Min(stackSize, itemToAdd.amount);
+		int32 space = GetRemainingSpace(stackSize);
+		int32 amountToTake = FMath::Min(itemToAdd.amount, space);
 		amount += amountToTake;
 		itemToAdd.amount -= amountToTake;
 	}

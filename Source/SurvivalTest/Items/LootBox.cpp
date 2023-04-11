@@ -64,8 +64,7 @@ void ALootBox::CreateLootboxData()
 	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerID), icd, gameIn);
 	container->OnItemRemoved.AddUniqueDynamic(this, &ALootBox::ItemRemoved);
 	container->OnItemAdded.AddUniqueDynamic(this, &ALootBox::ItemAdded);
-
-
+	
 	for (int32 i = 0; i < itemQuantity - 1; i++)
 	{
 		FItemData id = UItemStructs::GetRandomItemData(GetGame());
