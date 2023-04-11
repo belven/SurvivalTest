@@ -1,4 +1,4 @@
-"0","0","Melee","500.0","50.0","1.0","false"
-"1","1","Melee","500.0","100.0","2.0","false"
-"2","2","Projectile","1500.0","6.6666665","0.2","false"
-"3","3","Projectile","1500.0","8.333333","0.25","false"
+"0","0","Melee","Secondary_Weapon","500.0","50.0","1.0","false"
+"1","1","Melee","Secondary_Weapon","500.0","100.0","2.0","false"
+"2","2","Projectile","Primary_Weapon","1500.0","6.6666665","0.2","false"
+"3","3","Projectile","Primary_Weapon","1500.0","8.333333","0.25","false"

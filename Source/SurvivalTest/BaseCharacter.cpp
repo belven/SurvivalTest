@@ -60,7 +60,7 @@ ABaseCharacter::ABaseCharacter()
 	interactionSphere->SetCollisionProfileName("Interaction");
 	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
 	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
-	
+
 	ResetStats();
 }
 
@@ -83,7 +83,7 @@ void ABaseCharacter::SetupLoadout()
 	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
 
 	int32 instanceContainerDataID = mGameInstance()->GetNextInstanceContainerDataID();
-	
+
 	FContainerData cd = mGameInstance()->GetContainerDataName("Character Inventory");
 
 	FInstanceContainerData icd;
@@ -93,6 +93,22 @@ void ABaseCharacter::SetupLoadout()
 	icd.name = cd.name;
 	mGameInstance()->GetInstancedContainers().Add(icd.ID, icd);
 	inventory = UItemContainer::CreateItemContainer(cd, icd, mGameInstance());
+
+	TArray<EGearType> gearTypes;
+	gearTypes.AddUnique(EGearType::Head);
+	gearTypes.AddUnique(EGearType::Legs);
+	gearTypes.AddUnique(EGearType::Chest);
+	gearTypes.AddUnique(EGearType::Primary_Weapon);
+	gearTypes.AddUnique(EGearType::Secondary_Weapon);
+	gearTypes.AddUnique(EGearType::Bag);
+	gearTypes.AddUnique(EGearType::Sidearm);
+	gearTypes.AddUnique(EGearType::Vest);
+
+	for (EGearType type : gearTypes) {
+		int32 slot = GetSlotForGear(type);
+		if (slot != UItemStructs::InvalidInt)
+			inventory->AddValidSlot(type, slot);
+	}
 
 	CreateNewItemForInventory(ld.headArmourID, EGearType::Head);
 	CreateNewItemForInventory(ld.chestArmourID, EGearType::Chest);
@@ -111,15 +127,15 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
 {
 	switch (type)
 	{
-	case EGearType::Head: return 1;
-	case EGearType::Chest: return 2;
+	case EGearType::Head: return 0;
+	case EGearType::Chest: return 1;
+	case EGearType::Vest: return 2;
 	case EGearType::Legs: return 3;
 	case EGearType::Primary_Weapon: return 4;
 	case EGearType::Secondary_Weapon: return 5;
 	case EGearType::Sidearm: return 6;
 	case EGearType::Bag: return 7;
-	case EGearType::Vest: return 8;
-	default: return 9;
+	default: return UItemStructs::InvalidInt;
 	}
 }
 
@@ -142,7 +158,8 @@ void ABaseCharacter::CreateNewItemForInventory(int32 armourID, EGearType type)
 	id.itemID = armourID;
 	id.amount = 1;
 	id.slot = GetSlotForGear(type);
-	inventory->AddItem(id, ids);
+
+	if(inventory->AddItem(id, ids).amount == 0)
 	EquipArmour(UArmourCreator::CreateArmour(armourID, GetWorld(), ids[0]));
 }
 

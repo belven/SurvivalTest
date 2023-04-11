@@ -71,7 +71,7 @@ public:
 	bool HasSpace(FInstanceItemData item);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	FInstanceItemData GetItemAtSlot(int32 slot);
+	FInstanceItemData GetInstanceItemAtSlot(int32 slot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
@@ -121,6 +121,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		UBaseGameInstance* GetGame();
+
+	void AddValidSlot(EGearType type, int32 slot);
+
+	void AddValidSlots(EGearType type, FValidSlots slots);
 
 private:
 	UPROPERTY()

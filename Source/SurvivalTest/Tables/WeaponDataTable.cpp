@@ -14,6 +14,7 @@ void UWeaponDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.ID = GetIntFromString(row[index++]);
 		data.itemID = GetIntFromString(row[index++]);
 		data.type = UItemStructs::GetWeaponType(row[index++]);
+		data.gearType = UItemStructs::GetGearType(row[index++]);
 		data.range = GetFloatFromString(row[index++]);
 		data.healthChange = GetFloatFromString(row[index++]);
 		data.useRate = GetFloatFromString(row[index++]);

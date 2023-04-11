@@ -40,7 +40,7 @@ bool UItemContainer::HasSpace(FInstanceItemData item)
  *
  *
  */
-FInstanceItemData UItemContainer::GetItemAtSlot(int32 slot)
+FInstanceItemData UItemContainer::GetInstanceItemAtSlot(int32 slot)
 {
 	FInstanceItemData id;
 
@@ -82,20 +82,56 @@ TArray<FInstanceItemData> UItemContainer::GetExistingItemsWithSpace(int32 itemID
 
 FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot)
 {
-	
+	FItemData id = GetGame()->GetItemData(itemToTransfer.itemID);
+
+	// If the item type is armour, check we're not adding to ourselves
+	if (id.type == EItemType::Armour)
+	{
+		// Find the armour instance, containerInstanceID for the armour item
+		// If the containerInstanceID is the same as this container, then we're dragging the armour item, into it's own container
+		FInstanceArmourData iad = GetGame()->GetInstanceArmourDataByInstanceItemID(itemToTransfer.ID);
+
+		if (iad.containerInstanceID == GetInstanceContainerData().ID) {
+			return itemToTransfer;
+		}
+		else // TODO figure this out!! it works but maybe a little too well?
+		{
+			bool selfFound = false;
+
+			/*	for(FInstanceItemData iid : other->GetItems())
+				{
+					if (id.type == EItemType::Armour)
+					{
+						iad = GetGame()->GetInstanceArmourDataByInstanceItemID(iid.ID);
+
+						if(iad.containerInstanceID == GetInstanceContainerData().ID)
+						{
+							selfFound = true;
+						}
+					}
+				}*/
+
+			if (selfFound)
+				return itemToTransfer;
+		}
+	}
+
 	// Get the item, if any, at the slot we've dropped the item onto
-	FInstanceItemData existingItem = GetItemAtSlot(droppedSlot);
+	FInstanceItemData existingItem = GetInstanceItemAtSlot(droppedSlot);
+	EGearType type = GetGame()->GetGearTypeForItem(itemToTransfer.itemID);
 
 	// If the ID isn't -1, then we have an item in the slot
 	if (existingItem.ID != UItemStructs::InvalidInt)
 	{
-		// Check if our current item is valid for the dropped slot
-		if (IsValidForSlot(droppedSlot, GetGame()->GetGearTypeForItem(itemToTransfer.itemID))) {
+		EGearType existingIType = GetGame()->GetGearTypeForItem(existingItem.itemID);
+
+		// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
+		if (IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType)) {
 
 			// Switch the items in the containers
 			existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
 			existingItem.slot = itemToTransfer.slot;
-			
+
 			GetGame()->AddUpdateData(existingItem);
 			other->OnItemAdded.Broadcast(existingItem);
 			OnItemRemoved.Broadcast(existingItem);
@@ -106,7 +142,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		{
 			// If the item has no space, then it's a whole stack and should go into the next valid slot, if any
 			// No point adding it to others if it's a whole stack, this also helps dealing with single item stacks of armour and weapons
-			if(!HasSpace(itemToTransfer))
+			if (!HasSpace(itemToTransfer))
 			{
 				itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
 			}
@@ -121,7 +157,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 
 					for (FInstanceItemData iid : itemsFound)
 					{
-						if(itemToTransfer.amount > 0)
+						if (itemToTransfer.amount > 0)
 						{
 							iid.TakeFrom(iid, maxStack);
 
@@ -133,15 +169,19 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 				// If there are no existing items, just get the next valid slot
 				else
 				{
-					itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);					
+					itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
 				}
-			}			
+			}
 		}
 	}
 	// If the ID is -1, then we don't have an item in the slot
-	else
+	else if (IsValidForSlot(droppedSlot, type))
 	{
 		itemToTransfer.slot = droppedSlot;
+	}
+	else
+	{
+		itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
 	}
 
 	// If we found a valid slot then transfer the item
@@ -300,6 +340,18 @@ UBaseGameInstance* UItemContainer::GetGame()
 	return game;
 }
 
+void UItemContainer::AddValidSlot(EGearType type, int32 slot)
+{
+	FValidSlots slots;
+	slots.validSlots.Add(slot);
+	validSlots.Add(type, slots);
+}
+
+void UItemContainer::AddValidSlots(EGearType type, FValidSlots slots)
+{
+	validSlots.Add(type, slots);
+}
+
 /**
  *Helper method that loops through our items and removes slots from the list, for existing items in that slot.
  *
@@ -353,6 +405,8 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 	// Do we have any valid slots defined?
 	if (validSlots.Num() > 0)
 	{
+		TArray<int32> slotsToRemove;
+
 		// Get all the currently empty slots
 		TArray<int32> emptySlots = GetEmptySlots();
 
@@ -362,8 +416,13 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 			// If the slot isn't valid for the item type, then remove it
 			if (!IsValidForSlot(emptySlot, inType))
 			{
-				emptySlots.Remove(emptySlot);
+				slotsToRemove.Add(emptySlot);
 			}
+		}
+
+		for (int32 emptySlot : slotsToRemove)
+		{
+			emptySlots.Remove(emptySlot);
 		}
 
 		// Return the first empty slot

@@ -19,6 +19,47 @@ EWeaponType UItemStructs::GetWeaponType(FString typeName)
 	return EWeaponType::Melee;
 }
 
+EGearType UItemStructs::GetGearType(FString typeName)
+{
+	if (typeName.Equals("Legs"))
+	{
+		return EGearType::Legs;
+	}
+	else if (typeName.Equals("Vest"))
+	{
+		return EGearType::Vest;
+	}
+	else if (typeName.Equals("Bag"))
+	{
+		return EGearType::Bag;
+	}
+	else if (typeName.Equals("Chest"))
+	{
+		return EGearType::Chest;
+	}
+	else if (typeName.Equals("Head"))
+	{
+		return EGearType::Head;
+	}
+	else if (typeName.Equals("Primary_Weapon"))
+	{
+		return EGearType::Primary_Weapon;
+	}
+	else if (typeName.Equals("Secondary_Weapon"))
+	{
+		return EGearType::Secondary_Weapon;
+	}
+	else if (typeName.Equals("Sidearm"))
+	{
+		return EGearType::Sidearm;
+	}
+	else if (typeName.Equals("Legs"))
+	{
+		return EGearType::Legs;
+	}
+	return EGearType::Legs;
+}
+
 EItemType UItemStructs::GetItemType(FString typeName)
 {
 	if (typeName.Equals("Weapon"))

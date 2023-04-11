@@ -29,8 +29,8 @@ void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
 
 		FFileHelper::LoadFileToString(FileContent, *path);
 
-		const TCHAR* Terminators[] = {L"\r", L"\n"};
-		const TCHAR* CSVDelimiters[] = {TEXT(","), TEXT("\t")};
+		const TCHAR* Terminators[] = { L"\r", L"\n" };
+		const TCHAR* CSVDelimiters[] = { TEXT(","), TEXT("\t") };
 
 		TArray<FString> CSVLines;
 		FileContent.ParseIntoArray(CSVLines, Terminators, 2);
@@ -400,6 +400,8 @@ EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)
 	}
 	else if (id.type == EItemType::Weapon)
 	{
+		FWeaponData wd = GetWeaponData(itemID);
+		return wd.gearType;
 	}
 
 	return EGearType::End;
@@ -426,4 +428,14 @@ void UBaseGameInstance::AddUpdateData(const FInstanceArmourData& inData)
 void UBaseGameInstance::AddUpdateData(const FInstanceItemData& inData)
 {
 	GetInstancedItems().Add(inData.ID, inData);
+}
+
+FInstanceArmourData UBaseGameInstance::GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID)
+{
+	for (auto& iad : GetInstancedArmour())
+	{
+		if (iad.Value.instancedItemDataID == InstanceItemID)
+			return iad.Value;
+	}
+	return{};
 }

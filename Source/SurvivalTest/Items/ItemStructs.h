@@ -114,6 +114,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	EWeaponType type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		EGearType gearType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float useRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float healthChange;
@@ -188,6 +190,7 @@ class SURVIVALTEST_API UItemStructs : public UObject
 public:
 	static const int32 InvalidInt;
 	static EWeaponType GetWeaponType(FString typeName);
+	static EGearType GetGearType(FString typeName);
 	static EItemType GetItemType(FString typeName);
 	static EGearType GetArmourSlot(FString typeName);
 	static ECharacterType GetCharacterType(FString typeName);

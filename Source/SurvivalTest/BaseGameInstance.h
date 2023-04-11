@@ -39,6 +39,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 		FItemData GetItemData(int32 itemID);
 
+	void AddUpdateData(const FInstanceArmourData& inData);
+	void AddUpdateData(const FInstanceItemData& inData);
+
+	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);
 	FWeaponData GetWeaponData(int32 itemID);
 	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
@@ -48,9 +52,7 @@ public:
 	FContainerData GetContainerDataByID(int32 containerID);
 
 	FInstanceItemData CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID);
-
 	FArmourData GetArmourDataByItemID(int32 itemID);
-
 	FLoadoutData GetLoadoutData(int32 entityID);
 
 	TArray<FInstanceItemData> GetInventoryItems(int32 instanceContainerID);
@@ -67,8 +69,6 @@ public:
 	ULoadoutTableData* GetLoadoutTableData();
 	UContainerTableData* GetContainerData();
 	EGearType GetGearTypeForItem(int32 itemID);
-	void AddUpdateData(const FInstanceArmourData& inData);
-	void AddUpdateData(const FInstanceItemData& inData);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
 	FString GetContainerInstanceName(int32 containerID);
 
