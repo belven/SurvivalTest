@@ -2,6 +2,7 @@
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Character.h"
+#include "Items/Weapon.h"
 #include "UI/InventoryUI.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
@@ -27,6 +28,11 @@ void ABasePlayerController::ContainersUpdated()
 void ABasePlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+
+
+	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr) {
+		GetBaseCharacter()->GetEquippedWeapon()->UseWeapon(GetBaseCharacter()->GetActorRotation().Vector());
+	}
 }
 
 void ABasePlayerController::OnPossess(APawn* aPawn)
@@ -42,6 +48,11 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	InputComponent->BindAxis("Look Up / Down Mouse", GetCharacter(), &APawn::AddControllerPitchInput);
 }
 
+void ABasePlayerController::OnPrimaryActionReleased()
+{
+	performAction = false;
+}
+
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -49,6 +60,7 @@ void ABasePlayerController::SetupInputComponent()
 	check(InputComponent);
 
 	InputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ABasePlayerController::OnPrimaryAction);
+	InputComponent->BindAction("PrimaryAction", IE_Released, this, &ABasePlayerController::OnPrimaryActionReleased);
 	InputComponent->BindAction("Load Inventories", IE_Pressed, this, &ABasePlayerController::LoadInventories);
 	InputComponent->BindAction("Show Cursor", IE_Pressed, this, &ABasePlayerController::ShowCursor);
 	InputComponent->BindAxis("Move Forward / Backward", this, &ABasePlayerController::MoveForward);
@@ -62,7 +74,10 @@ void ABasePlayerController::ShowCursor()
 
 void ABasePlayerController::OnPrimaryAction()
 {
-	OnUseItem.Broadcast();
+	// Don't fire if we're in our inventory
+	if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden) {
+		performAction = true;
+	}
 }
 
 void ABasePlayerController::BeginPlay()

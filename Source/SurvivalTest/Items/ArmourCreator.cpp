@@ -3,51 +3,58 @@
 #include "ItemContainer.h"
 #include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseGameInstance.h"
-#include "SurvivalTest/Tables/ContainerTableData.h"
 
 UArmour* UArmourCreator::CreateArmour(int32 itemID, UWorld* world, int32 instanceItemDataID)
 {
-	UArmour* a = nullptr;
-	UBaseGameInstance* gameIn = GameInstance(world);
-	const FItemData id = gameIn->GetItemData(itemID);
-
-	a = UArmour::CreateArmour(itemID, gameIn, instanceItemDataID);
-	a->SetItemData(id);
+	UArmour* a = UArmour::CreateArmour(itemID, GameInstance(world), instanceItemDataID);
 	return a;
 }
 
 void UArmourCreator::CreateArmourData(int32 itemID, UBaseGameInstance* game, UArmour* armour, int32 instanceItemDataID)
 {
-	// Get Armour Data by ItemID
-	FArmourData armourData = game->GetArmourDataByItemID(itemID);
 	FItemData id = game->GetItemData(itemID);
-	armour->SetData(armourData);
+	FArmourData armourData = game->GetArmourDataByItemID(itemID);
 	armour->SetItemData(id);
+	armour->SetData(armourData);
+
+	FInstanceArmourData iad = game->GetInstanceArmourDataByInstanceItemID(instanceItemDataID);
 	FContainerData cd = game->GetContainerDataByID(armourData.containerID);
 
-	if (cd.slots > 0) {
-		// Create a new instance of container
-		// Get the next ID from the table
-		int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
+	// Do we have existing data?
+	if (iad.ID == UItemStructs::InvalidInt)
+	{
 
-		FInstanceContainerData icd;
-		icd.ID = instanceContainerDataID;
-		icd.containerID = armourData.containerID;
-		icd.type = EContainerType::Armour;
-		icd.name = id.name;
-		game->GetInstancedContainers().Add(icd.ID, icd);
+		if (cd.slots > 0) {
+			// Create a new instance of container
+			// Get the next ID from the table
+			int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
 
-		// Create a new Armour instance based on the container instance
-		int32 armourContainerDataID = game->GetNextInstanceArmourDataID();
+			FInstanceContainerData icd;
+			icd.ID = instanceContainerDataID;
+			icd.containerID = armourData.containerID;
+			icd.type = EContainerType::Armour;
+			icd.name = id.name;
+			game->GetInstancedContainers().Add(icd.ID, icd);
 
-		FInstanceArmourData acd;
-		acd.ID = armourContainerDataID;
-		acd.armourID = armourData.ID;
-		acd.containerInstanceID = icd.ID;
-		acd.instancedItemDataID = instanceItemDataID;
-		game->AddUpdateData(acd);
+			// Create a new Armour instance based on the container instance
+			int32 armourContainerDataID = game->GetNextInstanceArmourDataID();
 
-		armour->SetInstanceItemData(icd);
-		armour->SetInstanceArmourData(acd);
+			FInstanceArmourData acd;
+			acd.ID = armourContainerDataID;
+			acd.armourID = armourData.ID;
+			acd.containerInstanceID = icd.ID;
+			acd.instancedItemDataID = instanceItemDataID;
+			game->AddUpdateData(acd);
+
+			armour->SetInstanceContainerData(icd);
+			armour->SetInstanceArmourData(acd);
+			armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
+		}
+	}
+	else
+	{
+		armour->SetInstanceContainerData(game->GetInstancedContainers().FindChecked(iad.containerInstanceID));
+		armour->SetInstanceArmourData(iad);
+		armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
 	}
 }

@@ -33,7 +33,7 @@ void ABaseCharacter::ResetStats()
 	// Seconds
 	constexpr float minute = 60.0f;
 	constexpr float hour = 60.0f * minute;
-	constexpr float dayLengthSeconds = minute * 0.3;
+	constexpr float dayLengthSeconds = hour;
 
 	// Rate per Second
 	maxStats.waterLossRate = maxStats.water / dayLengthSeconds;
@@ -79,10 +79,7 @@ void ABaseCharacter::BeginPlay()
 void ABaseCharacter::SetupLoadout()
 {
 	const FLoadoutData ld = mGameInstance()->GetLoadoutData(1);
-
-
 	int32 instanceContainerDataID = mGameInstance()->GetNextInstanceContainerDataID();
-
 	FContainerData cd = mGameInstance()->GetContainerDataName("Character Inventory");
 
 	FInstanceContainerData icd;
@@ -109,12 +106,14 @@ void ABaseCharacter::SetupLoadout()
 			inventory->AddValidSlot(type, slot);
 	}
 
-	CreateNewItemForInventory(ld.weaponID, EGearType::Primary_Weapon);
-	CreateNewItemForInventory(ld.headArmourID, EGearType::Head);
-	CreateNewItemForInventory(ld.chestArmourID, EGearType::Chest);
-	CreateNewItemForInventory(ld.legsArmourID, EGearType::Legs);
-}
+	CreateNewItemForInventory(ld.weaponID);
+	CreateNewItemForInventory(ld.headArmourID);
+	CreateNewItemForInventory(ld.chestArmourID);
+	CreateNewItemForInventory(ld.legsArmourID);
 
+	inventory->OnItemAdded.AddUniqueDynamic(this, &ABaseCharacter::ItemAdded);
+	inventory->OnItemRemoved.AddUniqueDynamic(this, &ABaseCharacter::ItemRemoved);
+}
 
 /**
  *Helper method defining the slots that are valid for specific types of gear
@@ -139,7 +138,6 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
 	}
 }
 
-
 /**
  * Currently used as a helper method, to add gear spawned from the loadouts.
  *
@@ -147,17 +145,17 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
  * that stores the players inventory, so on reload, they get the same gear back
  *
  * @param itemID the ID of the armour to add
- * @param type The location of the gear to add
  */
-void ABaseCharacter::CreateNewItemForInventory(int32 itemID, EGearType type)
+void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 {
 	FItemData id = mGameInstance()->GetItemData(itemID);
 	TArray<int32> ids;
 	FInstanceItemData iid;
 	iid.itemID = itemID;
 	iid.amount = 1;
-	iid.slot = GetSlotForGear(type);
+	iid.slot = GetSlotForGear(mGameInstance()->GetGearTypeForItem(itemID));
 
+	// TODO figure a way to do this including AddItem
 	if (inventory->AddItem(iid, ids).amount == 0) {
 		if (id.type == EItemType::Armour) {
 			EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
@@ -185,7 +183,6 @@ void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
  *
  *@param armour The armour to equip
  *
- * TODO make this work with the new inventory system. Maybe even remove the concept entirely from character and make a sub class of inventory?
  */
 void ABaseCharacter::EquipArmour(UArmour* armour)
 {
@@ -332,6 +329,28 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
  */
 void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 {
+	FItemData id = mGameInstance()->GetItemData(inItem.itemID);
+
+	// TODO re-work the item data creation system
+	if (id.type == EItemType::Armour) {
+		FInstanceArmourData iad = mGameInstance()->GetInstanceArmourDataByInstanceItemID(inItem.ID);
+		EquipArmour(UArmour::CreateArmour(inItem.itemID, mGameInstance(), inItem.ID));
+	}
+	else if (id.type == EItemType::Weapon)
+	{
+		if(GetEquippedWeapon())
+		{
+			FWeaponData wd = mGameInstance()->GetWeaponData(inItem.itemID);
+			if(GetEquippedWeapon()->GetWeaponData().gearType == wd.gearType)
+			{
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));				
+			}
+		}
+		else
+		{
+			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));			
+		}
+	}
 	OnContainersUpdated.Broadcast();
 }
 

@@ -22,6 +22,7 @@ public:
 	ABasePlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
+	void OnPrimaryActionReleased();
 	virtual void SetupInputComponent() override;
 	void ShowCursor();
 	void OnPrimaryAction();
@@ -34,6 +35,7 @@ public:
 
 	UPROPERTY()
 	FOnUseItem OnUseItem;
+	bool performAction;
 
 protected:
 	virtual void BeginPlay() override;

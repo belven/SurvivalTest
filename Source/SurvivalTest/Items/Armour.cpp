@@ -9,11 +9,8 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 	UArmour* armour = NewObject<UArmour>();
 	UArmourCreator::CreateArmourData(itemID, game, armour, instanceItemDataID);
 	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armour->GetData().containerID);
-
+	
 	if (cd.slots > 0) {
-
-		armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
-
 		bool spawnedArmour = false;
 
 		for (int i = 0; i < 4; i++) // TODO remove test data!
@@ -39,20 +36,5 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 		//testData.amount = 10;
 		//testData = armour->GetContainer()->AddItem(testData, ids);
 	}
-	return armour;
-}
-
-UArmour* UArmour::LoadArmour(int32 armourInstanceID, UBaseGameInstance* game)
-{
-	UArmour* armour = NewObject<UArmour>();
-	FInstanceArmourData acd = game->GetInstancedArmour().FindChecked(armourInstanceID);
-
-	FArmourData armourData = game->GetArmourData(acd.armourID);
-	armour->SetData(armourData);
-	armour->SetItemData(game->GetItemData(armourData.itemID));
-	armour->SetInstanceArmourData(acd);
-
-	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armourData.containerID);
-	armour->SetContainer(UItemContainer::CreateItemContainer(cd, armour->GetInstanceContainerData(), game));
 	return armour;
 }

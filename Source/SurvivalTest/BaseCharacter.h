@@ -129,7 +129,7 @@ protected:
 	int32 GetSlotForGear(EGearType type);
 
 	UFUNCTION()
-	void CreateNewItemForInventory(int32 itemID, EGearType type);
+	void CreateNewItemForInventory(int32 itemID);
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
 
 	UPROPERTY()

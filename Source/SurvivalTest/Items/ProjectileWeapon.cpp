@@ -16,7 +16,8 @@ void UProjectileWeapon::UseWeapon(const FVector& LookAtRotation)
 			if (LookAtRotation.SizeSquared() > 0.0f)
 			{
 				const FRotator FireRotation = LookAtRotation.Rotation();
-				const FVector gunLocation = owner->GetActorLocation() + FireRotation.RotateVector(GunOffset);
+				const FVector statLoc = owner->GetActorLocation() + FVector(0,0, 100);
+				const FVector gunLocation = statLoc + FireRotation.RotateVector(GunOffset);
 
 				ABaseProjectile* proj = SpawnProjectile(gunLocation, FireRotation, ABaseProjectile::StaticClass());
 
