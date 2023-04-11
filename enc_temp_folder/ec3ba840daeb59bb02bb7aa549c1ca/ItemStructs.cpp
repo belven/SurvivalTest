@@ -83,17 +83,13 @@ EGearType UItemStructs::GetArmourSlot(FString typeName)
 	{
 		return EGearType::Chest;
 	}
-	else 	if (typeName.Equals("Head"))
+	if (typeName.Equals("Head"))
 	{
 		return EGearType::Head;
 	}
-	else 	if (typeName.Equals("Legs"))
+	if (typeName.Equals("Legs"))
 	{
 		return EGearType::Legs;
-	}
-	else 	if (typeName.Equals("Vest"))
-	{
-		return EGearType::Vest;
 	}
 	return EGearType::Head;
 }

@@ -80,7 +80,6 @@ void ABaseCharacter::SetupLoadout()
 {
 	const FLoadoutData ld = mGameInstance()->GetLoadoutData(1);
 
-	SetEquippedWeapon(UWeaponCreator::CreateWeapon(ld.weaponID, GetWorld()));
 
 	int32 instanceContainerDataID = mGameInstance()->GetNextInstanceContainerDataID();
 
@@ -110,6 +109,7 @@ void ABaseCharacter::SetupLoadout()
 			inventory->AddValidSlot(type, slot);
 	}
 
+	CreateNewItemForInventory(ld.weaponID, EGearType::Primary_Weapon);
 	CreateNewItemForInventory(ld.headArmourID, EGearType::Head);
 	CreateNewItemForInventory(ld.chestArmourID, EGearType::Chest);
 	CreateNewItemForInventory(ld.legsArmourID, EGearType::Legs);
@@ -146,21 +146,27 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
  * This needs to be changed so that gear equipped on a player, is added to an additional data table,
  * that stores the players inventory, so on reload, they get the same gear back
  *
- *TODO change this to work with the new inventory system
- *
- * @param armourID the ID of the armour to add
+ * @param itemID the ID of the armour to add
  * @param type The location of the gear to add
  */
-void ABaseCharacter::CreateNewItemForInventory(int32 armourID, EGearType type)
+void ABaseCharacter::CreateNewItemForInventory(int32 itemID, EGearType type)
 {
+	FItemData id = mGameInstance()->GetItemData(itemID);
 	TArray<int32> ids;
-	FInstanceItemData id;
-	id.itemID = armourID;
-	id.amount = 1;
-	id.slot = GetSlotForGear(type);
+	FInstanceItemData iid;
+	iid.itemID = itemID;
+	iid.amount = 1;
+	iid.slot = GetSlotForGear(type);
 
-	if(inventory->AddItem(id, ids).amount == 0)
-	EquipArmour(UArmourCreator::CreateArmour(armourID, GetWorld(), ids[0]));
+	if (inventory->AddItem(iid, ids).amount == 0) {
+		if (id.type == EItemType::Armour) {
+			EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
+		}
+		else if (id.type == EItemType::Weapon)
+		{
+			SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld()));
+		}
+	}
 }
 
 /**
