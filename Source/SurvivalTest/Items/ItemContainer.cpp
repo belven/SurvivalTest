@@ -157,6 +157,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 
 					for (FInstanceItemData iid : itemsFound)
 					{
+						// Check for self, as we can be in the same container 
 						if (itemToTransfer.amount > 0 && iid.ID != itemToTransfer.ID)
 						{
 							iid.TakeFrom(itemToTransfer, maxStack);
@@ -166,8 +167,18 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 						}
 					}
 
-					if (itemToTransfer.amount == 0)
+					// If amount is 0, then remove us
+					if (itemToTransfer.amount == 0) {
 						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
+						other->OnItemRemoved.Broadcast(itemToTransfer);
+						OnItemAdded.Broadcast(itemToTransfer);
+						UpdateDebugItemsList();
+					}
+					// If there's still some left, try and add the remainder to the next empty slot
+					else
+					{
+						itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);						
+					}
 				}
 				// If there are no existing items, just get the next valid slot
 				else
@@ -188,7 +199,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 	}
 
 	// If we found a valid slot then transfer the item
-	if (itemToTransfer.slot != UItemStructs::InvalidInt)
+	if (itemToTransfer.slot != UItemStructs::InvalidInt && itemToTransfer.amount > 0)
 	{
 		// Set the containerInstanceID to this container, this will move the item to belong to us
 		itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
