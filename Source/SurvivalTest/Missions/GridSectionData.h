@@ -48,6 +48,7 @@ public:
 	FGridSectionData GetSectionData() const { return sectionData; }
 
 	void SetSectionData(FGridSectionData inSectionData) { sectionData = inSectionData; }
+	void HighlightSection(float time);
 
 protected:
 	virtual void BeginPlay() override;

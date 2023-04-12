@@ -39,25 +39,25 @@ public:
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float health;
+		float health;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float water;
+		float water;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float hunger;
+		float hunger;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float rest;
+		float rest;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float waterLossRate;
+		float waterLossRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float hungerLossRate;
+		float hungerLossRate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float restLossRate;
+		float restLossRate;
 };
 
 UCLASS(config = Game)
@@ -83,7 +83,7 @@ public:
 	void SetEquippedWeapon(UWeapon* weapon);
 
 	void EquipArmour(UArmour* armour);
-	
+
 	virtual void ChangeHealth(FHealthChange& health_change) override;
 	virtual bool IsDead() override { return currentStats.health <= 0; };
 	virtual float GetCurrentHealth() override { return currentStats.health; }
@@ -96,29 +96,27 @@ public:
 	void AddInteractable(IInteractable* inter);
 	void RemoveInteractable(IInteractable* inter);
 
+	void Consume(EConsumableType type, int32 value);
+
 	TArray<IInteractable*> GetOverlappingInteractables() const { return overlappingInteractables; }
 
-	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables)
-	{
-		this->overlappingInteractables = inOverlappingInteractables;
-	}
+	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
 
 	UItemContainer* GetInventory() const { return inventory; }
 	void SetInventory(UItemContainer* inInventory) { inventory = inInventory; }
 
 	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp,
-	                int32 otherBodyIndex);
+		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
 	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	                  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION()
 		void ItemAdded(FInstanceItemData inItem);
 
 	UFUNCTION()
 		void ItemRemoved(FInstanceItemData inItem);
+	int32 GetSlotForGear(EGearType type);
 
 protected:
 	static float interactionRadius;
@@ -126,41 +124,40 @@ protected:
 	bool inCombat;
 	virtual void BeginPlay() override;
 	void SetupLoadout();
-	int32 GetSlotForGear(EGearType type);
 
 	UFUNCTION()
-	void CreateNewItemForInventory(int32 itemID);
+		void CreateNewItemForInventory(int32 itemID);
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
 
 	UPROPERTY()
-	USphereComponent* interactionSphere;
+		USphereComponent* interactionSphere;
 
 	TArray<IInteractable*> overlappingInteractables;
 
 	UPROPERTY()
-	UWeapon* equippedWeapon;
+		UWeapon* equippedWeapon;
 
 	UPROPERTY()
-	TMap<EGearType, UArmour*> equippedArmour;
+		TMap<EGearType, UArmour*> equippedArmour;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Factions, meta = (AllowPrivateAccess = "true"))
-	EFaction faction;
+		EFaction faction;
 
 public:
 	virtual void PossessedBy(AController* NewController) override;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+		UCameraComponent* FirstPersonCameraComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	FCharacterStats currentStats;
+		FCharacterStats currentStats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	UItemContainer* inventory;
+		UItemContainer* inventory;
 
 	UPROPERTY()
-	FCharacterStats maxStats;
+		FCharacterStats maxStats;
 	UPROPERTY()
-	UBaseGameInstance* gameInstance;
+		UBaseGameInstance* gameInstance;
 };

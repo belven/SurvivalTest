@@ -136,6 +136,23 @@ EContainerType UItemStructs::GetContainerType(FString typeName)
 	return EContainerType::Box;
 }
 
+EConsumableType UItemStructs::GetConsumableType(FString typeName)
+{
+	if (typeName.Equals("Drink"))
+	{
+		return EConsumableType::Drink;
+	}
+	if (typeName.Equals("Food"))
+	{
+		return EConsumableType::Food;
+	}
+	if (typeName.Equals("Medical"))
+	{
+		return EConsumableType::Medical;
+	}
+	return EConsumableType::Drink;
+}
+
 bool UItemStructs::GetBoolean(FString value)
 {
 	return value.Equals("true") ? true : false;

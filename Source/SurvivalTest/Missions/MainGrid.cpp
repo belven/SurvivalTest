@@ -1,6 +1,7 @@
 #include "MainGrid.h"
 
 #include "GridSectionData.h"
+#include "SurvivalTest/BaseGameInstance.h"
 
 void AMainGrid::ClearGrid()
 {
@@ -22,6 +23,30 @@ void AMainGrid::OnConstruction(const FTransform& Transform)
 	
 }
 
+AGridSection* AMainGrid::GetGridSection(FVector loc)
+{
+	AGridSection* section = nullptr;
+	int32 x = ModValue(loc.X);
+	int32 y = ModValue(loc.Y);
+
+	for(AGridSection* gs : gridSections)
+	{
+		if(gs->GetActorLocation().Y == y && gs->GetActorLocation().X == x)
+		{
+			section = gs;
+			break;
+		}
+	}
+	return section;
+	//return grid[x][y];
+}
+
+int32 AMainGrid::ModValue(double value)
+{
+	int32 valueInt = FMath::RoundToInt32(value);
+	return valueInt -= (valueInt % boxSize);
+}
+
 AMainGrid::AMainGrid()
 {
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> cube(TEXT("StaticMesh'/Game/LevelPrototyping/Meshes/SM_Cube.SM_Cube'"));
@@ -32,13 +57,15 @@ void AMainGrid::BeginPlay()
 {
 	Super::BeginPlay();
 
+	mGameInstance()->grid = this;
+
 	const FVector startLocation = FVector(0, 0, 0);
 	int32 halfBoxSize = boxSize / 2;
 	float startingDistance = boxSize * (columnsAndRows / 2);
 
 	ClearGrid();
 
-	int locationOffset = boxSize;;
+	int locationOffset = boxSize;
 
 	// if this is 0, is means it's divisible by 2 / even, therefore we need to shift the offset by half the box size so the center is based on corner.
 	// As you can't have a center in a 2x2 that's in the middle of a one section
@@ -77,7 +104,9 @@ void AMainGrid::BeginPlay()
 			gs->GetGridSectionComp()->SetWorldScale3D(FVector(boxSize / 100, boxSize / 100, 0.01f));
 			gridSections.Add(gs);
 
-			DrawDebugBox(GetWorld(), location, extent, FColor::Blue, false, debugDuration);
+			//grid[ModValue(gs->GetActorLocation().X) / boxSize][ModValue(gs->GetActorLocation().Y) / boxSize] = gs;
+			//grid.
+			//DrawDebugBox(GetWorld(), location, extent, FColor::Blue, false, debugDuration);
 		}
 	}
 }

@@ -13,6 +13,7 @@
 #include "Tables/RangedWeaponDataTable.h"
 #include "Tables/WeaponDataTable.h"
 #include "Missions/PatrolPath.h"
+#include "Tables/ConsumableTableData.h"
 
 UBaseGameInstance::UBaseGameInstance()
 {
@@ -124,6 +125,7 @@ void UBaseGameInstance::LoadTableData()
 	LoadTableFromFile(GetArmourDataTable());
 	LoadTableFromFile(GetLoadoutTableData());
 	LoadTableFromFile(GetContainerData());
+	LoadTableFromFile(GetConsumableData());
 }
 
 UFactionManager* UBaseGameInstance::GetFactionManager()
@@ -158,6 +160,18 @@ FWeaponData UBaseGameInstance::GetWeaponData(int32 itemID)
 		if (wd.itemID == itemID)
 		{
 			return wd;
+		}
+	}
+	return {};
+}
+
+FConsumableData UBaseGameInstance::GetConsumableData(int32 itemID)
+{
+	for (const auto& cd : GetConsumableData()->GetData())
+	{
+		if (cd.Value.itemID == itemID)
+		{
+			return cd.Value;
 		}
 	}
 	return {};
@@ -387,6 +401,16 @@ UContainerTableData* UBaseGameInstance::GetContainerData()
 	}
 
 	return containerData;
+}
+
+UConsumableTableData* UBaseGameInstance::GetConsumableData()
+{
+	if (consumableData == nullptr)
+	{
+		consumableData = NewObject<UConsumableTableData>();
+	}
+
+	return consumableData;
 }
 
 EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)

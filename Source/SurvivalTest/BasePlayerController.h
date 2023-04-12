@@ -23,6 +23,10 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
 	void OnPrimaryActionReleased();
+	void OnPrimaryWeapon();
+	void OnSecondaryWeapon();
+	void OnSidearm();
+	void EquipWeaponAtSlot(int32 slot, EGearType type);
 	virtual void SetupInputComponent() override;
 	void ShowCursor();
 	void OnPrimaryAction();

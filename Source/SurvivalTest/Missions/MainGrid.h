@@ -5,6 +5,14 @@
 
 class AGridSection;
 
+//USTRUCT()
+//struct FGridData
+//{
+//	GENERATED_BODY()
+//public:
+//	TArray<>
+//};
+
 UCLASS()
 class SURVIVALTEST_API AMainGrid : public ATargetPoint
 {
@@ -13,6 +21,8 @@ class SURVIVALTEST_API AMainGrid : public ATargetPoint
 public:
 	void ClearGrid();
 	virtual void OnConstruction(const FTransform& Transform) override;
+	AGridSection* GetGridSection(FVector loc);
+	int32 ModValue(double value);
 	AMainGrid();
 
 protected:
@@ -40,4 +50,6 @@ private:
 
 	UPROPERTY()
 	UStaticMesh* mesh;
+	//UE::Math::TVector2<AGridSection*> grid;
+	//AGridSection* grid[][];
 };

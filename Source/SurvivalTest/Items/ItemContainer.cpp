@@ -88,28 +88,30 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 	if (id.type == EItemType::Armour)
 	{
 		// Find the armour instance, containerInstanceID for the armour item
-		// If the containerInstanceID is the same as this container, then we're dragging the armour item, into it's own container
 		FInstanceArmourData iad = GetGame()->GetInstanceArmourDataByInstanceItemID(itemToTransfer.ID);
 
+		// If the containerInstanceID is the same as this container, then we're dragging the armour item, into it's own container
 		if (iad.containerInstanceID == GetInstanceContainerData().ID) {
 			return itemToTransfer;
 		}
-		else // TODO figure this out!! it works but maybe a little too well?
+		else // TODO This only works for 1 layer of container, would be worth making a recursive method for this
+			// This is also solved by simply not allowing armour in armour etc.
 		{
 			bool selfFound = false;
-
-			/*	for(FInstanceItemData iid : other->GetItems())
+			// Other is the container for the item we've dragged
+			// We need to find all the items contained in the armour we dragged
+			for (FInstanceItemData iid : GetGame()->GetInstancedItemsForContainer(iad.containerInstanceID))
+			{
+				if (id.type == EItemType::Armour)
 				{
-					if (id.type == EItemType::Armour)
-					{
-						iad = GetGame()->GetInstanceArmourDataByInstanceItemID(iid.ID);
+					iad = GetGame()->GetInstanceArmourDataByInstanceItemID(iid.ID);
 
-						if(iad.containerInstanceID == GetInstanceContainerData().ID)
-						{
-							selfFound = true;
-						}
+					if (iad.containerInstanceID == GetInstanceContainerData().ID)
+					{
+						selfFound = true;
 					}
-				}*/
+				}
+			}
 
 			if (selfFound)
 				return itemToTransfer;
@@ -177,7 +179,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 					// If there's still some left, try and add the remainder to the next empty slot
 					else
 					{
-						itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);						
+						itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
 					}
 				}
 				// If there are no existing items, just get the next valid slot

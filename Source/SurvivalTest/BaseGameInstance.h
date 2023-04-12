@@ -21,6 +21,8 @@ class UFactionManager;
 class URPGEventManager;
 class UContainerTableData;
 class APatrolPath;
+class AMainGrid;
+class UConsumableTableData;
 
 UCLASS()
 class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
@@ -44,6 +46,7 @@ public:
 
 	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);
 	FWeaponData GetWeaponData(int32 itemID);
+	FConsumableData GetConsumableData(int32 itemID);
 	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
@@ -68,6 +71,7 @@ public:
 	UArmourDataTable* GetArmourDataTable();
 	ULoadoutTableData* GetLoadoutTableData();
 	UContainerTableData* GetContainerData();
+	UConsumableTableData* GetConsumableData();
 	EGearType GetGearTypeForItem(int32 itemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
 	FString GetContainerInstanceName(int32 containerID);
@@ -87,6 +91,9 @@ public:
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
 
 	TArray<APatrolPath*> paths;
+
+	UPROPERTY()
+	AMainGrid* grid;
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
@@ -122,4 +129,7 @@ private:
 
 	UPROPERTY()
 		UContainerTableData* containerData;
+
+	UPROPERTY()
+		UConsumableTableData* consumableData;
 };

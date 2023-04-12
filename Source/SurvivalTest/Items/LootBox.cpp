@@ -96,10 +96,23 @@ FInstanceItemData ALootBox::CreateLoot(FItemData id)
 
 void ALootBox::ItemAdded(FInstanceItemData inItem)
 {
+
+}
+
+void ALootBox::RemoveLootBox()
+{
+	Destroy();
 }
 
 void ALootBox::ItemRemoved(FInstanceItemData inItem)
 {
+	if(!mIsTimerActive(TimerHandle_LootboxClear))
+		mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, 60.0f);
+
+	if (mTimeRemaining(TimerHandle_LootboxClear) < minTime)
+	{
+		mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, minTime);
+	}
 }
 
 void ALootBox::Tick(float DeltaTime)

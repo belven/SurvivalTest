@@ -15,6 +15,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemData, UItemContainer* inItemContainer);
 
+protected:
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
 	void UpdateItemDetails();
 

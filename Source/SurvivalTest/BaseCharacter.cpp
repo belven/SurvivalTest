@@ -17,6 +17,8 @@
 #include "BasePlayerController.h"
 #include "Components/SphereComponent.h"
 #include "Items/ItemContainer.h"
+#include "Missions/GridSectionData.h"
+#include "Missions/MainGrid.h"
 
 float ABaseCharacter::interactionRadius = 500;
 
@@ -155,7 +157,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 	iid.itemID = itemID;
 	iid.amount = 1;
 	iid.slot = GetSlotForGear(mGameInstance()->GetGearTypeForItem(itemID));
-	
+
 	if (inventory->AddItem(iid, ids).amount == 0) {
 		if (id.type == EItemType::Armour) {
 			EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
@@ -309,6 +311,22 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 	OnContainersUpdated.Broadcast();
 }
 
+void ABaseCharacter::Consume(EConsumableType type, int32 value)
+{
+	switch (type) {
+		case EConsumableType::Food:
+			currentStats.hunger += value;
+			break;
+	case EConsumableType::Drink:
+		currentStats.water += value;
+		break;
+	case EConsumableType::Medical:
+		currentStats.health += value;
+		break;
+	default: ;
+	}
+}
+
 /**
  * This is typically triggered by the BeginOverlap of the interactionSphere.
  * We use this to automate highlighting of in world actors, so the player can see them easier
@@ -330,24 +348,24 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 {
 	FItemData id = mGameInstance()->GetItemData(inItem.itemID);
-	
+
 	if (id.type == EItemType::Armour) {
 		FInstanceArmourData iad = mGameInstance()->GetInstanceArmourDataByInstanceItemID(inItem.ID);
 		EquipArmour(UArmour::CreateArmour(inItem.itemID, mGameInstance(), inItem.ID));
 	}
 	else if (id.type == EItemType::Weapon)
 	{
-		if(GetEquippedWeapon())
+		if (GetEquippedWeapon())
 		{
 			FWeaponData wd = mGameInstance()->GetWeaponData(inItem.itemID);
-			if(GetEquippedWeapon()->GetWeaponData().gearType == wd.gearType)
+			if (GetEquippedWeapon()->GetWeaponData().gearType == wd.gearType)
 			{
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));				
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));
 			}
 		}
 		else
 		{
-			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));			
+			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));
 		}
 	}
 	OnContainersUpdated.Broadcast();
@@ -434,6 +452,13 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 void ABaseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (mGameInstance()->grid)
+	{
+		AGridSection* gs = mGameInstance()->grid->GetGridSection(GetActorLocation());
+		if (gs)
+			gs->HighlightSection(DeltaSeconds);
+	}
 
 	if (currentStats.health > 0)
 	{

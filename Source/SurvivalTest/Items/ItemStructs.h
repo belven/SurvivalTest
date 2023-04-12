@@ -3,6 +3,12 @@
 #include "UObject/NoExportTypes.h"
 #include "ItemStructs.generated.h"
 
+#define mSetTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
+#define mSetTimer(handle, method, delay) mSetTimerWorld(GetWorld(), handle, method, delay)
+#define mTimeRemaining(handle) GetWorld()->GetTimerManager().GetTimerRemaining(handle)
+#define mIsTimerActive(handle) GetWorld()->GetTimerManager().IsTimerActive(handle)
+#define mClearTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
+
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
@@ -181,6 +187,16 @@ enum class EContainerType : uint8
 	End
 };
 
+UENUM(BlueprintType)
+enum class EConsumableType : uint8
+{
+	Food,
+	Drink,
+	Medical,
+	End
+};
+
+
 class UBaseGameInstance;
 
 UCLASS()
@@ -196,6 +212,7 @@ public:
 	static EGearType GetArmourSlot(FString typeName);
 	static ECharacterType GetCharacterType(FString typeName);
 	static EContainerType GetContainerType(FString typeName);
+	static EConsumableType GetConsumableType(FString typeName);
 	static bool GetBoolean(FString value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
 };
@@ -230,6 +247,22 @@ public:
 	int32 slots = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FString name;
+};
+
+USTRUCT(BlueprintType)
+struct FConsumableData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
+		int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
+		int32 itemID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
+		int32 value = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
+	EConsumableType consumableType;
 };
 
 

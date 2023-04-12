@@ -3,6 +3,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Character.h"
 #include "Items/Weapon.h"
+#include "Items/WeaponCreator.h"
 #include "UI/InventoryUI.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
@@ -53,6 +54,34 @@ void ABasePlayerController::OnPrimaryActionReleased()
 	performAction = false;
 }
 
+void ABasePlayerController::OnPrimaryWeapon()
+{
+		EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Primary_Weapon), EGearType::Primary_Weapon);
+}
+
+void ABasePlayerController::OnSecondaryWeapon()
+{
+	EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Secondary_Weapon), EGearType::Secondary_Weapon);
+}
+
+void ABasePlayerController::OnSidearm()
+{
+	EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Sidearm), EGearType::Sidearm);
+}
+
+void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
+{
+	FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
+
+	UWeapon* equippedWeapon = GetBaseCharacter()->GetEquippedWeapon();
+
+	// TODO need to check if we are quipping the same weapon
+	if(iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetWeaponData().gearType != type))
+	{
+		GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld()));
+	}
+}
+
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -61,6 +90,9 @@ void ABasePlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ABasePlayerController::OnPrimaryAction);
 	InputComponent->BindAction("PrimaryAction", IE_Released, this, &ABasePlayerController::OnPrimaryActionReleased);
+	InputComponent->BindAction("PrimaryWeapon", IE_Pressed, this, &ABasePlayerController::OnPrimaryWeapon);
+	InputComponent->BindAction("SecondaryWeapon", IE_Pressed, this, &ABasePlayerController::OnSecondaryWeapon);
+	InputComponent->BindAction("Sidearm", IE_Pressed, this, &ABasePlayerController::OnSidearm);
 	InputComponent->BindAction("Load Inventories", IE_Pressed, this, &ABasePlayerController::LoadInventories);
 	InputComponent->BindAction("Show Cursor", IE_Pressed, this, &ABasePlayerController::ShowCursor);
 	InputComponent->BindAxis("Move Forward / Backward", this, &ABasePlayerController::MoveForward);

@@ -26,10 +26,12 @@ public:
 	UFUNCTION()
 		void ItemAdded(FInstanceItemData inItem);
 
+	void RemoveLootBox();
 	UFUNCTION()
 		void ItemRemoved(FInstanceItemData inItem);
 
 protected:
+	FTimerHandle TimerHandle_LootboxClear;
 	virtual void BeginPlay() override;
 
 	UBaseGameInstance* GetGame();
@@ -53,6 +55,7 @@ protected:
 	FInstanceContainerData icd;
 	FInstanceBoxData ibd;
 	bool isHighlighted = false;
+	int32 minTime = 10;
 	
 	UPROPERTY()
 	UItemContainer* container;
