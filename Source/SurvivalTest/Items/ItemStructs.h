@@ -90,7 +90,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FString mesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	EItemType type;
+	EItemType type = EItemType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 maxStack;
 
