@@ -63,9 +63,24 @@ public:
 	UFUNCTION()
 		void ItemRemoved(FInstanceItemData inItem);
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	UGridSlot* AddToGrid(UUserWidget* widget);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+		UGridPanel* GetItemsGrid();
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItemToGrid(FInstanceItemData iid);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddArmourUI(FInstanceItemData iid, UItemUI* itemUI);
+	
 private:
 	UPROPERTY()
 		UItemContainer* container;
+
+	UPROPERTY()
+		UGridPanel* itemsGrid;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	int32 index;
