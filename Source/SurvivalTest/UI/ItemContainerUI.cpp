@@ -1,6 +1,7 @@
 #include "ItemContainerUI.h"
 
 #include "ItemUI.h"
+#include "Blueprint/WidgetTree.h"
 #include "Components/GridPanel.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
@@ -30,7 +31,7 @@ void UItemContainerUI::GenerateInventory()
 	for (int slot = 0; slot < GetItemContainer()->GetMaxItemCount() - 1; ++slot)
 	{
 		FInstanceItemData iid = GetItemContainer()->GetInstanceItemAtSlot(slot);
-		
+
 		if (iid.ID == UItemStructs::InvalidInt)
 		{
 			iid.slot = slot;
@@ -38,7 +39,7 @@ void UItemContainerUI::GenerateInventory()
 		}
 
 		AddItemToGrid(iid);
-	}	
+	}
 }
 
 int32 UItemContainerUI::GetCurrentColumn()
@@ -116,16 +117,19 @@ void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
 
 UGridSlot* UItemContainerUI::AddToGrid(UUserWidget* widget)
 {
+	//return AddItemWidgetToGrid(widget, GetCurrentRow(), GetCurrentColumn());
 	UGridSlot* slot = GetItemsGrid()->AddChildToGrid(widget, GetCurrentRow(), GetCurrentColumn());
+	//Cast<UGridSlot>(widget->Slot)->SetColumn(GetCurrentColumn());
+	//Cast<UGridSlot>(widget->Slot)->SetRow( GetCurrentRow());
 	return slot;
 }
 
 void UItemContainerUI::AddItemToGrid(FInstanceItemData iid)
 {
 	UItemUI* item = CreateWidget<UItemUI>(this, itemWidgetClass, "Item UI");
+	//UItemUI* item = WidgetTree.Get()->ConstructWidget<UItemUI>(itemWidgetClass, "Item UI");
 	item->UpdateItemData(iid, GetBaseGameInstance()->GetItemData(iid.itemID), GetItemContainer());
 	item->SetOwningPlayer(GetOwningPlayer());
-	//item->AddToViewport();
 
 	if (item->GetItemData().type == EItemType::Armour)
 	{
@@ -145,7 +149,8 @@ void UItemContainerUI::AddItemToGrid(FInstanceItemData iid)
 	args.Empty();
 	args.Add(FStringFormatArg(GetCurrentColumn()));
 	args.Add(FStringFormatArg(GetCurrentRow()));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, item->GetItemData().name + " added at " + FString::Format(TEXT("Column {0}, row {1} "), args));
+	args.Add(FStringFormatArg(GetItemsGrid()->GetAllChildren().Num()));
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, item->GetItemData().name + " added at " + FString::Format(TEXT("Column {0}, row {1} Items Count {2} "), args));
 }
 
 void UItemContainerUI::AddArmourUI(FInstanceItemData iid, UItemUI* itemUI)
@@ -157,9 +162,9 @@ void UItemContainerUI::AddArmourUI(FInstanceItemData iid, UItemUI* itemUI)
 		SetNextRowIndex();
 		AddToGrid(itemUI);
 
+		//UItemContainerUI* itemContainerUI = WidgetTree.Get()->ConstructWidget<UItemContainerUI>(itemContainerWidgetClass, "Armour Item Container UI");
 		UItemContainerUI* itemContainerUI = CreateWidget<UItemContainerUI>(this, itemContainerWidgetClass, "Armour Item Container UI");
 		itemContainerUI->SetOwningPlayer(GetOwningPlayer());
-		//itemContainerUI->AddToViewport();
 
 		itemUI->SetItemContainer(armourContainer);
 		itemContainerUI->SetItemContainer(armourContainer);
