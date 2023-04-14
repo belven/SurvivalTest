@@ -1,6 +1,6 @@
 #include "Team.h"
-#include "FactionManager.h"
-#include "BaseGameInstance.h"
+#include "../FactionManager.h"
+#include "../BaseGameInstance.h"
 
 ERelationshipType ITeam::GetRelationship(ITeam* other, UBaseGameInstance* instance)
 {

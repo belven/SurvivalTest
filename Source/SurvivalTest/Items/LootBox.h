@@ -2,8 +2,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ItemStructs.h"
-#include "SurvivalTest/Interactable.h"
-#include "SurvivalTest/ItemContainerInterface.h"
+#include "SurvivalTest/Interfaces/Interactable.h"
+#include "SurvivalTest/Interfaces/ItemContainerInterface.h"
 #include "LootBox.generated.h"
 
 class UItemContainer;

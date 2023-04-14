@@ -1,7 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "Items/ItemContainer.h"
+#include "../Items/ItemContainer.h"
 #include "ItemContainerInterface.generated.h"
 
 UINTERFACE(MinimalAPI)

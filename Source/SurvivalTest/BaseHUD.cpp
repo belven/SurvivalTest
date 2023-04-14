@@ -21,7 +21,7 @@ void ABaseHUD::DrawStats()
 
 	DrawStatBar(startX, startY, 60, "Health", player->GetCurrentStats().health / player->GetMaxStats().health, FLinearColor::Red, 100, 15);
 	DrawStatBar(startX, startY + 20, 60, "Water", player->GetCurrentStats().water / player->GetMaxStats().water, FLinearColor::Blue, 100, 15);
-	DrawStatBar(startX, startY + 40, 60, "Hunger", player->GetCurrentStats().hunger / player->GetMaxStats().hunger, FLinearColor::Yellow, 100, 15);
+	DrawStatBar(startX, startY + 40, 60, "Food", player->GetCurrentStats().hunger / player->GetMaxStats().hunger, FLinearColor::Yellow, 100, 15);
 	DrawStatBar(startX, startY + 60, 60, "Rest", player->GetCurrentStats().rest / player->GetMaxStats().rest, FLinearColor::White, 100, 15);
 }
 

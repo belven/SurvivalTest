@@ -1,7 +1,8 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "Engine/TargetPoint.h" 	
+#include "Engine/TargetPoint.h"
 #include "SurvivalTest/Items/ItemStructs.h"
+#include "MissionStructs.h"
 #include "Mission.generated.h"
 
 class AMissionArea;
@@ -10,6 +11,7 @@ UCLASS(HideCategories=("Rendering", "Replication", "Collision", "HLOD", "World_P
 class SURVIVALTEST_API AMission : public ATargetPoint
 {
 	GENERATED_BODY()
+
 public:
 	bool IsSpawnMission() const { return spawnMission; }
 	void SetSpawnMission(bool inSpawnMission) { spawnMission = inSpawnMission; }
@@ -22,37 +24,42 @@ protected:
 	void SpawnBox(FVector location);
 
 	UFUNCTION()
-		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex);
+	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex);
 	void SpawnMission();
 
 	bool IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp);
 	UFUNCTION()
-		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
-		int32 size;
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
-		int32 enemyAmount;
+	int32 size;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
+	int32 enemyAmount;
 	TSubclassOf<APawn> AIClass;
 
 	FTimerHandle TimerHandle_CheckNoPlayers;
-private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		int32 boxSize;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		int32 boxHeight;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		bool spawnMission = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		TMap<EItemType, int32> itemTypes;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		TMap<AMissionArea*, int32> players;
+	int32 boxSize;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		TArray<AMissionArea*>missionArea;
+	int32 boxHeight;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	EMissionType missionType;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	bool spawnMission = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	TMap<EItemType, int32> itemTypes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	TMap<AMissionArea*, int32> players;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	TArray<AMissionArea*> missionArea;
 };

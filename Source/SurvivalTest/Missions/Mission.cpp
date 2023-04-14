@@ -56,8 +56,8 @@ void AMission::SpawnBox(FVector location)
 	AMissionArea* area = GetWorld()->SpawnActor<AMissionArea>(location, GetActorRotation(), params);
 	FVector extent = FVector(boxSize / 2, boxSize / 2, boxHeight);
 	area->GetBox()->SetBoxExtent(extent);
-	//area->GetBox()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECR_Overlap);
 	missionArea.Add(area);
+
 	area->GetBox()->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMission::BeginOverlap);
 	area->GetBox()->OnComponentEndOverlap.AddUniqueDynamic(this, &AMission::EndOverlap);
 	DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);

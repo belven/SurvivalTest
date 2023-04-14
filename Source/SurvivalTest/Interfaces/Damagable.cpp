@@ -1,5 +1,5 @@
 #include "Damagable.h"
-#include "CharacterStructs.h"
+#include "../CharacterStructs.h"
 
 void IDamagable::ChangeHealth(FHealthChange& health_change)
 {

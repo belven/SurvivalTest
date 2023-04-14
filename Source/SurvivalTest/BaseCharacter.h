@@ -1,9 +1,9 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "Damagable.h"
-#include "Team.h"
+#include "Interfaces/Damagable.h"
+#include "Interfaces/Team.h"
 #include "GameFramework/Character.h"
-#include "Interactable.h"
+#include "Interfaces/Interactable.h"
 #include "Items/ItemStructs.h"
 #include "BaseCharacter.generated.h"
 

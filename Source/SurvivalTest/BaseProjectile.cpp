@@ -3,8 +3,8 @@
 #include "Components/SphereComponent.h"
 #include "BaseCharacter.h"
 #include "BaseGameInstance.h"
-#include "Damagable.h"
-#include "Team.h"
+#include "Interfaces/Damagable.h"
+#include "Interfaces/Team.h"
 
 const float ABaseProjectile::Default_Initial_Speed = 3000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 1.2f;

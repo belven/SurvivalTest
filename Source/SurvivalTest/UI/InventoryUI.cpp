@@ -3,8 +3,8 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BasePlayerController.h"
-#include "SurvivalTest/Interactable.h"
-#include "SurvivalTest/ItemContainerInterface.h"
+#include "SurvivalTest/Interfaces/Interactable.h"
+#include "SurvivalTest/Interfaces/ItemContainerInterface.h"
 
 TArray<UItemContainer*> UInventoryUI::GetContainers()
 {

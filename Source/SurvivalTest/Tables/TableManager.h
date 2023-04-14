@@ -11,17 +11,16 @@ class UItemDataTable;
 class UArmourDataTable;
 class UArmourResistanceDataTable;
 class ULoadoutTableData;
-class UFactionManager;
-class URPGEventManager;
 class UContainerTableData;
-class APatrolPath;
-class AMainGrid;
 class UConsumableTableData;
+class UMissionTable;
+class UMissionLoadoutTable;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
 {
 	GENERATED_BODY()
+
 public:
 	UItemDataTable* GetItemDataTable();
 	UWeaponDataTable* GetWeaponDataTable();
@@ -32,6 +31,8 @@ public:
 	ULoadoutTableData* GetLoadoutTableData();
 	UContainerTableData* GetContainerData();
 	UConsumableTableData* GetConsumableData();
+	UMissionTable* GetMissionTable();
+	UMissionLoadoutTable* GetMissionLoadoutTable();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
@@ -41,27 +42,33 @@ private:
 	UPROPERTY()
 	UItemDataTable* ItemData;
 
-	   UPROPERTY()
-		   UWeaponDataTable* WeaponData;
+	UPROPERTY()
+	UWeaponDataTable* WeaponData;
 
-	   UPROPERTY()
-		   URangedWeaponDataTable* rangedWeaponData;
+	UPROPERTY()
+	URangedWeaponDataTable* rangedWeaponData;
 
-	   UPROPERTY()
-		   UMeleeWeaponDataTable* meleeWeaponData;
+	UPROPERTY()
+	UMeleeWeaponDataTable* meleeWeaponData;
 
-	   UPROPERTY()
-		   UProjectileWeaponDataTable* projectileWeaponData;
+	UPROPERTY()
+	UProjectileWeaponDataTable* projectileWeaponData;
 
-	   UPROPERTY()
-		   UArmourDataTable* armourDataTable;
+	UPROPERTY()
+	UArmourDataTable* armourDataTable;
 
-	   UPROPERTY()
-		   ULoadoutTableData* loadoutTableData;
+	UPROPERTY()
+	ULoadoutTableData* loadoutTableData;
 
-	   UPROPERTY()
-		   UContainerTableData* containerData;
+	UPROPERTY()
+	UContainerTableData* containerData;
 
-	   UPROPERTY()
-		   UConsumableTableData* consumableData;
+	UPROPERTY()
+	UConsumableTableData* consumableData;
+
+	UPROPERTY()
+		UMissionTable* missionTable;
+
+	UPROPERTY()
+		UMissionLoadoutTable* missionLoadoutTable;
 };

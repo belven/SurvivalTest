@@ -9,6 +9,8 @@
 #include "RangedWeaponDataTable.h"
 #include "WeaponDataTable.h"
 #include "ConsumableTableData.h"
+#include "Mission/MissionLoadoutTable.h"
+#include "Mission/MissionTable.h"
 
 void UTableManager::LoadTableData()
 {
@@ -21,8 +23,9 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetLoadoutTableData());
 	LoadTableFromFile(GetContainerData());
 	LoadTableFromFile(GetConsumableData());
+	LoadTableFromFile(GetMissionTable());
+	LoadTableFromFile(GetMissionLoadoutTable());
 }
-
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
 {
@@ -118,6 +121,18 @@ UConsumableTableData* UTableManager::GetConsumableData()
 {
 	if (consumableData == nullptr) { consumableData = NewObject<UConsumableTableData>(); }
 	return consumableData;
+}
+
+UMissionTable* UTableManager::GetMissionTable()
+{
+	if (missionTable == nullptr) { missionTable = NewObject<UMissionTable>(); }
+	return missionTable;
+}
+
+UMissionLoadoutTable* UTableManager::GetMissionLoadoutTable()
+{
+	if (missionLoadoutTable == nullptr) { missionLoadoutTable = NewObject<UMissionLoadoutTable>(); }
+	return missionLoadoutTable;
 }
 
 #pragma endregion Getters

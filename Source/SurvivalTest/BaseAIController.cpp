@@ -5,7 +5,7 @@
 #include "Events/HealthChangeEvent.h"
 #include "Events/RPGEventManager.h"
 #include "BaseCharacter.h"
-#include "Damagable.h"
+#include "Interfaces/Damagable.h"
 #include "BaseGameInstance.h"
 #include "AI/NavigationSystemBase.h"
 #include "Components/SplineComponent.h"
