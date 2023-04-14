@@ -1,5 +1,7 @@
 #include "BaseHUD.h"
-#include "BaseCharacter.h"
+
+#include "GameFramework/PlayerController.h"
+#include "SurvivalTest/BaseCharacter.h"
 
 void ABaseHUD::DrawHUD()
 {
