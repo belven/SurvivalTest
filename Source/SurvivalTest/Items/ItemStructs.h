@@ -121,7 +121,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	EWeaponType type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-		EGearType gearType;
+	EGearType gearType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float useRate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
@@ -256,15 +256,14 @@ struct FConsumableData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
-		int32 ID = UItemStructs::InvalidInt;
+	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
-		int32 itemID = UItemStructs::InvalidInt;
+	int32 itemID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
-		int32 value = UItemStructs::InvalidInt;
+	int32 value = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
 	EConsumableType consumableType;
 };
-
 
 USTRUCT(BlueprintType)
 struct FInstanceContainerData

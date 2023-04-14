@@ -1,6 +1,5 @@
 #include "ItemContainer.h"
 #include "../BaseGameInstance.h"
-#include "SurvivalTest/Tables/ItemDataTable.h"
 
 UItemContainer::UItemContainer() : Super()
 {
@@ -37,7 +36,7 @@ bool UItemContainer::HasSpace(FInstanceItemData item)
 
 
 /**
- *
+ * 
  *
  */
 FInstanceItemData UItemContainer::GetInstanceItemAtSlot(int32 slot)
@@ -80,6 +79,9 @@ TArray<FInstanceItemData> UItemContainer::GetExistingItemsWithSpace(int32 itemID
 	return itemsFound;
 }
 
+/**
+ * 
+ */
 FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot)
 {
 	FItemData id = GetGame()->GetItemData(itemToTransfer.itemID);
@@ -91,11 +93,13 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		FInstanceArmourData iad = GetGame()->GetInstanceArmourDataByInstanceItemID(itemToTransfer.ID);
 
 		// If the containerInstanceID is the same as this container, then we're dragging the armour item, into it's own container
-		if (iad.containerInstanceID == GetInstanceContainerData().ID) {
+		if (iad.containerInstanceID == GetInstanceContainerData().ID)
+		{
 			return itemToTransfer;
 		}
-		else // TODO This only works for 1 layer of container, would be worth making a recursive method for this
-			// This is also solved by simply not allowing armour in armour etc.
+		else
+		// TODO This only works for 1 layer of container, would be worth making a recursive method for this
+		// This is also solved by simply not allowing armour in armour etc.
 		{
 			bool selfFound = false;
 			// Other is the container for the item we've dragged
@@ -128,8 +132,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		EGearType existingIType = GetGame()->GetGearTypeForItem(existingItem.itemID);
 
 		// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
-		if (existingItem.itemID != itemToTransfer.itemID && IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType)) {
-
+		if (existingItem.itemID != itemToTransfer.itemID && IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType))
+		{
 			// Switch the items in the containers
 			existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
 			existingItem.slot = itemToTransfer.slot;
@@ -154,7 +158,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 				TArray<FInstanceItemData> itemsFound = GetExistingItemsWithSpace(itemToTransfer.itemID);
 
 				// If we found items, then try and add to them
-				if (itemsFound.Num() > 0) {
+				if (itemsFound.Num() > 0)
+				{
 					int32 maxStack = GetGame()->GetItemData(itemToTransfer.itemID).maxStack;
 
 					for (FInstanceItemData iid : itemsFound)
@@ -170,7 +175,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 					}
 
 					// If amount is 0, then remove us
-					if (itemToTransfer.amount == 0) {
+					if (itemToTransfer.amount == 0)
+					{
 						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
 						other->OnItemRemoved.Broadcast(itemToTransfer);
 						OnItemAdded.Broadcast(itemToTransfer);
@@ -235,7 +241,8 @@ int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 	return gearType != EGearType::End ? FindNextEmptyValidSlot(gearType) : GetNextEmptySlot();
 }
 
-/** Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
+/**
+* Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
 * else it will create a new item with the remaining amount and set the one found to StackSize
 *
 *@param ids the list of new InstanceItemData ids created in the database

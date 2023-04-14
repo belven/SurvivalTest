@@ -16,7 +16,6 @@ class SURVIVALTEST_API ALootBox : public AActor, public IInteractable, public II
 public:
 	ALootBox();
 	void SetUpBox();
-	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual UItemContainer* GetItemContainer() override { return container; }
 	virtual void Interact(ABasePlayerController* instigator) override;
