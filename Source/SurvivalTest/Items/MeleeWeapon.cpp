@@ -5,7 +5,7 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BaseGameInstance.h"
 
-#define mSphereTraceMulti(start, end, radius, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, ETraceTypeQuery::TraceTypeQuery_MAX, true, ignore, EDrawDebugTrace::ForOneFrame, hits, true);
+#define mSphereTraceMulti(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::ForDuration, hits, true);
 
 void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 {
@@ -14,12 +14,15 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 	TArray<AActor*> ignore;
 	ignore.Add(GetOwner());
 
-	FVector endLoc = GetOwner()->GetActorLocation() + (GetOwner()->GetActorForwardVector() * GetWeaponData().range);
-	FVector startLoc = GetOwner()->GetActorLocation();
+	FVector actorLocation = GetOwner()->GetActorLocation() ;
+	FVector actorForwardVector = GetOwner()->GetActorForwardVector();
+	actorLocation.Z += GetOwner()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+
+	FVector endLoc = actorLocation + (actorForwardVector * GetWeaponData().range);
+	FVector startLoc = actorLocation;
 	float dist = FVector::Dist(endLoc, startLoc);
 	double radius = GetOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5;
-
-	mSphereTraceMulti(startLoc, endLoc, radius, hits, ignore);
+	mSphereTraceMulti(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
 
 	for(FHitResult hit : hits)
 	{
@@ -42,4 +45,9 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 		change.heals = GetWeaponData().heals;
 		hit->ChangeHealth(change);
 	}
+}
+
+UWorld* UMeleeWeapon::GetWorld() const
+{
+	return GetOwner()->GetWorld();
 }

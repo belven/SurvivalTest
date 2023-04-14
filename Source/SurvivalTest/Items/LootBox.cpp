@@ -6,7 +6,7 @@
 
 ALootBox::ALootBox()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	boxMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Loot Box Mesh"));
 	boxMeshComp->SetCustomDepthStencilValue(2);	
 }
@@ -15,8 +15,8 @@ void ALootBox::SetUpBox()
 {
 	if (boxMesh) {
 		boxMeshComp->SetStaticMesh(boxMesh);
-		boxMeshComp->SetCollisionProfileName("Interaction");
-		boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		//boxMeshComp->SetCollisionProfileName("Interaction");
+		//boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
 }
 
@@ -113,12 +113,6 @@ void ALootBox::ItemRemoved(FInstanceItemData inItem)
 	{
 		mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, minTime);
 	}
-}
-
-void ALootBox::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void ALootBox::OnConstruction(const FTransform& Transform)

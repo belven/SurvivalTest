@@ -11,6 +11,8 @@ public:
 	virtual void UseWeapon(const FVector& LookAtRotation) override;
 	FMeleeWeaponData GetMeleeWeaponData() const { return meleeWeaponData; }
 	void SetMeleeWeaponData(FMeleeWeaponData data) { meleeWeaponData = data; }
+	virtual UWorld* GetWorld() const override;
+
 protected:
 	FMeleeWeaponData meleeWeaponData;
 	
