@@ -1,64 +1,25 @@
 #include "ItemContainerUI.h"
 
-#include "ItemUI.h"
-#include "Components/GridPanel.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
-UItemContainerUI::UItemContainerUI(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
-	//static ConstructorHelpers::FClassFinder<UUserWidget> itemWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemUI_BP.ItemUI_BP_C'"));
-
-	//if (itemWidgetClassFound.Class != nullptr)
-	//{
-	//	itemWidgetClass = itemWidgetClassFound.Class;
-	//}
-
-	//static ConstructorHelpers::FClassFinder<UUserWidget> itemContainerWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemContainerUI_BP.ItemContainerUI_BP_C'"));
-
-	//if (itemContainerWidgetClassFound.Class != nullptr)
-	//{
-	//	itemContainerWidgetClass = itemContainerWidgetClassFound.Class;
-	//}
-}
-
-void UItemContainerUI::GenerateInventory()
-{
-	//SetInventoryName_BP(GetContainerName());
-	ResetIndex();
-	GetItemsGrid()->ClearChildren();
-
-	for (int slot = 0; slot < GetItemContainer()->GetMaxItemCount() - 1; ++slot)
-	{
-		FInstanceItemData iid = GetItemContainer()->GetInstanceItemAtSlot(slot);
-		
-		if (iid.ID == UItemStructs::InvalidInt)
-		{
-			iid.slot = slot;
-			iid.amount = 1;
-		}
-
-		AddItemToGrid(iid);
-	}	
-}
-
-int32 UItemContainerUI::GetCurrentColumn()
+int32 UItemContainerUI::GetColumn()
 {
 	return index % 5;
 }
 
 int32 UItemContainerUI::GetNextRowIndex()
 {
-	int32 nextRow = GetCurrentRow() + 1;
+	int32 nextRow = GetRow() + 1;
 	return (nextRow * 5);
 }
 
 void UItemContainerUI::GetGridData(int32& row, int32& column)
 {
-	row = GetCurrentRow();
-	column = GetCurrentColumn();
+	row = GetRow();
+	column = GetColumn();
 }
 
-int32 UItemContainerUI::GetCurrentRow()
+int32 UItemContainerUI::GetRow()
 {
 	int32 itemsPerRow = 5;
 	int32 rowMod = index % itemsPerRow;
@@ -88,11 +49,14 @@ UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData da
 
 	if (cd.slots > 0)
 	{
-		for (auto& iad : gameInstance->GetInstancedArmour())
+		TArray<FInstanceArmourData> armour;
+		gameInstance->GetInstancedArmour().GenerateValueArray(armour);
+
+		for (FInstanceArmourData iad : armour)
 		{
-			if (iad.Value.instancedItemDataID == data.ID)
+			if (iad.instancedItemDataID == data.ID)
 			{
-				iadFound = iad.Value;
+				iadFound = iad;
 			}
 		}
 
@@ -112,71 +76,4 @@ void UItemContainerUI::ItemAdded(FInstanceItemData inItem)
 void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
 {
 	GenerateInventory();
-}
-
-UGridSlot* UItemContainerUI::AddToGrid(UUserWidget* widget)
-{
-	UGridSlot* slot = GetItemsGrid()->AddChildToGrid(widget, GetCurrentRow(), GetCurrentColumn());
-	return slot;
-}
-
-void UItemContainerUI::AddItemToGrid(FInstanceItemData iid)
-{
-	UItemUI* item = CreateWidget<UItemUI>(this, itemWidgetClass, "Item UI");
-	item->UpdateItemData(iid, GetBaseGameInstance()->GetItemData(iid.itemID), GetItemContainer());
-	item->SetOwningPlayer(GetOwningPlayer());
-	//item->AddToViewport();
-
-	if (item->GetItemData().type == EItemType::Armour)
-	{
-		AddArmourUI(iid, item);
-	}
-	else
-	{
-		AddToGrid(item);
-		IncrementIndex();
-	}
-
-	TArray< FStringFormatArg > args;
-	args.Add(FStringFormatArg(item->GetItemData().ID));
-	args.Add(FStringFormatArg(item->GetInstanceItemData().ID));
-	//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, FString::Format(TEXT("Item ID {0}, Instance ID {1} "), args));
-
-	args.Empty();
-	args.Add(FStringFormatArg(GetCurrentColumn()));
-	args.Add(FStringFormatArg(GetCurrentRow()));
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Green, item->GetItemData().name + " added at " + FString::Format(TEXT("Column {0}, row {1} "), args));
-}
-
-void UItemContainerUI::AddArmourUI(FInstanceItemData iid, UItemUI* itemUI)
-{
-	UItemContainer* armourContainer = GetItemContainerForArmour(iid);
-
-	if (armourContainer)
-	{
-		SetNextRowIndex();
-		AddToGrid(itemUI);
-
-		UItemContainerUI* itemContainerUI = CreateWidget<UItemContainerUI>(this, itemContainerWidgetClass, "Armour Item Container UI");
-		itemContainerUI->SetOwningPlayer(GetOwningPlayer());
-		//itemContainerUI->AddToViewport();
-
-		itemUI->SetItemContainer(armourContainer);
-		itemContainerUI->SetItemContainer(armourContainer);
-		itemContainerUI->SetBaseGameInstance(GetBaseGameInstance());
-		itemContainerUI->SetVisibility(ESlateVisibility::Collapsed);
-
-		SetNextRowIndex();
-
-		UGridSlot* slot = AddToGrid(itemContainerUI);
-		slot->SetColumnSpan(5);
-
-		SetNextRowIndex();
-		itemContainerUI->GenerateInventory();
-	}
-	else
-	{
-		AddToGrid(itemUI);
-		IncrementIndex();
-	}
 }

@@ -1,32 +1,22 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Components/GridSlot.h"
 #include "SurvivalTest/Items/ItemContainer.h"
 #include "ItemContainerUI.generated.h"
 
 class UBaseGameInstance;
-class UItemUI;
 
 UCLASS(Blueprintable)
 class SURVIVALTEST_API UItemContainerUI : public UUserWidget
 {
 	GENERATED_BODY()
-		
-public:
-	UItemContainerUI(const FObjectInitializer& ObjectInitializer);
 
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
+public:
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
 		void GenerateInventory();
 
-	//UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		//void SetInventoryText(FString name);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		UGridSlot* AddItemWidgetToGrid(UUserWidget* widget, int32 row, int32 column);
-	
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		int32 GetCurrentColumn();
+		int32 GetColumn();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		int32 GetNextRowIndex();
@@ -38,7 +28,7 @@ public:
 		void SetIndex(int32 value) { index = value; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		int32 GetCurrentRow();
+		int32 GetRow();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void ResetIndex() { index = 0; }
@@ -73,38 +63,9 @@ public:
 	UFUNCTION()
 		void ItemRemoved(FInstanceItemData inItem);
 
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	UGridSlot* AddToGrid(UUserWidget* widget);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Inventory")
-		UGridPanel* GetItemsGrid();
-	
-		UGridPanel* GetItemsGrid_Implementation() { return itemsGrid; }
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItemToGrid(FInstanceItemData iid);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddArmourUI(FInstanceItemData iid, UItemUI* itemUI);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void SetItemsGrid(UGridPanel* inItemsGrid)
-	{
-		itemsGrid = inItemsGrid;
-	}
-
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-		TSubclassOf<UUserWidget> itemWidgetClass;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UUserWidget> itemContainerWidgetClass;
-	
 	UPROPERTY()
 		UItemContainer* container;
-
-	UPROPERTY()
-		UGridPanel* itemsGrid;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	int32 index;
