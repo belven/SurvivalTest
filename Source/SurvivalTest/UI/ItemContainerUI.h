@@ -76,15 +76,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UGridSlot* AddToGrid(UUserWidget* widget);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Inventory")
 		UGridPanel* GetItemsGrid();
 	
+		UGridPanel* GetItemsGrid_Implementation() { return itemsGrid; }
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItemToGrid(FInstanceItemData iid);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddArmourUI(FInstanceItemData iid, UItemUI* itemUI);
-	
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SetItemsGrid(UGridPanel* inItemsGrid)
+	{
+		itemsGrid = inItemsGrid;
+	}
+
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 		TSubclassOf<UUserWidget> itemWidgetClass;
@@ -94,7 +102,10 @@ private:
 	
 	UPROPERTY()
 		UItemContainer* container;
-	
+
+	UPROPERTY()
+		UGridPanel* itemsGrid;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	int32 index;
 

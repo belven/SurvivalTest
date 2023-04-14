@@ -117,6 +117,7 @@ void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
 UGridSlot* UItemContainerUI::AddToGrid(UUserWidget* widget)
 {
 	UGridSlot* slot = GetItemsGrid()->AddChildToGrid(widget, GetCurrentRow(), GetCurrentColumn());
+	
 	return slot;
 }
 
