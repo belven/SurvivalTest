@@ -123,7 +123,7 @@ protected:
 	void ResetStats();
 	bool inCombat;
 	virtual void BeginPlay() override;
-	void SetupLoadout();
+	void SetupLoadout(FString loadoutName);
 
 	UFUNCTION()
 		void CreateNewItemForInventory(int32 itemID);

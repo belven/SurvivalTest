@@ -8,7 +8,7 @@
 
 class UItemContainer;
 
-UCLASS()
+UCLASS(HideCategories = ("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
 class SURVIVALTEST_API ALootBox : public AActor, public IInteractable, public IItemContainerInterface
 {
 	GENERATED_BODY()

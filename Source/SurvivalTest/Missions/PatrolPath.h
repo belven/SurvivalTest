@@ -5,7 +5,7 @@
 #include "PatrolPath.generated.h"
 
 class USplineComponent;
-UCLASS()
+UCLASS(HideCategories = ("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
 class SURVIVALTEST_API APatrolPath : public AActor
 {
 	GENERATED_BODY()

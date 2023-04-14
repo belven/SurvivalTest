@@ -56,7 +56,7 @@ public:
 
 	FInstanceItemData CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID);
 	FArmourData GetArmourDataByItemID(int32 itemID);
-	FLoadoutData GetLoadoutData(int32 entityID);
+	FLoadoutData GetLoadoutData(FString loadoutName);
 
 	TArray<FInstanceItemData> GetInventoryItems(int32 instanceContainerID);
 

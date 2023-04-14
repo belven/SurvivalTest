@@ -70,7 +70,7 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	SetupLoadout();
+	GetOverlapsOnSpawn();
 }
 
 /**
@@ -79,9 +79,9 @@ void ABaseCharacter::BeginPlay()
  * This will need to be updated so that players either load existing gear or a new starter set.
  * AI will also need to have gear sets set in the database, so we can spawn them with specific gear based on the mission
  */
-void ABaseCharacter::SetupLoadout()
+void ABaseCharacter::SetupLoadout(FString loadoutName)
 {
-	const FLoadoutData ld = mGameInstance()->GetLoadoutData(1);
+	const FLoadoutData ld = mGameInstance()->GetLoadoutData(loadoutName);
 	int32 instanceContainerDataID = mGameInstance()->GetNextInstanceContainerDataID();
 	FContainerData cd = mGameInstance()->GetContainerDataName("Character Inventory");
 
@@ -112,6 +112,7 @@ void ABaseCharacter::SetupLoadout()
 	CreateNewItemForInventory(ld.weaponID);
 	CreateNewItemForInventory(ld.headArmourID);
 	CreateNewItemForInventory(ld.chestArmourID);
+	CreateNewItemForInventory(ld.vestArmourID);
 	CreateNewItemForInventory(ld.legsArmourID);
 
 	inventory->OnItemAdded.AddUniqueDynamic(this, &ABaseCharacter::ItemAdded);
@@ -151,20 +152,22 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
  */
 void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 {
-	FItemData id = mGameInstance()->GetItemData(itemID);
-	TArray<int32> ids;
-	FInstanceItemData iid;
-	iid.itemID = itemID;
-	iid.amount = 1;
-	iid.slot = GetSlotForGear(mGameInstance()->GetGearTypeForItem(itemID));
+	if (itemID != UItemStructs::InvalidInt) {
+		FItemData id = mGameInstance()->GetItemData(itemID);
+		TArray<int32> ids;
+		FInstanceItemData iid;
+		iid.itemID = itemID;
+		iid.amount = 1;
+		iid.slot = GetSlotForGear(mGameInstance()->GetGearTypeForItem(itemID));
 
-	if (inventory->AddItem(iid, ids).amount == 0) {
-		if (id.type == EItemType::Armour) {
-			EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
-		}
-		else if (id.type == EItemType::Weapon)
-		{
-			SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld()));
+		if (inventory->AddItem(iid, ids).amount == 0) {
+			if (id.type == EItemType::Armour) {
+				EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
+			}
+			else if (id.type == EItemType::Weapon)
+			{
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld()));
+			}
 		}
 	}
 }
@@ -273,14 +276,16 @@ int32 ABaseCharacter::GetDamageResistance()
  */
 void ABaseCharacter::GetOverlapsOnSpawn()
 {
-	TArray<AActor*> actors;
-	interactionSphere->GetOverlappingActors(actors);
+	if (interactionSphere) {
+		TArray<AActor*> actors;
+		interactionSphere->GetOverlappingActors(actors);
 
-	for (AActor* actor : actors)
-	{
-		if (actor->Implements<UInteractable>())
+		for (AActor* actor : actors)
 		{
-			AddInteractable(Cast<IInteractable>(actor));
+			if (actor->Implements<UInteractable>())
+			{
+				AddInteractable(Cast<IInteractable>(actor));
+			}
 		}
 	}
 }
@@ -439,9 +444,12 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	if (NewController->IsA(ABasePlayerController::StaticClass()))
 	{
 		GetOverlapsOnSpawn();
+
+		SetupLoadout("Player");
 	}
 	else
 	{
+		SetupLoadout("AI Base");
 		interactionSphere->DestroyComponent();
 	}
 }

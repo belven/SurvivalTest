@@ -5,15 +5,7 @@
 
 class AGridSection;
 
-//USTRUCT()
-//struct FGridData
-//{
-//	GENERATED_BODY()
-//public:
-//	TArray<>
-//};
-
-UCLASS()
+UCLASS(HideCategories=(Rendering, Replication, Collision, HLOD, World_Partition, Input, Replication, Actor, Cooking, Data_Layers, Physics, Lighting, Navigation, Tags, Activation))
 class SURVIVALTEST_API AMainGrid : public ATargetPoint
 {
 	GENERATED_BODY()
@@ -30,7 +22,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleDefaultsOnly)
 	TArray<AGridSection*> gridSections;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
@@ -48,7 +40,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Grid", meta = (AllowPrivateAccess = "true"))
 	int32 heightAboveGround = 300;
 
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly)
 	UStaticMesh* mesh;
 	//UE::Math::TVector2<AGridSection*> grid;
 	//AGridSection* grid[][];

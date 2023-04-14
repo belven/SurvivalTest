@@ -11,7 +11,6 @@
 #include "Tables/ProjectileWeaponDataTable.h"
 #include "Tables/RangedWeaponDataTable.h"
 #include "Tables/WeaponDataTable.h"
-#include "Missions/PatrolPath.h"
 #include "Tables/ConsumableTableData.h"
 
 void UBaseGameInstance::Init()
@@ -287,11 +286,11 @@ FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 	return {};
 }
 
-FLoadoutData UBaseGameInstance::GetLoadoutData(int32 entityID)
+FLoadoutData UBaseGameInstance::GetLoadoutData(FString loadoutName)
 {
 	for (const FLoadoutData ld : GetLoadoutTableData()->GetData())
 	{
-		if (ld.entityID == entityID)
+		if (ld.name.Equals( loadoutName))
 		{
 			return ld;
 		}

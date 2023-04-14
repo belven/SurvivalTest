@@ -60,7 +60,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 entityID;
+	FString name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	ECharacterType type;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
@@ -69,6 +69,8 @@ public:
 	int32 headArmourID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 chestArmourID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
+	int32 vestArmourID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 legsArmourID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")

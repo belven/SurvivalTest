@@ -6,7 +6,7 @@
 
 class AMissionArea;
 
-UCLASS()
+UCLASS(HideCategories=("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
 class SURVIVALTEST_API AMission : public ATargetPoint
 {
 	GENERATED_BODY()
