@@ -5,7 +5,7 @@
 #include "Components/GridPanel.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
-int32 UItemContainerUI::GetColumn()
+UItemContainerUI::UItemContainerUI(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	//static ConstructorHelpers::FClassFinder<UUserWidget> itemWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemUI_BP.ItemUI_BP_C'"));
 
@@ -49,17 +49,17 @@ int32 UItemContainerUI::GetCurrentColumn()
 
 int32 UItemContainerUI::GetNextRowIndex()
 {
-	int32 nextRow = GetRow() + 1;
+	int32 nextRow = GetCurrentRow() + 1;
 	return (nextRow * 5);
 }
 
 void UItemContainerUI::GetGridData(int32& row, int32& column)
 {
-	row = GetRow();
-	column = GetColumn();
+	row = GetCurrentRow();
+	column = GetCurrentColumn();
 }
 
-int32 UItemContainerUI::GetRow()
+int32 UItemContainerUI::GetCurrentRow()
 {
 	int32 itemsPerRow = 5;
 	int32 rowMod = index % itemsPerRow;
@@ -89,14 +89,11 @@ UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData da
 
 	if (cd.slots > 0)
 	{
-		TArray<FInstanceArmourData> armour;
-		gameInstance->GetInstancedArmour().GenerateValueArray(armour);
-
-		for (FInstanceArmourData iad : armour)
+		for (auto& iad : gameInstance->GetInstancedArmour())
 		{
-			if (iad.instancedItemDataID == data.ID)
+			if (iad.Value.instancedItemDataID == data.ID)
 			{
-				iadFound = iad;
+				iadFound = iad.Value;
 			}
 		}
 
