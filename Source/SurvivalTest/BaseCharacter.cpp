@@ -231,6 +231,8 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 		SetActorEnableCollision(false);
 		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 	}
+
+	mEventTriggered(mGameInstance(), mCreateHealthChangeEvent(this, health_change, false));
 }
 
 
