@@ -4,6 +4,7 @@ AMissionArea::AMissionArea()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	box = CreateDefaultSubobject<UBoxComponent>(TEXT("Mission Area Box"));
+	box->SetCollisionProfileName("Interaction");
 	RootComponent = box;
 }
 

@@ -6,7 +6,7 @@
 #include "Damagable.h"
 #include "Team.h"
 
-const float ABaseProjectile::Default_Initial_Speed = 1000.0f;
+const float ABaseProjectile::Default_Initial_Speed = 3000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 1.2f;
 
 ABaseProjectile::ABaseProjectile()

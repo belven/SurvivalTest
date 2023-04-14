@@ -5,14 +5,14 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BaseGameInstance.h"
 
-#define mSphereTraceMulti(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::ForDuration, hits, true);
+#define mSphereTraceMulti(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::None, hits, true);
 
 void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 {
 	if (canAttack) {
 		canAttack = false;
 
-		mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::ShotTimerExpired, GetWeaponData().useRate);
+		mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::AttackComplete, GetWeaponData().useRate);
 		TArray<FHitResult> hits;
 		TArray<IDamagable*> hitTargets;
 		TArray<AActor*> ignore;
@@ -50,11 +50,6 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 			hit->ChangeHealth(change);
 		}
 	}
-}
-
-void UMeleeWeapon::AttackComplete()
-{
-	canAttack = true;
 }
 
 UWorld* UMeleeWeapon::GetWorld() const

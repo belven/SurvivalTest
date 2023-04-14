@@ -1,5 +1,4 @@
 #include "BaseGameInstance.h"
-
 #include "FactionManager.h"
 #include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
@@ -15,8 +14,27 @@
 #include "Missions/PatrolPath.h"
 #include "Tables/ConsumableTableData.h"
 
+void UBaseGameInstance::Init()
+{
+	Super::Init();
+	LoadTableData();
+}
+
 UBaseGameInstance::UBaseGameInstance()
 {
+}
+
+void UBaseGameInstance::LoadTableData()
+{
+	LoadTableFromFile(GetItemDataTable());
+	LoadTableFromFile(GetWeaponDataTable());
+	LoadTableFromFile(GetRangedWeaponData());
+	LoadTableFromFile(GetMeleeWeaponData());
+	LoadTableFromFile(GetProjectileWeaponData());
+	LoadTableFromFile(GetArmourDataTable());
+	LoadTableFromFile(GetLoadoutTableData());
+	LoadTableFromFile(GetContainerData());
+	LoadTableFromFile(GetConsumableData());
 }
 
 void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
@@ -30,8 +48,8 @@ void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
 
 		FFileHelper::LoadFileToString(FileContent, *path);
 
-		const TCHAR* Terminators[] = { L"\r", L"\n" };
-		const TCHAR* CSVDelimiters[] = { TEXT(","), TEXT("\t") };
+		const TCHAR* Terminators[] = {L"\r", L"\n"};
+		const TCHAR* CSVDelimiters[] = {TEXT(","), TEXT("\t")};
 
 		TArray<FString> CSVLines;
 		FileContent.ParseIntoArray(CSVLines, Terminators, 2);
@@ -66,6 +84,17 @@ int32 UBaseGameInstance::GetNextInstanceItemDataID()
 		instanceItemDataID = GetInstancedItems()[GetInstancedItems().Num() - 1].ID + 1;
 	}
 	return instanceItemDataID;
+}
+
+
+int32 UBaseGameInstance::GetNextBoxID()
+{
+	int32 boxID = 0;
+	if (GetInstancedBoxes().Num() > 0)
+	{
+		boxID = GetInstancedBoxes()[GetInstancedBoxes().Num() - 1].boxID + 1;
+	}
+	return boxID;
 }
 
 int32 UBaseGameInstance::GetNextInstanceBoxDataID()
@@ -114,30 +143,6 @@ TArray<FInstanceItemData> UBaseGameInstance::GetInstancedItemsForContainer(int32
 	}
 	return itemsFound;
 }
-
-void UBaseGameInstance::LoadTableData()
-{
-	LoadTableFromFile(GetItemDataTable());
-	LoadTableFromFile(GetWeaponDataTable());
-	LoadTableFromFile(GetRangedWeaponData());
-	LoadTableFromFile(GetMeleeWeaponData());
-	LoadTableFromFile(GetProjectileWeaponData());
-	LoadTableFromFile(GetArmourDataTable());
-	LoadTableFromFile(GetLoadoutTableData());
-	LoadTableFromFile(GetContainerData());
-	LoadTableFromFile(GetConsumableData());
-}
-
-UFactionManager* UBaseGameInstance::GetFactionManager()
-{
-	if (factionManager == nullptr)
-	{
-		factionManager = NewObject<UFactionManager>();
-	}
-
-	return factionManager;
-}
-
 
 FItemData UBaseGameInstance::GetItemData(int32 itemID)
 {
@@ -307,116 +312,9 @@ TArray<FInstanceItemData> UBaseGameInstance::GetInventoryItems(int32 instanceCon
 	return data;
 }
 
-void UBaseGameInstance::Init()
-{
-	Super::Init();
-	LoadTableData();
-}
-
-URPGEventManager* UBaseGameInstance::GetEventManager()
-{
-	if (eventManager == nullptr)
-	{
-		eventManager = NewObject<URPGEventManager>();
-	}
-
-	return eventManager;
-}
-
-UItemDataTable* UBaseGameInstance::GetItemDataTable()
-{
-	if (ItemData == nullptr)
-	{
-		ItemData = NewObject<UItemDataTable>();
-	}
-
-	return ItemData;
-}
-
-UWeaponDataTable* UBaseGameInstance::GetWeaponDataTable()
-{
-	if (WeaponData == nullptr)
-	{
-		WeaponData = NewObject<UWeaponDataTable>();
-	}
-
-	return WeaponData;
-}
-
-URangedWeaponDataTable* UBaseGameInstance::GetRangedWeaponData()
-{
-	if (rangedWeaponData == nullptr)
-	{
-		rangedWeaponData = NewObject<URangedWeaponDataTable>();
-	}
-
-	return rangedWeaponData;
-}
-
-UProjectileWeaponDataTable* UBaseGameInstance::GetProjectileWeaponData()
-{
-	if (projectileWeaponData == nullptr)
-	{
-		projectileWeaponData = NewObject<UProjectileWeaponDataTable>();
-	}
-
-	return projectileWeaponData;
-}
-
-UMeleeWeaponDataTable* UBaseGameInstance::GetMeleeWeaponData()
-{
-	if (meleeWeaponData == nullptr)
-	{
-		meleeWeaponData = NewObject<UMeleeWeaponDataTable>();
-	}
-
-	return meleeWeaponData;
-}
-
-UArmourDataTable* UBaseGameInstance::GetArmourDataTable()
-{
-	if (armourDataTable == nullptr)
-	{
-		armourDataTable = NewObject<UArmourDataTable>();
-	}
-
-	return armourDataTable;
-}
-
-ULoadoutTableData* UBaseGameInstance::GetLoadoutTableData()
-{
-	if (loadoutTableData == nullptr)
-	{
-		loadoutTableData = NewObject<ULoadoutTableData>();
-	}
-
-	return loadoutTableData;
-}
-
-UContainerTableData* UBaseGameInstance::GetContainerData()
-{
-	if (containerData == nullptr)
-	{
-		containerData = NewObject<UContainerTableData>();
-	}
-
-	return containerData;
-}
-
-UConsumableTableData* UBaseGameInstance::GetConsumableData()
-{
-	if (consumableData == nullptr)
-	{
-		consumableData = NewObject<UConsumableTableData>();
-	}
-
-	return consumableData;
-}
-
 EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)
 {
 	FItemData id = GetItemData(itemID);
-
 	if (id.type == EItemType::Armour)
 	{
 		FArmourData ad = GetArmourDataByItemID(itemID);
@@ -461,5 +359,74 @@ FInstanceArmourData UBaseGameInstance::GetInstanceArmourDataByInstanceItemID(int
 		if (iad.Value.instancedItemDataID == InstanceItemID)
 			return iad.Value;
 	}
-	return{};
+	return {};
 }
+
+#pragma region Getters
+UFactionManager* UBaseGameInstance::GetFactionManager()
+{
+	if (factionManager == nullptr) { factionManager = NewObject<UFactionManager>(); }
+	return factionManager;
+}
+
+URPGEventManager* UBaseGameInstance::GetEventManager()
+{
+	if (eventManager == nullptr) { eventManager = NewObject<URPGEventManager>(); }
+	return eventManager;
+}
+
+UItemDataTable* UBaseGameInstance::GetItemDataTable()
+{
+	if (ItemData == nullptr) { ItemData = NewObject<UItemDataTable>(); }
+	return ItemData;
+}
+
+UWeaponDataTable* UBaseGameInstance::GetWeaponDataTable()
+{
+	if (WeaponData == nullptr) { WeaponData = NewObject<UWeaponDataTable>(); }
+	return WeaponData;
+}
+
+URangedWeaponDataTable* UBaseGameInstance::GetRangedWeaponData()
+{
+	if (rangedWeaponData == nullptr) { rangedWeaponData = NewObject<URangedWeaponDataTable>(); }
+	return rangedWeaponData;
+}
+
+UProjectileWeaponDataTable* UBaseGameInstance::GetProjectileWeaponData()
+{
+	if (projectileWeaponData == nullptr) { projectileWeaponData = NewObject<UProjectileWeaponDataTable>(); }
+	return projectileWeaponData;
+}
+
+UMeleeWeaponDataTable* UBaseGameInstance::GetMeleeWeaponData()
+{
+	if (meleeWeaponData == nullptr) { meleeWeaponData = NewObject<UMeleeWeaponDataTable>(); }
+	return meleeWeaponData;
+}
+
+UArmourDataTable* UBaseGameInstance::GetArmourDataTable()
+{
+	if (armourDataTable == nullptr) { armourDataTable = NewObject<UArmourDataTable>(); }
+	return armourDataTable;
+}
+
+ULoadoutTableData* UBaseGameInstance::GetLoadoutTableData()
+{
+	if (loadoutTableData == nullptr) { loadoutTableData = NewObject<ULoadoutTableData>(); }
+	return loadoutTableData;
+}
+
+UContainerTableData* UBaseGameInstance::GetContainerData()
+{
+	if (containerData == nullptr) { containerData = NewObject<UContainerTableData>(); }
+	return containerData;
+}
+
+UConsumableTableData* UBaseGameInstance::GetConsumableData()
+{
+	if (consumableData == nullptr) { consumableData = NewObject<UConsumableTableData>(); }
+	return consumableData;
+}
+
+#pragma endregion Getters

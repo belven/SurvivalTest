@@ -7,6 +7,7 @@
 #include <NavigationSystem.h>
 
 #include "SurvivalTest/BasePlayerController.h"
+#include "SurvivalTest/Items/LootBox.h"
 
 AMission::AMission()
 {
@@ -14,41 +15,23 @@ AMission::AMission()
 	AIClass = PlayerPawnClassFinder.Class;
 }
 
+void AMission::SetUpLootBoxes()
+{
+	TArray<AActor*> actors;
+	missionArea[0]->GetBox()->GetOverlappingActors(actors, ALootBox::StaticClass());
+
+	for(AActor* actor : actors)
+	{
+		ALootBox* loot = Cast<ALootBox>(actor);
+
+		loot->SetItemTypes(itemTypes);
+		loot->SpawnLoot();
+	}
+}
+
 void AMission::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//const FVector actorLocation = GetActorLocation();
-	//boxSize = 1000;
-	//boxHeight = 1000;
-
-	//boxSize = 1000;
-	//boxHeight = 1000;
-
-	//int locationOffset = 0;
-
-	//if (size % 2 == 0)
-	//{
-	//	locationOffset = (boxSize / 2);
-	//}
-	//else
-	//{
-	//	locationOffset = boxSize;
-	//}
-
-	//int x = actorLocation.X - (boxSize * (size / 2)) - locationOffset;
-
-	//for (int indexX = 0; indexX < size; indexX++)
-	//{
-	//	int y = actorLocation.Y - (boxSize * (size / 2)) - locationOffset;
-	//	x += boxSize;
-
-	//	for (int indexY = 0; indexY < size; indexY++)
-	//	{
-	//		y += boxSize;
-	//		SpawnBox(FVector(x, y, actorLocation.Z + (boxHeight - 100)));
-	//	}
-	//}
 
 	SpawnBox(GetActorLocation());
 }
@@ -73,6 +56,7 @@ void AMission::SpawnBox(FVector location)
 	AMissionArea* area = GetWorld()->SpawnActor<AMissionArea>(location, GetActorRotation(), params);
 	FVector extent = FVector(boxSize / 2, boxSize / 2, boxHeight);
 	area->GetBox()->SetBoxExtent(extent);
+	//area->GetBox()->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel2, ECR_Overlap);
 	missionArea.Add(area);
 	area->GetBox()->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMission::BeginOverlap);
 	area->GetBox()->OnComponentEndOverlap.AddUniqueDynamic(this, &AMission::EndOverlap);
@@ -107,6 +91,8 @@ void AMission::SpawnMission()
 
 			GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
 		}
+
+		SetUpLootBoxes();
 	}
 }
 

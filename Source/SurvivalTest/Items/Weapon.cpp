@@ -9,7 +9,7 @@ UWeapon::UWeapon()
 	canAttack = true;
 }
 
-void UWeapon::ShotTimerExpired()
+void UWeapon::AttackComplete()
 {
 	canAttack = true;
 }

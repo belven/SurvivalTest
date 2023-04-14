@@ -6,7 +6,6 @@
 #include "Weapon.generated.h"
 
 #define mSpawnProjectile(projectileClass) owner->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
-#define mSetTimer(handle, method, delay) GetWorld()->GetTimerManager().SetTimer(handle, this, method, delay)
 #define mSetTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
 #define mClearTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
 
@@ -27,7 +26,7 @@ public:
 	ABaseCharacter* GetOwner() const { return owner; }
 	void SetOwner(ABaseCharacter* val) { owner = val; }
 
-	void ShotTimerExpired();
+	void AttackComplete();
 protected:
 	FWeaponData weaponData;
 	FVector GunOffset;

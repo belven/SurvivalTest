@@ -13,7 +13,7 @@ public:
 	virtual void UseWeapon(const FVector& LookAtRotation) override;
 
 	FTimerHandle TimerHandle_ReloadExpired;
-	void ReloadEExpired();
+	void ReloadExpired();
 protected:
 	FProjectileWeaponData projectileWeaponData;
 	int32 currentAmmo;

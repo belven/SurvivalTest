@@ -79,6 +79,7 @@ public:
 	static TArray<FString> CleanData(TArray<FString> strings);
 
 	int32 GetNextInstanceItemDataID();
+	int32 GetNextBoxID();
 	int32 GetNextInstanceBoxDataID();
 	int32 GetNextInstanceArmourDataID();
 

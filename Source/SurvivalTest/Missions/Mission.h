@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Engine/TargetPoint.h" 	
+#include "SurvivalTest/Items/ItemStructs.h"
 #include "Mission.generated.h"
 
 class AMissionArea;
@@ -15,6 +16,7 @@ public:
 
 protected:
 	AMission();
+	void SetUpLootBoxes();
 	virtual void BeginPlay() override;
 	bool HasPlayers();
 	void SpawnBox(FVector location);
@@ -44,6 +46,8 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 		bool spawnMission = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+		TMap<EItemType, int32> itemTypes;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))

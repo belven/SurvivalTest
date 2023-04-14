@@ -21,7 +21,6 @@
 #define mActorLocation GetCharacter()->GetActorLocation()
 #define mActorRotation GetCharacter()->GetActorRotation()
 #define mCurrentWeapon() GetBaseCharacter()->GetEquippedWeapon()
-#define mSphereTraceMulti(start, end, radius, ignore, hits) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, ETraceTypeQuery::TraceTypeQuery1, false, ignore, EDrawDebugTrace::ForOneFrame, hits,true)
 
 ABaseAIController::ABaseAIController() : Super()
 {
