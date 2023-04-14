@@ -4,11 +4,11 @@
 
 void UProjectileWeapon::UseWeapon(const FVector& LookAtRotation)
 {
-	if (canFire)
+	if (canAttack)
 	{
 		if (currentAmmo == 0)
 		{
-			canFire = false;
+			canAttack = false;
 			mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadEExpired, projectileWeaponData.reloadSpeed);
 		}
 		else
@@ -23,7 +23,7 @@ void UProjectileWeapon::UseWeapon(const FVector& LookAtRotation)
 
 				mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::ShotTimerExpired, GetWeaponData().useRate);
 				currentAmmo--;
-				canFire = false;
+				canAttack = false;
 			}
 		}
 	}
@@ -31,6 +31,6 @@ void UProjectileWeapon::UseWeapon(const FVector& LookAtRotation)
 
 void UProjectileWeapon::ReloadEExpired()
 {
-	canFire = true;
+	canAttack = true;
 	currentAmmo = projectileWeaponData.magazineSize;
 }

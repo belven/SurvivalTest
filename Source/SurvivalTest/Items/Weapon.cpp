@@ -6,12 +6,12 @@
 UWeapon::UWeapon()
 {
 	GunOffset = FVector(100.f, 0.f, 0.f);
-	canFire = true;
+	canAttack = true;
 }
 
 void UWeapon::ShotTimerExpired()
 {
-	canFire = true;
+	canAttack = true;
 }
 
 ABaseProjectile* UWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) {

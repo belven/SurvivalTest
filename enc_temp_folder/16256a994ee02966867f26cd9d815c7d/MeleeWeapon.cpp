@@ -10,8 +10,6 @@
 void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 {
 	if (canAttack) {
-		canAttack = false;
-
 		mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::ShotTimerExpired, GetWeaponData().useRate);
 		TArray<FHitResult> hits;
 		TArray<IDamagable*> hitTargets;

@@ -31,7 +31,7 @@ public:
 protected:
 	FWeaponData weaponData;
 	FVector GunOffset;
-	bool canFire;
+	bool canAttack;
 	FTimerHandle TimerHandle_ShotTimerExpired;
 
 	UPROPERTY()
