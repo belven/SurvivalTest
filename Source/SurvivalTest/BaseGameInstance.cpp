@@ -3,76 +3,22 @@
 #include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
 #include "Tables/ArmourDataTable.h"
+#include "Tables/ConsumableTableData.h"
 #include "Tables/ContainerTableData.h"
-#include "Tables/CSVTable.h"
 #include "Tables/ItemDataTable.h"
 #include "Tables/LoadoutTableData.h"
 #include "Tables/MeleeWeaponDataTable.h"
 #include "Tables/ProjectileWeaponDataTable.h"
 #include "Tables/RangedWeaponDataTable.h"
+#include "Tables/TableManager.h"
 #include "Tables/WeaponDataTable.h"
-#include "Tables/ConsumableTableData.h"
+
+#define mTable() GetTableManager()
 
 void UBaseGameInstance::Init()
 {
 	Super::Init();
-	LoadTableData();
-}
-
-UBaseGameInstance::UBaseGameInstance()
-{
-}
-
-void UBaseGameInstance::LoadTableData()
-{
-	LoadTableFromFile(GetItemDataTable());
-	LoadTableFromFile(GetWeaponDataTable());
-	LoadTableFromFile(GetRangedWeaponData());
-	LoadTableFromFile(GetMeleeWeaponData());
-	LoadTableFromFile(GetProjectileWeaponData());
-	LoadTableFromFile(GetArmourDataTable());
-	LoadTableFromFile(GetLoadoutTableData());
-	LoadTableFromFile(GetContainerData());
-	LoadTableFromFile(GetConsumableData());
-}
-
-void UBaseGameInstance::LoadTableFromFile(UCSVTable* table)
-{
-	const FString path = table->GetPath();
-
-	if (FPaths::FileExists(path))
-	{
-		TArray<TArray<FString>> parsedCSV;
-		FString FileContent;
-
-		FFileHelper::LoadFileToString(FileContent, *path);
-
-		const TCHAR* Terminators[] = {L"\r", L"\n"};
-		const TCHAR* CSVDelimiters[] = {TEXT(","), TEXT("\t")};
-
-		TArray<FString> CSVLines;
-		FileContent.ParseIntoArray(CSVLines, Terminators, 2);
-
-		TArray<FString> temp_array;
-		for (int i = 0; i < CSVLines.Num(); i++)
-		{
-			temp_array.Empty();
-			CSVLines[i].ParseIntoArray(temp_array, CSVDelimiters, 2);
-			parsedCSV.Add(CleanData(temp_array));
-		}
-
-		table->LoadData(parsedCSV);
-	}
-}
-
-TArray<FString> UBaseGameInstance::CleanData(TArray<FString> strings)
-{
-	TArray<FString> newStrings;
-	for (FString s : strings)
-	{
-		newStrings.Add(s.TrimQuotes());
-	}
-	return newStrings;
+	mTable()->LoadTableData();
 }
 
 int32 UBaseGameInstance::GetNextInstanceItemDataID()
@@ -145,7 +91,7 @@ TArray<FInstanceItemData> UBaseGameInstance::GetInstancedItemsForContainer(int32
 
 FItemData UBaseGameInstance::GetItemData(int32 itemID)
 {
-	TArray<FItemData> itemData = GetItemDataTable()->GetData();
+	TArray<FItemData> itemData = mTable()->GetItemDataTable()->GetData();
 	for (const FItemData id : itemData)
 	{
 		if (id.ID == itemID)
@@ -158,7 +104,7 @@ FItemData UBaseGameInstance::GetItemData(int32 itemID)
 
 FWeaponData UBaseGameInstance::GetWeaponData(int32 itemID)
 {
-	TArray<FWeaponData> weaponData = GetWeaponDataTable()->GetData();
+	TArray<FWeaponData> weaponData = mTable()->GetWeaponDataTable()->GetData();
 	for (const FWeaponData wd : weaponData)
 	{
 		if (wd.itemID == itemID)
@@ -171,7 +117,7 @@ FWeaponData UBaseGameInstance::GetWeaponData(int32 itemID)
 
 FConsumableData UBaseGameInstance::GetConsumableData(int32 itemID)
 {
-	for (const auto& cd : GetConsumableData()->GetData())
+	for (const auto& cd : mTable()->GetConsumableData()->GetData())
 	{
 		if (cd.Value.itemID == itemID)
 		{
@@ -183,7 +129,7 @@ FConsumableData UBaseGameInstance::GetConsumableData(int32 itemID)
 
 FMeleeWeaponData UBaseGameInstance::GetMeleeWeaponData(int32 weaponID)
 {
-	for (const FMeleeWeaponData wd : GetMeleeWeaponData()->GetData())
+	for (const FMeleeWeaponData wd : mTable()->GetMeleeWeaponData()->GetData())
 	{
 		if (wd.weaponID == weaponID)
 		{
@@ -195,7 +141,7 @@ FMeleeWeaponData UBaseGameInstance::GetMeleeWeaponData(int32 weaponID)
 
 FRangedWeaponData UBaseGameInstance::GetRangedWeaponData(int32 weaponID)
 {
-	for (const FRangedWeaponData wd : GetRangedWeaponData()->GetData())
+	for (const FRangedWeaponData wd : mTable()->GetRangedWeaponData()->GetData())
 	{
 		if (wd.weaponID == weaponID)
 		{
@@ -207,7 +153,7 @@ FRangedWeaponData UBaseGameInstance::GetRangedWeaponData(int32 weaponID)
 
 FProjectileWeaponData UBaseGameInstance::GetProjectileWeaponData(int32 rangedWeaponID)
 {
-	for (const FProjectileWeaponData wd : GetProjectileWeaponData()->GetData())
+	for (const FProjectileWeaponData wd : mTable()->GetProjectileWeaponData()->GetData())
 	{
 		if (wd.rangedWeaponID == rangedWeaponID)
 		{
@@ -237,7 +183,7 @@ FString UBaseGameInstance::GetContainerInstanceName(int32 containerID)
 
 FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 {
-	for (const FArmourData ad : GetArmourDataTable()->GetData())
+	for (const FArmourData ad : mTable()->GetArmourDataTable()->GetData())
 	{
 		if (ad.ID == armourID)
 		{
@@ -249,7 +195,7 @@ FArmourData UBaseGameInstance::GetArmourData(int32 armourID)
 
 FContainerData UBaseGameInstance::GetContainerDataName(FString containerName)
 {
-	for (auto& cd : GetContainerData()->GetData())
+	for (auto& cd : mTable()->GetContainerData()->GetData())
 	{
 		if (cd.Value.name.Equals(containerName))
 			return cd.Value;
@@ -259,7 +205,7 @@ FContainerData UBaseGameInstance::GetContainerDataName(FString containerName)
 
 FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 {
-	return GetContainerData()->GetData().FindChecked(containerID);
+	return mTable()->GetContainerData()->GetData().FindChecked(containerID);
 }
 
 FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID)
@@ -276,7 +222,7 @@ FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 a
 
 FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 {
-	for (const FArmourData ad : GetArmourDataTable()->GetData())
+	for (const FArmourData ad : mTable()->GetArmourDataTable()->GetData())
 	{
 		if (ad.itemID == itemID)
 		{
@@ -288,7 +234,7 @@ FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 
 FLoadoutData UBaseGameInstance::GetLoadoutData(FString loadoutName)
 {
-	for (const FLoadoutData ld : GetLoadoutTableData()->GetData())
+	for (const FLoadoutData ld : mTable()->GetLoadoutTableData()->GetData())
 	{
 		if (ld.name.Equals( loadoutName))
 		{
@@ -374,58 +320,10 @@ URPGEventManager* UBaseGameInstance::GetEventManager()
 	return eventManager;
 }
 
-UItemDataTable* UBaseGameInstance::GetItemDataTable()
+UTableManager* UBaseGameInstance::GetTableManager()
 {
-	if (ItemData == nullptr) { ItemData = NewObject<UItemDataTable>(); }
-	return ItemData;
-}
-
-UWeaponDataTable* UBaseGameInstance::GetWeaponDataTable()
-{
-	if (WeaponData == nullptr) { WeaponData = NewObject<UWeaponDataTable>(); }
-	return WeaponData;
-}
-
-URangedWeaponDataTable* UBaseGameInstance::GetRangedWeaponData()
-{
-	if (rangedWeaponData == nullptr) { rangedWeaponData = NewObject<URangedWeaponDataTable>(); }
-	return rangedWeaponData;
-}
-
-UProjectileWeaponDataTable* UBaseGameInstance::GetProjectileWeaponData()
-{
-	if (projectileWeaponData == nullptr) { projectileWeaponData = NewObject<UProjectileWeaponDataTable>(); }
-	return projectileWeaponData;
-}
-
-UMeleeWeaponDataTable* UBaseGameInstance::GetMeleeWeaponData()
-{
-	if (meleeWeaponData == nullptr) { meleeWeaponData = NewObject<UMeleeWeaponDataTable>(); }
-	return meleeWeaponData;
-}
-
-UArmourDataTable* UBaseGameInstance::GetArmourDataTable()
-{
-	if (armourDataTable == nullptr) { armourDataTable = NewObject<UArmourDataTable>(); }
-	return armourDataTable;
-}
-
-ULoadoutTableData* UBaseGameInstance::GetLoadoutTableData()
-{
-	if (loadoutTableData == nullptr) { loadoutTableData = NewObject<ULoadoutTableData>(); }
-	return loadoutTableData;
-}
-
-UContainerTableData* UBaseGameInstance::GetContainerData()
-{
-	if (containerData == nullptr) { containerData = NewObject<UContainerTableData>(); }
-	return containerData;
-}
-
-UConsumableTableData* UBaseGameInstance::GetConsumableData()
-{
-	if (consumableData == nullptr) { consumableData = NewObject<UConsumableTableData>(); }
-	return consumableData;
+	if (tableManager == nullptr) { tableManager = NewObject<UTableManager>(); }
+	return tableManager;
 }
 
 #pragma endregion Getters

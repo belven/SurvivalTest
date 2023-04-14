@@ -2,6 +2,7 @@
 
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ItemDataTable.h"
+#include "SurvivalTest/Tables/TableManager.h"
 
 
 const int32 UItemStructs::InvalidInt = -1;
@@ -160,7 +161,7 @@ bool UItemStructs::GetBoolean(FString value)
 
 FItemData UItemStructs::GetRandomItemData(UBaseGameInstance* game)
 {
-	TArray<FItemData> itemData = game->GetItemDataTable()->GetData();
+	TArray<FItemData> itemData = game->GetTableManager()->GetItemDataTable()->GetData();
 	FItemData id = itemData[FMath::RandRange(0, itemData.Num() - 1)];
 	return id;
 }

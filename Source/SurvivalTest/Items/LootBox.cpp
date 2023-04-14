@@ -4,6 +4,7 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
 #include "SurvivalTest/Tables/ItemDataTable.h"
+#include "SurvivalTest/Tables/TableManager.h"
 
 ALootBox::ALootBox()
 {
@@ -59,7 +60,7 @@ TMap<EItemType, TArray<FItemData>> ALootBox::GetItemList()
 	TArray<EItemType> types;
 	itemTypes.GenerateKeyArray(types);
 
-	for (auto item : GetGame()->GetItemDataTable()->GetData())
+	for (auto item : GetGame()->GetTableManager()->GetItemDataTable()->GetData())
 	{
 		if (types.Contains(item.type)) {
 			items.FindOrAdd(item.type).Add(item);

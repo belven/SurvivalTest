@@ -3,6 +3,7 @@
 #include "ItemContainer.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
+#include "SurvivalTest/Tables/TableManager.h"
 
 /**
  * Create a new instance of equipped armour. Requires an instance of FInstanceItemData to exist, so we can create a container linked to this piece of armour
@@ -18,7 +19,7 @@ UArmour* UArmour::CreateArmour(int32 itemID, UBaseGameInstance* game, int32 inst
 {
 	UArmour* armour = NewObject<UArmour>();
 	UArmourCreator::CreateArmourData(itemID, game, armour, instanceItemDataID);
-	FContainerData cd = game->GetContainerData()->GetData().FindOrAdd(armour->GetData().containerID);
+	FContainerData cd = game->GetTableManager()->GetContainerData()->GetData().FindOrAdd(armour->GetData().containerID);
 	
 	if (cd.slots > 0) {
 		bool spawnedArmour = false;

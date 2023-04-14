@@ -9,14 +9,7 @@
 #define GameInstance(world) Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(world))
 #define mGameInstance() Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))
 
-class UProjectileWeaponDataTable;
-class UMeleeWeaponDataTable;
-class URangedWeaponDataTable;
-class UWeaponDataTable;
-class UItemDataTable;
-class UArmourDataTable;
-class UArmourResistanceDataTable;
-class ULoadoutTableData;
+class UTableManager;
 class UFactionManager;
 class URPGEventManager;
 class UContainerTableData;
@@ -29,13 +22,6 @@ class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	UBaseGameInstance();
-
-	UFUNCTION(BlueprintCallable)
-		void LoadTableFromFile(UCSVTable* table);
-
-	void LoadTableData();
-
 	UFactionManager* GetFactionManager();
 
 	UFUNCTION(BlueprintCallable)
@@ -62,22 +48,12 @@ public:
 
 	virtual void Init() override;
 	URPGEventManager* GetEventManager();
-
-	UItemDataTable* GetItemDataTable();
-	UWeaponDataTable* GetWeaponDataTable();
-	URangedWeaponDataTable* GetRangedWeaponData();
-	UProjectileWeaponDataTable* GetProjectileWeaponData();
-	UMeleeWeaponDataTable* GetMeleeWeaponData();
-	UArmourDataTable* GetArmourDataTable();
-	ULoadoutTableData* GetLoadoutTableData();
-	UContainerTableData* GetContainerData();
-	UConsumableTableData* GetConsumableData();
+	UTableManager* GetTableManager();
+	
 	EGearType GetGearTypeForItem(int32 itemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
 	FString GetContainerInstanceName(int32 containerID);
-
-	static TArray<FString> CleanData(TArray<FString> strings);
-
+	
 	int32 GetNextInstanceItemDataID();
 	int32 GetNextBoxID();
 	int32 GetNextInstanceBoxDataID();
@@ -108,29 +84,5 @@ private:
 		UFactionManager* factionManager;
 
 	UPROPERTY()
-		UItemDataTable* ItemData;
-
-	UPROPERTY()
-		UWeaponDataTable* WeaponData;
-
-	UPROPERTY()
-		URangedWeaponDataTable* rangedWeaponData;
-
-	UPROPERTY()
-		UMeleeWeaponDataTable* meleeWeaponData;
-
-	UPROPERTY()
-		UProjectileWeaponDataTable* projectileWeaponData;
-
-	UPROPERTY()
-		UArmourDataTable* armourDataTable;
-
-	UPROPERTY()
-		ULoadoutTableData* loadoutTableData;
-
-	UPROPERTY()
-		UContainerTableData* containerData;
-
-	UPROPERTY()
-		UConsumableTableData* consumableData;
-};
+		UTableManager* tableManager;
+	};
