@@ -22,7 +22,7 @@ class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 public:
-	UFactionManager* GetFactionManager();
+	virtual void Init() override;
 
 	UFUNCTION(BlueprintCallable)
 		FItemData GetItemData(int32 itemID);
@@ -30,25 +30,19 @@ public:
 	void AddUpdateData(const FInstanceArmourData& inData);
 	void AddUpdateData(const FInstanceItemData& inData);
 
+	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
 	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);
+
 	FWeaponData GetWeaponData(int32 itemID);
-	FConsumableData GetConsumableData(int32 itemID);
 	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
 	FArmourData GetArmourData(int32 armourID);
 	FContainerData GetContainerDataName(FString containerName);
-	FContainerData GetContainerDataByID(int32 containerID);
-
-	FInstanceItemData CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID);
+	FContainerData GetContainerDataByID(int32 containerID);	
 	FArmourData GetArmourDataByItemID(int32 itemID);
 	FLoadoutData GetLoadoutData(FString loadoutName);
-
-	TArray<FInstanceItemData> GetInventoryItems(int32 instanceContainerID);
-
-	virtual void Init() override;
-	URPGEventManager* GetEventManager();
-	UTableManager* GetTableManager();
+	FConsumableData GetConsumableData(int32 itemID);
 	
 	EGearType GetGearTypeForItem(int32 itemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
@@ -58,9 +52,7 @@ public:
 	int32 GetNextBoxID();
 	int32 GetNextInstanceBoxDataID();
 	int32 GetNextInstanceArmourDataID();
-
 	int32 GetNextInstanceContainerDataID();
-	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
 
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return instanceItems; }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
@@ -71,7 +63,13 @@ public:
 
 	UPROPERTY()
 	AMainGrid* grid;
+
+	URPGEventManager* GetEventManager();
+	UTableManager* GetTableManager();
+	UFactionManager* GetFactionManager();
 private:
+
+	// TODO Make these use data tables!
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
 	TMap<int32, FInstanceBoxData> boxContainers;

@@ -31,7 +31,6 @@ int32 UBaseGameInstance::GetNextInstanceItemDataID()
 	return instanceItemDataID;
 }
 
-
 int32 UBaseGameInstance::GetNextBoxID()
 {
 	int32 boxID = 0;
@@ -74,19 +73,15 @@ int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 
 TArray<FInstanceItemData> UBaseGameInstance::GetInstancedItemsForContainer(int32 instanceContainerID)
 {
-	TArray<FInstanceItemData> items;
-	TArray<FInstanceItemData> itemsFound;
-
-	GetInstancedItems().GenerateValueArray(items);
-
-	for (FInstanceItemData iid : items)
+	TArray<FInstanceItemData> data;
+	for (TTuple<int32, FInstanceItemData>& iid : GetInstancedItems())
 	{
-		if (iid.containerInstanceID == instanceContainerID)
+		if (iid.Value.containerInstanceID == instanceContainerID)
 		{
-			itemsFound.Add(iid);
+			data.Add(iid.Value);
 		}
 	}
-	return itemsFound;
+	return data;
 }
 
 FItemData UBaseGameInstance::GetItemData(int32 itemID)
@@ -208,18 +203,6 @@ FContainerData UBaseGameInstance::GetContainerDataByID(int32 containerID)
 	return mTable()->GetContainerData()->GetData().FindChecked(containerID);
 }
 
-FInstanceItemData UBaseGameInstance::CreateNewInstanceItem(int32 itemID, int32 amount, int32 slot, int32 containerInstanceID)
-{
-	FInstanceItemData data;
-	data.ID = GetNextInstanceItemDataID();
-	data.amount = amount;
-	data.containerInstanceID = containerInstanceID;
-	data.itemID = itemID;
-	data.slot = slot;
-	GetInstancedItems().Add(data.ID, data);
-	return data;
-}
-
 FArmourData UBaseGameInstance::GetArmourDataByItemID(int32 itemID)
 {
 	for (const FArmourData ad : mTable()->GetArmourDataTable()->GetData())
@@ -242,19 +225,6 @@ FLoadoutData UBaseGameInstance::GetLoadoutData(FString loadoutName)
 		}
 	}
 	return {};
-}
-
-TArray<FInstanceItemData> UBaseGameInstance::GetInventoryItems(int32 instanceContainerID)
-{
-	TArray<FInstanceItemData> data;
-	for (TTuple<int32, FInstanceItemData>& iid : instanceItems)
-	{
-		if (iid.Value.containerInstanceID == instanceContainerID)
-		{
-			data.Add(iid.Value);
-		}
-	}
-	return data;
 }
 
 EGearType UBaseGameInstance::GetGearTypeForItem(int32 itemID)

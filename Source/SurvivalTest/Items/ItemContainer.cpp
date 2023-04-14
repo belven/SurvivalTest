@@ -463,7 +463,7 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 
 void UItemContainer::UpdateDebugItemsList()
 {
-	TArray<FInstanceItemData> data = GetGame()->GetInventoryItems(instanceContainerData.ID);
+	TArray<FInstanceItemData> data = GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID);
 	lastUpdatedItems.Empty();
 
 	for (FInstanceItemData iid : data)

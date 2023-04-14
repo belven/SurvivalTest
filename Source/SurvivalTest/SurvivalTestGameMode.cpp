@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "SurvivalTestGameMode.h"
-#include "BaseHUD.h"
 #include "BasePlayerController.h"
+#include "UI/BaseHUD.h"
 #include "UObject/ConstructorHelpers.h"
 
 ASurvivalTestGameMode::ASurvivalTestGameMode()

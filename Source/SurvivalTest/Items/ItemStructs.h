@@ -58,25 +58,25 @@ struct FLoadoutData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 ID;
+	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	FString name;
+	FString name = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	ECharacterType type;
+	ECharacterType type = ECharacterType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 weaponID;
+	int32 weaponID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 headArmourID;
+	int32 headArmourID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 chestArmourID;
+	int32 chestArmourID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 vestArmourID;
+	int32 vestArmourID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 legsArmourID;
+	int32 legsArmourID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 health;
+	int32 health = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
-	int32 moveSpeed;
+	int32 moveSpeed = 800;
 };
 
 USTRUCT(BlueprintType)
@@ -86,15 +86,15 @@ struct FItemData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	int32 ID;
+	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	FString name;
+	FString name = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	FString mesh;
+	FString mesh = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	EItemType type;
+	EItemType type = EItemType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-	int32 maxStack;
+	int32 maxStack = 1;
 
 	FItemData() : ID(0), type(EItemType::Consumable), maxStack(0)
 	{
@@ -117,21 +117,21 @@ struct FWeaponData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 ID;
+	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 itemID;
+	int32 itemID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	EWeaponType type;
+	EWeaponType type = EWeaponType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	EGearType gearType;
+	EGearType gearType = EGearType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	float useRate;
+	float useRate = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	float healthChange;
+	float healthChange = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	bool heals;
+	bool heals = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 range;
+	int32 range = -1;
 };
 
 USTRUCT(BlueprintType)
@@ -141,11 +141,11 @@ struct FMeleeWeaponData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 ID;
+	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 weaponID;
+	int32 weaponID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	float cleaveRadius;
+	float cleaveRadius = 100;
 };
 
 USTRUCT(BlueprintType)
@@ -155,15 +155,15 @@ struct FProjectileWeaponData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 ID;
+	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 rangedWeaponID;
+	int32 rangedWeaponID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FString projectileClass;
+	FString projectileClass = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 magazineSize;
+	int32 magazineSize = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	float reloadSpeed;
+	float reloadSpeed = 1;
 };
 
 USTRUCT(BlueprintType)
@@ -173,11 +173,11 @@ struct FRangedWeaponData
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 ID;
+	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	int32 weaponID;
+	int32 weaponID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	float accuracy;
+	float accuracy = 1;
 };
 
 UENUM(BlueprintType)
@@ -248,7 +248,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 slots = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	FString name;
+	FString name = "";
 };
 
 USTRUCT(BlueprintType)
@@ -365,7 +365,7 @@ public:
 
 	FInstanceItemData CopyItem(int32 emptySlot, int32 nextID, int32 instanceContainerID)
 	{
-		FInstanceItemData newData = {};
+		FInstanceItemData newData;
 		newData.ID = nextID;
 		newData.itemID = itemID;
 		newData.containerInstanceID = instanceContainerID;
