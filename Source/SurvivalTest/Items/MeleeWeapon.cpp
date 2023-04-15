@@ -16,16 +16,16 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 		TArray<FHitResult> hits;
 		TArray<IDamagable*> hitTargets;
 		TArray<AActor*> ignore;
-		ignore.Add(GetOwner());
+		ignore.Add(GetCharacterOwner());
 
-		FVector actorLocation = GetOwner()->GetActorLocation();
-		FVector actorForwardVector = GetOwner()->GetActorForwardVector();
-		actorLocation.Z += GetOwner()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		FVector actorLocation = GetCharacterOwner()->GetActorLocation();
+		FVector actorForwardVector = GetCharacterOwner()->GetActorForwardVector();
+		actorLocation.Z += GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 		FVector endLoc = actorLocation + (actorForwardVector * GetWeaponData().range);
 		FVector startLoc = actorLocation;
 		float dist = FVector::Dist(endLoc, startLoc);
-		double radius = GetOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5;
+		double radius = GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5;
 		mSphereTraceMultiWeapon(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
 
 		for (FHitResult hit : hits)
@@ -34,7 +34,7 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 			{
 				ITeam* team = Cast<ITeam>(hit.GetActor());
 
-				if (team && team->GetRelationship(GetOwner(), mGameInstance()) == ERelationshipType::Enemy)
+				if (team && team->GetRelationship(GetCharacterOwner(), mGameInstance()) == ERelationshipType::Enemy)
 				{
 					hitTargets.AddUnique(Cast<IDamagable>(hit.GetActor()));
 				}
@@ -45,7 +45,7 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 		{
 			FHealthChange change;
 			change.changeAmount = GetWeaponData().healthChange;
-			change.source = GetOwner();
+			change.source = GetCharacterOwner();
 			change.heals = GetWeaponData().heals;
 			hit->ChangeHealth(change);
 		}
@@ -54,5 +54,5 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 
 UWorld* UMeleeWeapon::GetWorld() const
 {
-	return GetOwner()->GetWorld();
+	return GetCharacterOwner()->GetWorld();
 }

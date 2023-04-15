@@ -67,6 +67,9 @@ ABaseCharacter::ABaseCharacter()
 	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
 	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
 
+	weaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
+	weaponMeshComp->SetupAttachment(GetCapsuleComponent());
+
 	ResetStats();
 }
 
@@ -184,10 +187,6 @@ void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
 {
 	equippedWeapon = weapon;
 	equippedWeapon->SetOwner(this);
-	equippedWeapon->GetWeaponMeshComp()->SetStaticMesh(GetItemMesh(equippedWeapon->GetItemData()));
-
-	FAttachmentTransformRules atr(EAttachmentRule::KeepRelative, false);
-	equippedWeapon->GetWeaponMeshComp()->AttachToComponent(GetRootComponent(), atr);
 }
 
 UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)

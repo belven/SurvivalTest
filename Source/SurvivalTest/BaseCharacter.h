@@ -70,6 +70,10 @@ public:
 
 	FOnContainersUpdated OnContainersUpdated;
 
+	UStaticMeshComponent* GetWeaponMeshComp() const { return weaponMeshComp; }
+	UPROPERTY()
+	UStaticMeshComponent* weaponMeshComp;
+
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 	FCharacterStats GetCurrentStats() const { return currentStats; }

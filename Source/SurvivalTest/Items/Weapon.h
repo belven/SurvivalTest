@@ -20,16 +20,17 @@ class SURVIVALTEST_API UWeapon : public UItem
 public:
 	UWeapon();
 
+	UStaticMesh* GetItemMesh();
+
 	FWeaponData GetWeaponData() const { return weaponData; }
 	void SetWeaponData(FWeaponData data) { weaponData = data; }
 	virtual void UseWeapon(const FVector& LookAtRotation);
 
-	ABaseCharacter* GetOwner() const { return owner; }
-	void SetOwner(ABaseCharacter* val) { owner = val; }
+	ABaseCharacter* GetCharacterOwner() const { return owner; }
+	void SetOwner(ABaseCharacter* val);
 
 	void AttackComplete();
 
-	UStaticMeshComponent* GetWeaponMeshComp() const { return weaponMeshComp; }
 
 protected:
 	FWeaponData weaponData;
