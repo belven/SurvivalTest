@@ -5,7 +5,7 @@
 #include "Tables/ArmourDataTable.h"
 #include "Tables/ConsumableTableData.h"
 #include "Tables/ContainerTableData.h"
-#include "Tables/ItemDataTable.h"
+#include "Tables/Items/ItemDataTable.h"
 #include "Tables/LoadoutTableData.h"
 #include "Tables/Weapons/MeleeWeaponDataTable.h"
 #include "Tables/Weapons/ProjectileWeaponDataTable.h"

@@ -4,6 +4,8 @@
 #include "Engine/GameInstance.h"
 #include "Items/ItemStructs.h"
 #include "Kismet/GameplayStatics.h"
+#include "Tables/Items/InstanceItemDataTable.h"
+#include "Tables/TableManager.h"
 #include "BaseGameInstance.generated.h"
 
 #define GameInstance(world) Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(world))
@@ -54,7 +56,7 @@ public:
 	int32 GetNextInstanceArmourDataID();
 	int32 GetNextInstanceContainerDataID();
 
-	TMap<int32, FInstanceItemData>& GetInstancedItems() { return instanceItems; }
+	TMap<int32, FInstanceItemData>& GetInstancedItems() { return tableManager->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
@@ -73,7 +75,6 @@ private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
 	TMap<int32, FInstanceBoxData> boxContainers;
-	TMap<int32, FInstanceItemData> instanceItems;
 
 	UPROPERTY()
 		URPGEventManager* eventManager;

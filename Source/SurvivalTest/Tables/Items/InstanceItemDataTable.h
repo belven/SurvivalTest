@@ -1,17 +1,17 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "CSVTable.h"
+#include "../CSVTable.h"
 #include "InstanceItemDataTable.generated.h"
 
 UCLASS()
 class SURVIVALTEST_API UInstanceItemDataTable : public UCSVTable
 {
 	GENERATED_BODY()
+public:
 		UInstanceItemDataTable();
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
-	TArray<FInstanceItemData >& GetData() { return instanceItemData; }
+	TMap<int32, FInstanceItemData>& GetData() { return instanceItems; }
 private:
-	TArray<FInstanceItemData > instanceItemData;
-
+	TMap<int32, FInstanceItemData> instanceItems;
 };

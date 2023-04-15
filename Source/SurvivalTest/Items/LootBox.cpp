@@ -3,7 +3,7 @@
 #include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
-#include "SurvivalTest/Tables/ItemDataTable.h"
+#include "SurvivalTest/Tables/Items/ItemDataTable.h"
 #include "SurvivalTest/Tables/TableManager.h"
 
 ALootBox::ALootBox()

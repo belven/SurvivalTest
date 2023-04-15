@@ -2,13 +2,14 @@
 #include "ArmourDataTable.h"
 #include "ContainerTableData.h"
 #include "CSVTable.h"
-#include "ItemDataTable.h"
+#include "Items/ItemDataTable.h"
 #include "LoadoutTableData.h"
 #include "Weapons/MeleeWeaponDataTable.h"
 #include "Weapons/ProjectileWeaponDataTable.h"
 #include "Weapons/RangedWeaponDataTable.h"
 #include "Weapons/WeaponDataTable.h"
 #include "ConsumableTableData.h"
+#include "Items/InstanceItemDataTable.h"
 #include "Mission/MissionLoadoutTable.h"
 #include "Mission/MissionTable.h"
 
@@ -133,6 +134,12 @@ UMissionLoadoutTable* UTableManager::GetMissionLoadoutTable()
 {
 	if (missionLoadoutTable == nullptr) { missionLoadoutTable = NewObject<UMissionLoadoutTable>(); }
 	return missionLoadoutTable;
+}
+
+UInstanceItemDataTable* UTableManager::GetInstanceItemDataTable()
+{
+	if (instanceItemDataTable == nullptr) { instanceItemDataTable = NewObject<UInstanceItemDataTable>(); }
+	return instanceItemDataTable;
 }
 
 #pragma endregion Getters

@@ -16,6 +16,6 @@ void UInstanceItemDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.containerInstanceID = GetIntFromString(row[index++]);
 		data.amount = GetIntFromString(row[index++]);
 		data.slot = GetIntFromString(row[index++]);
-		instanceItemData.Add(data);
+		instanceItems.Add(data.ID, data);
 	}
 }
