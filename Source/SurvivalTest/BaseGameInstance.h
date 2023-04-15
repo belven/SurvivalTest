@@ -25,13 +25,12 @@ class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 	GENERATED_BODY()
 public:
 	virtual void Init() override;
-
+	virtual void Shutdown() override;
 	UFUNCTION(BlueprintCallable)
 		FItemData GetItemData(int32 itemID);
 
 	void AddUpdateData(const FInstanceArmourData& inData);
 	void AddUpdateData(const FInstanceItemData& inData);
-
 	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
 	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);
 

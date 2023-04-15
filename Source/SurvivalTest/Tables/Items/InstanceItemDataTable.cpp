@@ -19,3 +19,19 @@ void UInstanceItemDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		instanceItems.Add(data.ID, data);
 	}
 }
+
+TArray<FString> UInstanceItemDataTable::GetDataStrings()
+{
+	TArray<FString> rows;
+	for (auto& data : GetData())
+	{
+		TArray< FStringFormatArg > args;
+		args.Add(FStringFormatArg(data.Value.ID));
+		args.Add(FStringFormatArg(data.Value.itemID));
+		args.Add(FStringFormatArg(data.Value.containerInstanceID));
+		args.Add(FStringFormatArg(data.Value.amount));
+		args.Add(FStringFormatArg(data.Value.slot));
+		rows.Add(FString::Format(TEXT("{0}, {1}, {2}, {3}, {4}"), args));
+	}
+	return rows;
+}

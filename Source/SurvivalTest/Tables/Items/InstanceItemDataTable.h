@@ -12,6 +12,9 @@ public:
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
 	TMap<int32, FInstanceItemData>& GetData() { return instanceItems; }
+
+	virtual TArray<FString> GetDataStrings() override;
+
 private:
 	TMap<int32, FInstanceItemData> instanceItems;
 };

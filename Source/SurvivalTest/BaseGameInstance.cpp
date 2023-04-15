@@ -21,6 +21,12 @@ void UBaseGameInstance::Init()
 	mTable()->LoadTableData();
 }
 
+void UBaseGameInstance::Shutdown()
+{
+	mTable()->SaveTableToFile(mTable()->GetInstanceItemDataTable());
+	Super::Shutdown();
+}
+
 int32 UBaseGameInstance::GetNextInstanceItemDataID()
 {
 	int32 instanceItemDataID = 0;

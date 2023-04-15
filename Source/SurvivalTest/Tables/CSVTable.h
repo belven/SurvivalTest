@@ -11,11 +11,15 @@
 // ReSharper disable once IdentifierTypo
 #define CSVT UCSVTable
 
-UCLASS() class SURVIVALTEST_API UCSVTable : public UObject
+UCLASS()
+class SURVIVALTEST_API UCSVTable : public UObject
 {
 	GENERATED_BODY()
+
 public:
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings);
+	virtual TArray<FString> GetDataStrings();
+
 	FString GetPath() const { return path; }
 
 	static FString GetTableFilePath(FString table)
@@ -30,6 +34,6 @@ protected:
 	TArray<TArray<FString>> dataStrings;
 	FString path;
 
-	static int32 GetIntFromString(FString value) { return FCString::Atoi(*value);  }
+	static int32 GetIntFromString(FString value) { return FCString::Atoi(*value); }
 	static float GetFloatFromString(FString value) { return FCString::Atof(*value); }
 };

@@ -37,6 +37,7 @@ public:
 	UInstanceItemDataTable* GetInstanceItemDataTable();
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
+	void SaveTableToFile(UCSVTable* table);
 	TArray<FString> CleanData(TArray<FString> strings);
 
 private:
