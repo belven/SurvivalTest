@@ -197,7 +197,7 @@ void ABasePlayerController::BeginPlay()
 	{
 		inventoryWidget = CreateWidget<UInventoryUI>(this, inventoryWidgetClass);
 		inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-		inventoryWidget->AddToViewport(1);
+		inventoryWidget->AddToViewport();
 		inventoryWidget->SetBaseGameInstance(GameInstance(GetWorld()));
 		inventoryWidget->SetController(this);
 	}

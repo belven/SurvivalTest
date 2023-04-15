@@ -6,7 +6,7 @@
 void ABaseHUD::DrawHUD()
 {
 	Super::DrawHUD();
-	DrawStats();
+	//DrawStats();
 }
 
 void ABaseHUD::DrawStats()

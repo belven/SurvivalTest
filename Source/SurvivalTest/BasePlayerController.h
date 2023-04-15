@@ -11,6 +11,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
 class UInventoryUI;
 class ABaseCharacter;
 class UTimelineComponent;
+class UHUDUI;
 
 UCLASS()
 class SURVIVALTEST_API ABasePlayerController : public APlayerController
@@ -71,6 +72,12 @@ private:
 
 	UPROPERTY()
 	TSubclassOf<UUserWidget> inventoryWidgetClass;
+
+	UPROPERTY()
+		TSubclassOf<UUserWidget> mainHUDClass;
+
+	UPROPERTY()
+	UHUDUI* mainHUD;
 
 	UPROPERTY()
 	UInventoryUI* inventoryWidget;
