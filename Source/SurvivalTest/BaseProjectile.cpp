@@ -16,7 +16,7 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::BeginOverlap);
+	//CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::BeginOverlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
@@ -40,6 +40,32 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 	InitialLifeSpan = Default_Initial_Lifespan;
+}
+
+void ABaseProjectile::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	FHitResult hit;
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 50), ECollisionChannel::ECC_Pawn);
+	
+	if(hit.IsValidBlockingHit())
+	{
+		if (hit.GetActor()->Implements<UDamagable>())
+		{
+			ITeam* hitTeam = Cast<ITeam>(hit.GetActor());
+
+			if (hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy) {
+				IDamagable* hitActor = Cast<IDamagable>(hit.GetActor());
+				hitActor->ChangeHealth(healthChange);
+				Destroy();
+			}
+		}
+		else
+		{
+			Destroy();
+		}
+	}
 }
 
 void ABaseProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -91,7 +91,6 @@ void ALootBox::SpawnLoot()
 				UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
 			}
 		}
-
 	}
 }
 
@@ -134,7 +133,8 @@ void ALootBox::ItemAdded(FInstanceItemData inItem)
 
 void ALootBox::RemoveLootBox()
 {
-	Destroy();
+	// TODO sort out loot boxes despawning etc.
+	//Destroy();
 }
 
 void ALootBox::ItemRemoved(FInstanceItemData inItem)
