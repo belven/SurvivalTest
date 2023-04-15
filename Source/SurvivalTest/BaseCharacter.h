@@ -71,8 +71,6 @@ public:
 	FOnContainersUpdated OnContainersUpdated;
 
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-	UCameraComponent* GetLeftCameraComponent() const { return LeftCameraComponent; }
-	UCameraComponent* GetRightCameraComponent() const { return RightCameraComponent; }
 
 	FCharacterStats GetCurrentStats() const { return currentStats; }
 	FCharacterStats GetMaxStats() const { return maxStats; }
@@ -81,6 +79,7 @@ public:
 
 	FORCEINLINE UWeapon* GetEquippedWeapon() { return equippedWeapon; }
 	void SetEquippedWeapon(UWeapon* weapon);
+	UStaticMesh* GetItemMesh(FItemData data);
 
 	void EquipArmour(UArmour* armour);
 
@@ -150,12 +149,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* LeftCameraComponent;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* RightCameraComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	FCharacterStats currentStats;

@@ -59,17 +59,7 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 80.0f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-
-	//LeftCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("LeftCamera"));
-	//LeftCameraComponent->SetupAttachment(GetCapsuleComponent());
-	//LeftCameraComponent->SetRelativeLocation(FVector(50.0f, -60.0f, 60.0f)); // Position the camera
-	//LeftCameraComponent->bUsePawnControlRotation = true;
-
-	//RightCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("RightCamera"));
-	//RightCameraComponent->SetupAttachment(GetCapsuleComponent());
-	//RightCameraComponent->SetRelativeLocation(FVector(50.0f, 60.0f, 60.0f)); // Position the camera
-	//RightCameraComponent->bUsePawnControlRotation = true;
-
+	
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
 	interactionSphere->SetupAttachment(GetCapsuleComponent());
@@ -194,6 +184,18 @@ void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
 {
 	equippedWeapon = weapon;
 	equippedWeapon->SetOwner(this);
+	equippedWeapon->GetWeaponMeshComp()->SetStaticMesh(GetItemMesh(equippedWeapon->GetItemData()));
+
+	FAttachmentTransformRules atr(EAttachmentRule::KeepRelative, false);
+	equippedWeapon->GetWeaponMeshComp()->AttachToComponent(GetRootComponent(), atr);
+}
+
+UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)
+{
+	if (data.mesh.Equals(""))
+		return nullptr;
+
+	return LoadObject<UStaticMesh>(this, *data.mesh);
 }
 
 /**

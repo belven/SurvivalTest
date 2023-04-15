@@ -7,6 +7,7 @@ UWeapon::UWeapon()
 {
 	GunOffset = FVector(100.f, 0.f, 0.f);
 	canAttack = true;
+	weaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
 }
 
 void UWeapon::AttackComplete()

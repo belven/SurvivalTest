@@ -95,6 +95,8 @@ public:
 	EItemType type = EItemType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 maxStack = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	FString icon = "";
 
 	FItemData() : ID(0), type(EItemType::Consumable), maxStack(0)
 	{
