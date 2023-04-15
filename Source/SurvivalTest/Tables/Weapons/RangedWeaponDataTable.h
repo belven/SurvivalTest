@@ -1,6 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "CSVTable.h"
+#include "SurvivalTest/Tables/CSVTable.h"
 #include "RangedWeaponDataTable.generated.h"
 
 UCLASS()

@@ -1,12 +1,14 @@
 #include "BasePlayerController.h"
 
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "Items/Weapon.h"
 #include "Items/WeaponCreator.h"
 #include "UI/InventoryUI.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
+#include "Components/TimelineComponent.h"
 
 class ABaseCharacter;
 
@@ -18,6 +20,36 @@ ABasePlayerController::ABasePlayerController() : Super()
 	{
 		inventoryWidgetClass = inventoryWidgetClassFound.Class;
 	}
+
+	//leanTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("LeanTimeline"));
+	//leanTimeline->CreationMethod = EComponentCreationMethod::Native;
+}
+
+void ABasePlayerController::TimelineCallback()
+{
+	TimelineValue = leanTimeline.GetPlaybackPosition();
+	CurveFloatValue = leanCurve->GetFloatValue(TimelineValue);
+	FVector cameraPosition;
+
+	if (leanDirection == 0)
+	{
+		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetFirstPersonCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->cameraCenter, TimelineValue);
+	}
+	else if (leanDirection == 1)
+	{
+		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetFirstPersonCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->rightLean, TimelineValue);
+	}
+	else
+	{
+		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetFirstPersonCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->leftLean, TimelineValue);
+	}
+
+	GetBaseCharacter()->GetFirstPersonCameraComponent()->SetRelativeLocation(cameraPosition);
+}
+
+void ABasePlayerController::TimelineFinishedCallback()
+{
+	//leanTimeline->Deactivate();
 }
 
 void ABasePlayerController::ContainersUpdated()
@@ -29,9 +61,11 @@ void ABasePlayerController::ContainersUpdated()
 void ABasePlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
+	leanTimeline.TickTimeline(DeltaTime);
 
 
-	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr) {
+	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr)
+	{
 		GetBaseCharacter()->GetEquippedWeapon()->UseWeapon(GetBaseCharacter()->GetActorRotation().Vector());
 	}
 }
@@ -56,7 +90,7 @@ void ABasePlayerController::OnPrimaryActionReleased()
 
 void ABasePlayerController::OnPrimaryWeapon()
 {
-		EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Primary_Weapon), EGearType::Primary_Weapon);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Primary_Weapon), EGearType::Primary_Weapon);
 }
 
 void ABasePlayerController::OnSecondaryWeapon()
@@ -76,10 +110,28 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 	UWeapon* equippedWeapon = GetBaseCharacter()->GetEquippedWeapon();
 
 	// TODO need to check if we are quipping the same weapon
-	if(iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetWeaponData().gearType != type))
+	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetWeaponData().gearType != type))
 	{
 		GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld()));
 	}
+}
+
+void ABasePlayerController::LeanRight()
+{
+	leanDirection = 1;
+	leanTimeline.PlayFromStart();
+}
+
+void ABasePlayerController::LeanLeft()
+{
+	leanDirection = -1;
+	leanTimeline.PlayFromStart();
+}
+
+void ABasePlayerController::LeanCenter()
+{
+	leanDirection = 0;
+	leanTimeline.PlayFromStart();
 }
 
 void ABasePlayerController::SetupInputComponent()
@@ -90,6 +142,13 @@ void ABasePlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ABasePlayerController::OnPrimaryAction);
 	InputComponent->BindAction("PrimaryAction", IE_Released, this, &ABasePlayerController::OnPrimaryActionReleased);
+
+	InputComponent->BindAction("Lean Right", IE_Pressed, this, &ABasePlayerController::LeanRight);
+	InputComponent->BindAction("Lean Left", IE_Pressed, this, &ABasePlayerController::LeanLeft);
+
+	InputComponent->BindAction("Lean Right", IE_Released, this, &ABasePlayerController::LeanCenter);
+	InputComponent->BindAction("Lean Left", IE_Released, this, &ABasePlayerController::LeanCenter);
+
 	InputComponent->BindAction("PrimaryWeapon", IE_Pressed, this, &ABasePlayerController::OnPrimaryWeapon);
 	InputComponent->BindAction("SecondaryWeapon", IE_Pressed, this, &ABasePlayerController::OnSecondaryWeapon);
 	InputComponent->BindAction("Sidearm", IE_Pressed, this, &ABasePlayerController::OnSidearm);
@@ -107,7 +166,8 @@ void ABasePlayerController::ShowCursor()
 void ABasePlayerController::OnPrimaryAction()
 {
 	// Don't fire if we're in our inventory
-	if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden) {
+	if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
+	{
 		performAction = true;
 	}
 }
@@ -115,6 +175,15 @@ void ABasePlayerController::OnPrimaryAction()
 void ABasePlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FOnTimelineFloat TimelineCallback;
+	FOnTimelineEventStatic TimelineFinishedCallback;
+	leanCurve = NewObject<UCurveFloat>();
+
+	TimelineCallback.BindUFunction(this, FName{ TEXT("TimelineCallback") });
+	TimelineFinishedCallback.BindUFunction(this, FName{ TEXT("TimelineFinishedCallback") });
+	leanTimeline.AddInterpFloat(leanCurve, TimelineCallback);
+	leanTimeline.SetTimelineFinishedFunc(TimelineFinishedCallback);
 
 	if (inventoryWidgetClass)
 	{

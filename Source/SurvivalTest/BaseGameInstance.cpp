@@ -7,11 +7,11 @@
 #include "Tables/ContainerTableData.h"
 #include "Tables/ItemDataTable.h"
 #include "Tables/LoadoutTableData.h"
-#include "Tables/MeleeWeaponDataTable.h"
-#include "Tables/ProjectileWeaponDataTable.h"
-#include "Tables/RangedWeaponDataTable.h"
+#include "Tables/Weapons/MeleeWeaponDataTable.h"
+#include "Tables/Weapons/ProjectileWeaponDataTable.h"
+#include "Tables/Weapons/RangedWeaponDataTable.h"
 #include "Tables/TableManager.h"
-#include "Tables/WeaponDataTable.h"
+#include "Tables/Weapons/WeaponDataTable.h"
 
 #define mTable() GetTableManager()
 

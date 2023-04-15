@@ -21,6 +21,9 @@
 #include "Missions/MainGrid.h"
 
 float ABaseCharacter::interactionRadius = 500;
+const FVector ABaseCharacter::cameraCenter = FVector(50.0f, 0.0f, 80.0f);
+const FVector ABaseCharacter::leftLean = FVector(50.0f, -60.0f, 60.0f);
+const FVector ABaseCharacter::rightLean = FVector(50.0f, 60.0f, 60.0f);
 
 /**
  *Clears the current stats and sets them back to the max they started with.
@@ -54,8 +57,18 @@ ABaseCharacter::ABaseCharacter()
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	FirstPersonCameraComponent->SetRelativeLocation(FVector(-39.56f, 1.75f, 150.f)); // Position the camera
+	FirstPersonCameraComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 80.0f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
+
+	//LeftCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("LeftCamera"));
+	//LeftCameraComponent->SetupAttachment(GetCapsuleComponent());
+	//LeftCameraComponent->SetRelativeLocation(FVector(50.0f, -60.0f, 60.0f)); // Position the camera
+	//LeftCameraComponent->bUsePawnControlRotation = true;
+
+	//RightCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("RightCamera"));
+	//RightCameraComponent->SetupAttachment(GetCapsuleComponent());
+	//RightCameraComponent->SetRelativeLocation(FVector(50.0f, 60.0f, 60.0f)); // Position the camera
+	//RightCameraComponent->bUsePawnControlRotation = true;
 
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);

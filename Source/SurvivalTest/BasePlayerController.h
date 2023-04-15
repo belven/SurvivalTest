@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/TimelineComponent.h"
 #include "Items/ItemStructs.h"
 #include "BasePlayerController.generated.h"
 
@@ -9,6 +10,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
 
 class UInventoryUI;
 class ABaseCharacter;
+class UTimelineComponent;
 
 UCLASS()
 class SURVIVALTEST_API ABasePlayerController : public APlayerController
@@ -16,10 +18,17 @@ class SURVIVALTEST_API ABasePlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
-	void ContainersUpdated();
-
 	ABasePlayerController();
+
+	UFUNCTION()
+	void TimelineCallback();
+
+	UFUNCTION()
+	void TimelineFinishedCallback();
+
+	UFUNCTION()
+		void ContainersUpdated();
+
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
 	void OnPrimaryActionReleased();
@@ -27,6 +36,9 @@ public:
 	void OnSecondaryWeapon();
 	void OnSidearm();
 	void EquipWeaponAtSlot(int32 slot, EGearType type);
+	void LeanRight();
+	void LeanLeft();
+	void LeanCenter();
 	virtual void SetupInputComponent() override;
 	void ShowCursor();
 	void OnPrimaryAction();
@@ -40,11 +52,23 @@ public:
 	UPROPERTY()
 	FOnUseItem OnUseItem;
 	bool performAction;
-
-protected:
+	
 	virtual void BeginPlay() override;
 
 private:
+	float RotateValue;
+	float CurveFloatValue;
+	float TimelineValue;
+	int32 leanDirection = 0;
+
+	//UPROPERTY()
+	//UTimelineComponent* leanTimeline;
+
+	FTimeline leanTimeline;
+
+	UPROPERTY()
+	UCurveFloat* leanCurve;
+
 	UPROPERTY()
 	TSubclassOf<UUserWidget> inventoryWidgetClass;
 
