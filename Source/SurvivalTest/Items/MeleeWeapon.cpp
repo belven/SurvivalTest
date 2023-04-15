@@ -5,7 +5,7 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BaseGameInstance.h"
 
-#define mSphereTraceMulti(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::None, hits, true);
+#define mSphereTraceMultiWeapon(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::None, hits, true);
 
 void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 {
@@ -26,7 +26,7 @@ void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
 		FVector startLoc = actorLocation;
 		float dist = FVector::Dist(endLoc, startLoc);
 		double radius = GetOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5;
-		mSphereTraceMulti(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
+		mSphereTraceMultiWeapon(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
 
 		for (FHitResult hit : hits)
 		{

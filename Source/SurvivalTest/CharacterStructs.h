@@ -16,11 +16,11 @@ struct FHealthChange
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	float changeAmount;
-	bool heals;
+	float changeAmount = 0;
+	bool heals = false;
 
 	UPROPERTY()
-		ABaseCharacter* source;
+		ABaseCharacter* source = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -28,9 +28,9 @@ struct FCombatStateChange
 {
 	GENERATED_USTRUCT_BODY()
 public:
-	bool oldState;
-	bool newState;
+	bool oldState = false;
+	bool newState = true;
 
 	UPROPERTY()
-		UObject* source;
+		UObject* source = nullptr;
 };

@@ -42,5 +42,8 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 
 UTexture2D* UItemUI::GetItemIcon()
 {
+	if (GetItemData().mesh.Equals(""))
+		return nullptr;
+
 	return LoadObject<UTexture2D>(this, *GetItemData().mesh);
 }

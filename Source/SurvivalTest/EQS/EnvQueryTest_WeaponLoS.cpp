@@ -6,7 +6,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "SurvivalTest/Items/Weapon.h"
 
-#define mSphereTraceMulti(start, end, radius, hits) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, ETraceTypeQuery::TraceTypeQuery1, true, ignore, EDrawDebugTrace::None, hits, true);
+#define mSphereTraceMultiEQS(start, end, radius, hits) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, ETraceTypeQuery::TraceTypeQuery1, true, ignore, EDrawDebugTrace::None, hits, true);
 
 UEnvQueryTest_WeaponLoS::UEnvQueryTest_WeaponLoS(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -77,7 +77,7 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 				ItemLocation.Z += controllerBaseCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 				// Create a sphere trace, slightly larger than the characters capsule, so we make sure there's enough room to shoot
-				mSphereTraceMulti(ItemLocation, targetLocation, con->GetCharacter()->GetCapsuleComponent()->GetScaledCapsuleRadius()* 1.5, hits);
+				mSphereTraceMultiEQS(ItemLocation, targetLocation, con->GetCharacter()->GetCapsuleComponent()->GetScaledCapsuleRadius()* 1.5, hits);
 
 				bool canSee = true;
 
