@@ -20,6 +20,8 @@ void ABaseHUD::DrawStats()
 
 	float startX = vpX * 0.05;
 	float startY = vpY * 0.9;
+	
+	DrawLine(vpX * 0.5, vpY * 0.5, vpX * 0.5, vpY * 0.5, FLinearColor::Red, 10);
 
 	DrawStatBar(startX, startY, 60, "Health", player->GetCurrentStats().health / player->GetMaxStats().health, FLinearColor::Red, 100, 15);
 	DrawStatBar(startX, startY + 20, 60, "Water", player->GetCurrentStats().water / player->GetMaxStats().water, FLinearColor::Blue, 100, 15);

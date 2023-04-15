@@ -16,9 +16,9 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	//CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::BeginOverlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
 	RootComponent = CollisionComp;
 
@@ -29,9 +29,8 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMesh->SetupAttachment(RootComponent);
 	ProjectileMesh->CastShadow = false;
 	ProjectileMesh->SetWorldScale3D(FVector(0.05));
-	ProjectileMesh->SetWorldScale3D(FVector(0.2));
 	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	ProjectileMesh->SetRelativeRotation(FRotator(-90, 0, 0));
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	ProjectileMovement->InitialSpeed = Default_Initial_Speed;
@@ -68,28 +67,28 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 	}
 }
 
-void ABaseProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	ABaseCharacter* us = healthChange.source;
-
-	if (OtherActor != NULL && OtherActor != this && OtherActor != us && us != NULL && OtherComp->GetName().Equals("CollisionCylinder"))
-	{
-		if (OtherActor->Implements<UDamagable>())
-		{
-			ITeam* hitTeam = Cast<ITeam>(OtherActor);
-
-			if (hitTeam->GetRelationship(us, mGameInstance()) == ERelationshipType::Enemy) {
-				IDamagable* hit = Cast<IDamagable>(OtherActor);
-				hit->ChangeHealth(healthChange);
-				Destroy();
-			}
-		}
-		else
-		{
-			Destroy();
-		}
-	}
-}
+//void ABaseProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+//{
+//	ABaseCharacter* us = healthChange.source;
+//
+//	if (OtherActor != NULL && OtherActor != this && OtherActor != us && us != NULL && OtherComp->GetName().Equals("CollisionCylinder"))
+//	{
+//		if (OtherActor->Implements<UDamagable>())
+//		{
+//			ITeam* hitTeam = Cast<ITeam>(OtherActor);
+//
+//			if (hitTeam->GetRelationship(us, mGameInstance()) == ERelationshipType::Enemy) {
+//				IDamagable* hit = Cast<IDamagable>(OtherActor);
+//				hit->ChangeHealth(healthChange);
+//				Destroy();
+//			}
+//		}
+//		else
+//		{
+//			Destroy();
+//		}
+//	}
+//}
 
 void ABaseProjectile::SetHealthChange(FHealthChange inHealthChange)
 {

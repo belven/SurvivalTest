@@ -68,7 +68,7 @@ ABaseCharacter::ABaseCharacter()
 	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
 
 	weaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
-	weaponMeshComp->SetupAttachment(GetCapsuleComponent());
+	weaponMeshComp->SetupAttachment(GetMesh(), FName(TEXT("GripPoint")));
 
 	ResetStats();
 }
