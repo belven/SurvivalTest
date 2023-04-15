@@ -59,13 +59,7 @@ void UTableManager::LoadTableFromFile(UCSVTable* table)
 
 void UTableManager::SaveTableToFile(UCSVTable* table)
 {
-	const FString path = table->GetPath();
-
-	/*if (FPaths::FileExists(path))
-	{
-		FFileHelper::
-	}*/
-
+	const FString path = table->GetPath();	
 	FFileHelper::SaveStringArrayToFile(table->GetDataStrings(), *path);
 }
 
