@@ -145,6 +145,9 @@ protected:
 	TArray<IInteractable*> overlappingInteractables;
 
 	UPROPERTY()
+	UBaseGameInstance* game;
+
+	UPROPERTY()
 	UWeapon* equippedWeapon;
 
 	UPROPERTY()

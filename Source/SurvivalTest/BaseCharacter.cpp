@@ -76,6 +76,7 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	game = mGameInstance();
 	GetOverlapsOnSpawn();
 }
 
@@ -87,17 +88,17 @@ void ABaseCharacter::BeginPlay()
  */
 void ABaseCharacter::SetupLoadout(FString loadoutName)
 {
-	const FLoadoutData ld = mGameInstance()->GetLoadoutData(loadoutName);
-	int32 instanceContainerDataID = mGameInstance()->GetNextInstanceContainerDataID();
-	FContainerData cd = mGameInstance()->GetContainerDataName("Character Inventory");
+	const FLoadoutData ld = game->GetLoadoutData(loadoutName);
+	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
+	FContainerData cd = game->GetContainerDataName("Character Inventory");
 
 	FInstanceContainerData icd;
 	icd.ID = instanceContainerDataID;
 	icd.containerID = cd.ID;
 	icd.type = EContainerType::Player;
 	icd.name = cd.name;
-	mGameInstance()->GetInstancedContainers().Add(icd.ID, icd);
-	inventory = UItemContainer::CreateItemContainer(cd, icd, mGameInstance());
+	game->GetInstancedContainers().Add(icd.ID, icd);
+	inventory = UItemContainer::CreateItemContainer(cd, icd, game);
 
 	TArray<EGearType> gearTypes;
 	gearTypes.AddUnique(EGearType::Head);
@@ -159,12 +160,12 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
 void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 {
 	if (itemID != UItemStructs::InvalidInt) {
-		FItemData id = mGameInstance()->GetItemData(itemID);
+		FItemData id = game->GetItemData(itemID);
 		TArray<int32> ids;
 		FInstanceItemData iid;
 		iid.itemID = itemID;
 		iid.amount = 1;
-		iid.slot = GetSlotForGear(mGameInstance()->GetGearTypeForItem(itemID));
+		iid.slot = GetSlotForGear(game->GetGearTypeForItem(itemID));
 
 		if (inventory->AddItem(iid, ids).amount == 0) {
 			if (id.type == EItemType::Armour) {
@@ -215,7 +216,7 @@ void ABaseCharacter::EquipArmour(UArmour* armour)
  */
 void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 {
-	mEventTriggered(mGameInstance(), mCreateHealthChangeEvent(this, health_change, true));
+	mEventTriggered(game, mCreateHealthChangeEvent(this, health_change, true));
 
 	if (!inCombat && !health_change.heals)
 	{
@@ -224,7 +225,7 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 		csc.oldState = false;
 		csc.newState = true;
 		inCombat = true;
-		mEventTriggered(mGameInstance(), mCreateCombatStateEvent(this, csc));
+		mEventTriggered(game, mCreateCombatStateEvent(this, csc));
 	}
 
 	if (health_change.heals)
@@ -246,9 +247,8 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 	}
 
-	mEventTriggered(mGameInstance(), mCreateHealthChangeEvent(this, health_change, false));
+	mEventTriggered(game, mCreateHealthChangeEvent(this, health_change, false));
 }
-
 
 /**
  *This method calculates damage taken after damage resistance applied.
@@ -368,17 +368,17 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
  */
 void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 {
-	FItemData id = mGameInstance()->GetItemData(inItem.itemID);
+	FItemData id = game->GetItemData(inItem.itemID);
 
 	if (id.type == EItemType::Armour) {
-		FInstanceArmourData iad = mGameInstance()->GetInstanceArmourDataByInstanceItemID(inItem.ID);
-		EquipArmour(UArmour::CreateArmour(inItem.itemID, mGameInstance(), inItem.ID));
+		FInstanceArmourData iad = game->GetInstanceArmourDataByInstanceItemID(inItem.ID);
+		EquipArmour(UArmour::CreateArmour(inItem.itemID, game, inItem.ID));
 	}
 	else if (id.type == EItemType::Weapon)
 	{
 		if (GetEquippedWeapon())
 		{
-			FWeaponData wd = mGameInstance()->GetWeaponData(inItem.itemID);
+			FWeaponData wd = game->GetWeaponData(inItem.itemID);
 			if (GetEquippedWeapon()->GetWeaponData().gearType == wd.gearType)
 			{
 				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));
@@ -456,6 +456,7 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
 void ABaseCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
+	game = mGameInstance();
 
 	if (NewController->IsA(ABasePlayerController::StaticClass()))
 	{
@@ -465,7 +466,6 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 	else
 	{
-		SetupLoadout("AI Base");
 		interactionSphere->DestroyComponent();
 	}
 }
@@ -477,9 +477,9 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (mGameInstance()->grid)
+	if (game->grid)
 	{
-		AGridSection* gs = mGameInstance()->grid->GetGridSection(GetActorLocation());
+		AGridSection* gs = game->grid->GetGridSection(GetActorLocation());
 		if (gs)
 			gs->HighlightSection(DeltaSeconds);
 	}
