@@ -3,17 +3,21 @@
 #include "Engine/TargetPoint.h"
 #include "SurvivalTest/Items/ItemStructs.h"
 #include "MissionStructs.h"
+#include "SurvivalTest/Events/EventListener.h"
 #include "Mission.generated.h"
 
 class AMissionArea;
 class UBaseGameInstance;
+class ABaseCharacter;
 
 UCLASS(HideCategories=("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
-class SURVIVALTEST_API AMission : public ATargetPoint
+class SURVIVALTEST_API AMission : public ATargetPoint, public IEventListener
 {
 	GENERATED_BODY()
 
 public:
+	virtual void EventTriggered(UBaseEvent* inEvent) override;
+	void MissionComplete();
 	bool IsSpawnMission() const { return spawnMission; }
 	void SetSpawnMission(bool inSpawnMission) { spawnMission = inSpawnMission; }
 	void SpawnMission();
@@ -63,6 +67,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	TMap<AMissionArea*, int32> players;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+		TArray<ABaseCharacter*> aiSpawned;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	TArray<AMissionArea*> missionArea;

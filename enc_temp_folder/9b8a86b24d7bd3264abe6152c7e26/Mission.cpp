@@ -10,7 +10,6 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Events/BaseEvent.h"
 #include "SurvivalTest/Events/HealthChangeEvent.h"
-#include "SurvivalTest/Events/RPGEventManager.h"
 #include "SurvivalTest/Tables/LoadoutTableData.h"
 #include "SurvivalTest/Tables/Mission/MissionLoadoutTable.h"
 
@@ -39,7 +38,6 @@ void AMission::BeginPlay()
 	Super::BeginPlay();
 	game = mGameInstance();
 	game->GetMissionManager()->AddMission(this);
-	game->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &AMission::EventTriggered);
 	SpawnBox(GetActorLocation());
 }
 

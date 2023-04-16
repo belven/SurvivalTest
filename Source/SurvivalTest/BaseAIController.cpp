@@ -227,7 +227,9 @@ void ABaseAIController::CalculateCombat()
 
 			// Check we're in range of the target
 			if (FVector::Dist(mActorLocation, targetLocation) <= weapon->GetWeaponData().range) {
-				AttackLocation(mActorRotation.Vector());
+				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(GetBaseCharacter()->GetActorLocation(), target->asActor()->GetActorLocation());
+
+				AttackLocation(rotation.Vector());
 			}
 			// Otherwise move towards the targets current location
 			else
