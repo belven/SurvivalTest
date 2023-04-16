@@ -33,9 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
-		EMissionType type;
+		int32 loadoutID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
-		FString name;
+		EMissionType type;
 };
 
 UCLASS()

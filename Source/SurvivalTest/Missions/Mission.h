@@ -6,6 +6,7 @@
 #include "Mission.generated.h"
 
 class AMissionArea;
+class UBaseGameInstance;
 
 UCLASS(HideCategories=("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
 class SURVIVALTEST_API AMission : public ATargetPoint
@@ -15,6 +16,9 @@ class SURVIVALTEST_API AMission : public ATargetPoint
 public:
 	bool IsSpawnMission() const { return spawnMission; }
 	void SetSpawnMission(bool inSpawnMission) { spawnMission = inSpawnMission; }
+	void SpawnMission();
+	EMissionType GetMissionType() const { return missionType; }
+	void SetMissionType(EMissionType inMissionType) { missionType = inMissionType; }
 
 protected:
 	AMission();
@@ -23,9 +27,11 @@ protected:
 	bool HasPlayers();
 	void SpawnBox(FVector location);
 
+	UPROPERTY()
+	UBaseGameInstance* game;
+
 	UFUNCTION()
 	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex);
-	void SpawnMission();
 
 	bool IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp);
 	UFUNCTION()
@@ -39,8 +45,7 @@ protected:
 	TSubclassOf<APawn> AIClass;
 
 	FTimerHandle TimerHandle_CheckNoPlayers;
-
-private:
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	int32 boxSize;
 
@@ -49,8 +54,7 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	EMissionType missionType;
-
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	bool spawnMission = true;
 

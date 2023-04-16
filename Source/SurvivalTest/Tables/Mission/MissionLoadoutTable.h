@@ -12,6 +12,8 @@ public:
 	UMissionLoadoutTable();
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
+	TArray<FMissionLoadoutData> GetLoadoutsForMissionType(EMissionType type);
+
 	TArray<FMissionLoadoutData >& GetData() { return missionLoadoutData; }
 private:
 	TArray<FMissionLoadoutData > missionLoadoutData;

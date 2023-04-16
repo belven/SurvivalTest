@@ -8,13 +8,29 @@
 
 class UItemContainer;
 
+class FSpawnLootRunnable : public FRunnable
+{
+public:
+	FSpawnLootRunnable();
+
+	//override Init,Run and Stop.
+	virtual bool Init() override;
+	virtual uint32 Run() override;
+	FInstanceItemData CreateLoot(FItemData id);
+
+	ALootBox* lootBox;
+};
+
 UCLASS(HideCategories = ("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
 class SURVIVALTEST_API ALootBox : public AActor, public IInteractable, public IItemContainerInterface
 {
+	friend class FSpawnLootRunnable;
+
 	GENERATED_BODY()
 
 public:
 	ALootBox();
+	virtual ~ALootBox() override;
 	void SetUpBox();
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual UItemContainer* GetItemContainer() override { return container; }
@@ -37,6 +53,7 @@ protected:
 	FInstanceItemData CreateLoot(FItemData id);
 
 	FTimerHandle TimerHandle_LootboxClear;
+	FSpawnLootRunnable* runnable;
 	virtual void BeginPlay() override;
 
 	UBaseGameInstance* GetGame();

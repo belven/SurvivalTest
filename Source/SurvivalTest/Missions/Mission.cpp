@@ -1,13 +1,15 @@
 #include "Mission.h"
-
 #include "Components/ShapeComponent.h"
 #include "DrawDebugHelpers.h"
 #include "MissionArea.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include <NavigationSystem.h>
-
+#include "MissionManager.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Items/LootBox.h"
+#include "SurvivalTest/BaseGameInstance.h"
+#include "SurvivalTest/Tables/LoadoutTableData.h"
+#include "SurvivalTest/Tables/Mission/MissionLoadoutTable.h"
 
 AMission::AMission()
 {
@@ -32,8 +34,9 @@ void AMission::SetUpLootBoxes()
 void AMission::BeginPlay()
 {
 	Super::BeginPlay();
-
-	SpawnBox(GetActorLocation());
+	game = mGameInstance();
+	game->GetMissionManager()->AddMission(this);
+	SpawnBox(GetActorLocation());	
 }
 
 bool AMission::HasPlayers()
@@ -80,17 +83,21 @@ void AMission::SpawnMission()
 {
 	if (!HasPlayers() && spawnMission)
 	{
+		 UMissionLoadoutTable* mlt = game->GetTableManager()->GetMissionLoadoutTable();
 		FActorSpawnParameters params;
 		params.Owner = this;
 		FNavLocation location;
 
-		for (int i = 0; i < enemyAmount; ++i)
+		for(auto& mld : mlt->GetData())
 		{
+			FLoadoutData ld = game->GetTableManager()->GetLoadoutTableData()->GetLoadoutDataByID(mld.loadoutID);
+
 			UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
 			nav->GetRandomPointInNavigableRadius(GetActorLocation(), size * (boxSize / 2), location);
 
-			GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
-		}
+			ABaseCharacter* character = GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
+			character->SetupLoadout(ld.name);
+		}		
 
 		SetUpLootBoxes();
 	}

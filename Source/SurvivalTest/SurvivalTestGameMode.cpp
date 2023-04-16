@@ -1,9 +1,15 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "SurvivalTestGameMode.h"
 #include "BasePlayerController.h"
+#include "Missions/MissionManager.h"
 #include "UI/BaseHUD.h"
 #include "UObject/ConstructorHelpers.h"
+#include "SurvivalTest/BaseGameInstance.h"
+
+void ASurvivalTestGameMode::StartPlay()
+{
+	Super::StartPlay();
+	mGameInstance()->GetMissionManager()->StartPlay();
+}
 
 ASurvivalTestGameMode::ASurvivalTestGameMode()
 	: Super()

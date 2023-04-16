@@ -24,3 +24,13 @@ void ULoadoutTableData::LoadData(TArray<TArray<FString>> inDataStrings)
 		loadoutData.Add(data);
 	}
 }
+
+FLoadoutData ULoadoutTableData::GetLoadoutDataByID(int32 loadoutID)
+{
+	for (auto ld : GetData())
+	{
+		if (ld.ID == loadoutID)
+			return ld;
+	}
+	return {};
+}

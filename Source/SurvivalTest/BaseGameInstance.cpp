@@ -2,6 +2,7 @@
 #include "FactionManager.h"
 #include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
+#include "Missions/MissionManager.h"
 #include "Tables/ArmourDataTable.h"
 #include "Tables/ConsumableTableData.h"
 #include "Tables/ContainerTableData.h"
@@ -288,6 +289,17 @@ UFactionManager* UBaseGameInstance::GetFactionManager()
 {
 	if (factionManager == nullptr) { factionManager = NewObject<UFactionManager>(); }
 	return factionManager;
+}
+
+UMissionManager* UBaseGameInstance::GetMissionManager()
+{
+	if (missionManager == nullptr)
+	{
+		missionManager = NewObject<UMissionManager>();
+		missionManager->SetGame(this);
+	}
+
+	return missionManager;
 }
 
 URPGEventManager* UBaseGameInstance::GetEventManager()

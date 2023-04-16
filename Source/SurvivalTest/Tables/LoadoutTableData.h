@@ -12,6 +12,8 @@ public:
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
 	TArray<FLoadoutData >& GetData() { return loadoutData; }
+
+	FLoadoutData GetLoadoutDataByID(int32 loadoutID);
 private:
 	TArray<FLoadoutData > loadoutData;
 };

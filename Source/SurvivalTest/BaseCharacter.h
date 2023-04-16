@@ -98,10 +98,12 @@ public:
 	void GetOverlapsOnSpawn();
 	void AddInteractable(IInteractable* inter);
 	void RemoveInteractable(IInteractable* inter);
-
 	void Consume(EConsumableType type, int32 value);
 
 	TArray<IInteractable*> GetOverlappingInteractables() const { return overlappingInteractables; }
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetNearbyContainersNum() { return overlappingInteractables.Num(); }
 
 	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
 
@@ -125,13 +127,13 @@ public:
 	static const FVector cameraCenter;
 	static const FVector leftLean;
 	static const FVector rightLean;
+	void SetupLoadout(FString loadoutName);
 
 protected:
 	static float interactionRadius;
 	void ResetStats();
 	bool inCombat;
 	virtual void BeginPlay() override;
-	void SetupLoadout(FString loadoutName);
 
 	UFUNCTION()
 	void CreateNewItemForInventory(int32 itemID);

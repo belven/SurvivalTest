@@ -16,6 +16,11 @@ ALootBox::ALootBox()
 	boxMeshComp->SetCollisionProfileName("Interaction");
 }
 
+ALootBox::~ALootBox()
+{
+	//delete runnable;
+}
+
 void ALootBox::SetUpBox()
 {
 	if (boxMesh) {
@@ -33,7 +38,6 @@ void ALootBox::BeginPlay()
 
 void ALootBox::Interact(ABasePlayerController* instigator)
 {
-
 }
 
 void ALootBox::Highlight(bool activate)
@@ -72,6 +76,9 @@ TMap<EItemType, TArray<FItemData>> ALootBox::GetItemList()
 
 void ALootBox::SpawnLoot()
 {
+	// runnable = new FSpawnLootRunnable();
+	//runnable->lootBox = this;
+	//FRunnableThread* thread = FRunnableThread::Create(runnable, TEXT(""));
 	TMap<EItemType, TArray<FItemData>> itemList = GetItemList();
 
 	for (auto& lootItem : itemTypes)
@@ -92,6 +99,7 @@ void ALootBox::SpawnLoot()
 			}
 		}
 	}
+
 }
 
 void ALootBox::CreateLootboxData()
@@ -152,4 +160,54 @@ void ALootBox::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	SetUpBox();
+}
+
+FSpawnLootRunnable::FSpawnLootRunnable() : lootBox(nullptr)
+{
+
+}
+
+bool FSpawnLootRunnable::Init()
+{
+	return true;
+}
+
+uint32 FSpawnLootRunnable::Run()
+{
+	TMap<EItemType, TArray<FItemData>> itemList = lootBox->GetItemList();
+
+	for (auto& lootItem : lootBox->itemTypes)
+	{
+		TArray<FItemData> items = itemList.FindOrAdd(lootItem.Key);
+
+		for (int i = 0; i < lootItem.Value; ++i)
+		{
+			FItemData id = items[FMath::RandRange(0, items.Num() - 1)];
+			FInstanceItemData iid = CreateLoot(id);
+
+			TArray<int32> ids;
+			lootBox->container->AddItem(iid, ids);
+
+			if (id.type == EItemType::Armour)
+			{
+				UArmour::CreateArmour(id.ID, lootBox->GetGame(), ids[0]);
+			}
+		}
+	}
+
+	return 0;
+}
+
+FInstanceItemData FSpawnLootRunnable::CreateLoot(FItemData id)
+{
+	FInstanceItemData iid;
+	if (id.ID != UItemStructs::InvalidInt)
+	{
+		iid.ID = lootBox->GetGame()->GetNextInstanceItemDataID();
+		iid.amount = FMath::RandRange(1, id.maxStack);
+		iid.containerInstanceID = lootBox->icd.ID;
+		iid.itemID = id.ID;
+		iid.slot = lootBox->container->GetNextEmptySlot();
+	}
+	return iid;
 }

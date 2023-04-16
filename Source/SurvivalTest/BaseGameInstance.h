@@ -18,16 +18,18 @@ class UContainerTableData;
 class APatrolPath;
 class AMainGrid;
 class UConsumableTableData;
+class UMissionManager;
 
 UCLASS()
 class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
 	UFUNCTION(BlueprintCallable)
-		FItemData GetItemData(int32 itemID);
+	FItemData GetItemData(int32 itemID);
 
 	void AddUpdateData(const FInstanceArmourData& inData);
 	void AddUpdateData(const FInstanceItemData& inData);
@@ -40,15 +42,15 @@ public:
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
 	FArmourData GetArmourData(int32 armourID);
 	FContainerData GetContainerDataName(FString containerName);
-	FContainerData GetContainerDataByID(int32 containerID);	
+	FContainerData GetContainerDataByID(int32 containerID);
 	FArmourData GetArmourDataByItemID(int32 itemID);
 	FLoadoutData GetLoadoutData(FString loadoutName);
 	FConsumableData GetConsumableData(int32 itemID);
-	
+
 	EGearType GetGearTypeForItem(int32 itemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
 	FString GetContainerInstanceName(int32 containerID);
-	
+
 	int32 GetNextInstanceItemDataID();
 	int32 GetNextBoxID();
 	int32 GetNextInstanceBoxDataID();
@@ -68,19 +70,23 @@ public:
 	URPGEventManager* GetEventManager();
 	UTableManager* GetTableManager();
 	UFactionManager* GetFactionManager();
-private:
+	UMissionManager* GetMissionManager();
 
+private:
 	// TODO Make these use data tables!
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
 	TMap<int32, FInstanceBoxData> boxContainers;
 
 	UPROPERTY()
-		URPGEventManager* eventManager;
+	UMissionManager* missionManager;
 
 	UPROPERTY()
-		UFactionManager* factionManager;
+	URPGEventManager* eventManager;
 
 	UPROPERTY()
-		UTableManager* tableManager;
-	};
+	UFactionManager* factionManager;
+
+	UPROPERTY()
+	UTableManager* tableManager;
+};
