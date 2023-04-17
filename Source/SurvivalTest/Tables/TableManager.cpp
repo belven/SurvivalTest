@@ -27,6 +27,7 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetConsumableData());
 	LoadTableFromFile(GetMissionTable());
 	LoadTableFromFile(GetMissionLoadoutTable());
+	LoadTableFromFile(GetMissionItemTable());
 }
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
