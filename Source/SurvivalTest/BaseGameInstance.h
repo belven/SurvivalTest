@@ -32,6 +32,7 @@ public:
 	FItemData GetItemData(int32 itemID);
 
 	void AddUpdateData(const FInstanceArmourData& inData);
+	void AddUpdateData(const FInstanceWeaponData& inData);
 	void AddUpdateData(const FInstanceItemData& inData);
 	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
 	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);

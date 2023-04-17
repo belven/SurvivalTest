@@ -10,16 +10,22 @@ class SURVIVALTEST_API UHUDUI : public UUserWidget
 
 public:
 	UFUNCTION(BlueprintCallable)
-		float GetHealthProgress();
+	float GetHealthProgress();
 
 	UFUNCTION(BlueprintCallable)
-		float GetWaterProgress();
+	float GetWaterProgress();
 
 	UFUNCTION(BlueprintCallable)
-		float GetFoodProgress();
+	float GetFoodProgress();
 
 	UFUNCTION(BlueprintCallable)
-		float GetRestProgress();
+	int32 GetWeaponMaxAmmo();
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetWeaponCurrentAmmo();
+
+	UFUNCTION(BlueprintCallable)
+	float GetRestProgress();
 
 	UFUNCTION(BlueprintCallable)
 	ABaseCharacter* GetPlayer() const { return player; }

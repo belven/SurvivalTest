@@ -115,6 +115,9 @@ public:
 	UItemContainer* GetInventory() const { return inventory; }
 	void SetInventory(UItemContainer* inInventory) { inventory = inInventory; }
 
+	UBaseGameInstance* GetGame() const	{		return game;	}
+	void SetGame(UBaseGameInstance* inGame)	{		game = inGame;	}
+
 	UFUNCTION()
 	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
@@ -169,8 +172,5 @@ protected:
 	UItemContainer* inventory;
 
 	UPROPERTY()
-	FCharacterStats maxStats;
-
-	UPROPERTY()
-	UBaseGameInstance* gameInstance;
+	FCharacterStats maxStats;	
 };

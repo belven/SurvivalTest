@@ -291,6 +291,17 @@ void UBaseGameInstance::AddUpdateData(const FInstanceArmourData& inData)
 	GetInstancedArmour().Add(inData.ID, inData);
 }
 
+/**
+ * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
+ *
+ * @param inData The data we're adding or updating, it will match on ID of the data
+ *
+ */
+void UBaseGameInstance::AddUpdateData(const FInstanceWeaponData& inData)
+{
+	GetTableManager()->GetWeaponInstanceTable()->GetData().Add(inData.ID, inData);
+}
+
 
 /**
  * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
