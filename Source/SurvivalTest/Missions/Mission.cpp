@@ -21,7 +21,7 @@ AMission::AMission()
 	AIClass = PlayerPawnClassFinder.Class;
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
-	navInvoker->SetGenerationRadii(size, size * 1.2);
+	navInvoker->SetGenerationRadii(boxSize, boxSize * 1.2);
 	//navInvoker->AddToRoot();
 }
 
@@ -74,7 +74,7 @@ void AMission::SetUpLootBoxes()
 void AMission::BeginPlay()
 {
 	Super::BeginPlay();
-	navInvoker->SetGenerationRadii(size, size * 1.2);
+	navInvoker->SetGenerationRadii(boxSize, boxSize * 1.2);
 	navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 
 	game = mGameInstance();
@@ -166,7 +166,7 @@ void AMission::SpawnMission()
 			FLoadoutData ld = game->GetTableManager()->GetLoadoutTableData()->GetLoadoutDataByID(mld.loadoutID);
 
 			UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
-			nav->GetRandomPointInNavigableRadius(GetActorLocation(), size * (boxSize / 2), location);
+			nav->GetRandomPointInNavigableRadius(GetActorLocation(), boxSize / 2, location);
 
 			ABaseCharacter* character = GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
 

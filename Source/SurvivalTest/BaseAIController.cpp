@@ -153,7 +153,7 @@ void ABaseAIController::Tick(float DeltaTime)
 	}
 	else
 	{
-		//Patrol();
+		Patrol();
 	}
 }
 

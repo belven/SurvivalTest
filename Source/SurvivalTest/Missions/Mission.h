@@ -45,10 +45,7 @@ protected:
 	bool IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp);
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
-	int32 size = 5000;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	int32 enemyAmount;
 	TSubclassOf<APawn> AIClass;
