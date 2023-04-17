@@ -4,6 +4,7 @@
 #include "Interfaces/Team.h"
 #include "GameFramework/Character.h"
 #include "Interfaces/Interactable.h"
+#include "Interfaces/ItemContainerInterface.h"
 #include "Items/ItemStructs.h"
 #include "BaseCharacter.generated.h"
 
@@ -61,13 +62,15 @@ public:
 };
 
 UCLASS(config = Game)
-class ABaseCharacter : public ACharacter, public IDamagable, public ITeam
+class ABaseCharacter : public ACharacter, public IDamagable, public ITeam, public IItemContainerInterface, public IInteractable
 {
 	GENERATED_BODY()
 
 public:
 	ABaseCharacter();
-
+	virtual UItemContainer* GetItemContainer() override { return inventory;  }
+	virtual void Interact(ABasePlayerController* instigator) override;
+	virtual void Highlight(bool activate) override;
 	FOnContainersUpdated OnContainersUpdated;
 
 	UStaticMeshComponent* GetWeaponMeshComp() const { return weaponMeshComp; }

@@ -1,6 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
 #include "HUDUI.h"
-
 #include "SurvivalTest/BaseCharacter.h"
 
 float UHUDUI::GetHealthProgress()
@@ -11,7 +9,6 @@ float UHUDUI::GetHealthProgress()
 float UHUDUI::GetWaterProgress()
 {
 	return (GetPlayer()->GetCurrentStats().water / GetPlayer()->GetMaxStats().water);
-
 }
 
 float UHUDUI::GetFoodProgress()

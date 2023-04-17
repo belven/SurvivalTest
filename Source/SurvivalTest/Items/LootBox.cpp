@@ -91,9 +91,9 @@ void ALootBox::SpawnLoot()
 			FInstanceItemData iid = CreateLoot(id);
 
 			TArray<int32> ids;
-			container->AddItem(iid, ids);
+			FInstanceItemData added = container->AddItem(iid, ids);
 
-			if (id.type == EItemType::Armour)
+			if (added.amount == 0 && id.type == EItemType::Armour)
 			{
 				UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
 			}

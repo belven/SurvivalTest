@@ -250,7 +250,7 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 
 	if (IsDead())
 	{
-		//SetActorHiddenInGame(true);
+		SetActorHiddenInGame(true);
 		//SetActorEnableCollision(false);
 		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 	}
