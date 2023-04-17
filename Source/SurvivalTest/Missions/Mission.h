@@ -26,6 +26,7 @@ public:
 
 protected:
 	AMission();
+	FContainerData GetRandomContainerData();
 	void SetUpLootBoxes();
 	virtual void BeginPlay() override;
 	bool HasPlayers();
@@ -61,9 +62,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	bool spawnMission = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	TMap<EItemType, int32> itemTypes;
+	
+	//TMap<int32, int32> itemTypes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	TMap<AMissionArea*, int32> players;

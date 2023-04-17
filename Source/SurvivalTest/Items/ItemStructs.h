@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
+#include "SurvivalTest/Missions/MissionStructs.h"
 #include "ItemStructs.generated.h"
 
 #define mSetTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
@@ -251,6 +252,10 @@ public:
 	int32 slots = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	FString name = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	FString mesh = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	EMissionType type = EMissionType::End;
 };
 
 USTRUCT(BlueprintType)

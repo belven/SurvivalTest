@@ -1,10 +1,7 @@
 #include "LootBox.h"
-
 #include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
-#include "SurvivalTest/Tables/Items/ItemDataTable.h"
-#include "SurvivalTest/Tables/TableManager.h"
 
 ALootBox::ALootBox()
 {
@@ -23,17 +20,18 @@ ALootBox::~ALootBox()
 
 void ALootBox::SetUpBox()
 {
-	if (boxMesh) {
-		boxMeshComp->SetStaticMesh(boxMesh);
+	if (!containerData.mesh.Equals("")) {
+		UStaticMesh* mesh = LoadObject<UStaticMesh>(this, *containerData.mesh);
+		boxMeshComp->SetStaticMesh(mesh);
 		//boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+	CreateLootboxData();
 }
 
 void ALootBox::BeginPlay()
 {
 	Super::BeginPlay();
-	CreateLootboxData();
-	SetUpBox();
+	SetActorHiddenInGame(true);
 }
 
 void ALootBox::Interact(ABasePlayerController* instigator)
@@ -58,48 +56,42 @@ UBaseGameInstance* ALootBox::GetGame()
 	return gameIn;
 }
 
-TMap<EItemType, TArray<FItemData>> ALootBox::GetItemList()
-{
-	TMap<EItemType, TArray<FItemData>> items;
-	TArray<EItemType> types;
-	itemTypes.GenerateKeyArray(types);
-
-	for (auto item : GetGame()->GetTableManager()->GetItemDataTable()->GetData())
-	{
-		if (types.Contains(item.type)) {
-			items.FindOrAdd(item.type).Add(item);
-		}
-	}
-
-	return items;
-}
+//TMap<EItemType, TArray<FItemData>> ALootBox::GetItemList()
+//{
+//	TMap<EItemType, TArray<FItemData>> items;
+//	TArray<EItemType> types;
+//	itemTypes.GenerateKeyArray(types);
+//
+//	for (auto item : GetGame()->GetTableManager()->GetItemDataTable()->GetData())
+//	{
+//		if (types.Contains(item.type)) {
+//			items.FindOrAdd(item.type).Add(item);
+//		}
+//	}
+//
+//	return items;
+//}
 
 void ALootBox::SpawnLoot()
 {
+	SetUpBox();
 	// runnable = new FSpawnLootRunnable();
 	//runnable->lootBox = this;
 	//FRunnableThread* thread = FRunnableThread::Create(runnable, TEXT(""));
-	TMap<EItemType, TArray<FItemData>> itemList = GetItemList();
 
 	for (auto& lootItem : itemTypes)
 	{
-		TArray<FItemData> items = itemList.FindOrAdd(lootItem.Key);
+		FItemData id = GetGame()->GetItemData(lootItem);
+		FInstanceItemData iid = CreateLoot(id);
 
-		for (int i = 0; i < lootItem.Value; ++i)
+		TArray<int32> ids;
+		FInstanceItemData added = container->AddItem(iid, ids);
+
+		if (added.amount == 0 && id.type == EItemType::Armour)
 		{
-			FItemData id = items[FMath::RandRange(0, items.Num() - 1)];
-			FInstanceItemData iid = CreateLoot(id);
-
-			TArray<int32> ids;
-			FInstanceItemData added = container->AddItem(iid, ids);
-
-			if (added.amount == 0 && id.type == EItemType::Armour)
-			{
-				UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
-			}
+			UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
 		}
 	}
-
 }
 
 void ALootBox::CreateLootboxData()
@@ -110,12 +102,12 @@ void ALootBox::CreateLootboxData()
 	GetGame()->GetInstancedBoxes().Add(ibd.ID, ibd);
 
 	icd.ID = GetGame()->GetNextInstanceContainerDataID();
-	icd.containerID = containerID;
+	icd.containerID = containerData.ID;
 	icd.type = EContainerType::Box;
 	icd.name = "Loot Box " + FString::FromInt(ibd.boxID);
 	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
 
-	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerID), icd, gameIn);
+	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerData.ID), icd, gameIn);
 	container->OnItemRemoved.AddUniqueDynamic(this, &ALootBox::ItemRemoved);
 	container->OnItemAdded.AddUniqueDynamic(this, &ALootBox::ItemAdded);
 }
@@ -159,7 +151,6 @@ void ALootBox::ItemRemoved(FInstanceItemData inItem)
 void ALootBox::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	SetUpBox();
 }
 
 FSpawnLootRunnable::FSpawnLootRunnable() : lootBox(nullptr)
@@ -174,7 +165,7 @@ bool FSpawnLootRunnable::Init()
 
 uint32 FSpawnLootRunnable::Run()
 {
-	TMap<EItemType, TArray<FItemData>> itemList = lootBox->GetItemList();
+	/*TMap<EItemType, TArray<FItemData>> itemList = lootBox->GetItemList();
 
 	for (auto& lootItem : lootBox->itemTypes)
 	{
@@ -193,7 +184,7 @@ uint32 FSpawnLootRunnable::Run()
 				UArmour::CreateArmour(id.ID, lootBox->GetGame(), ids[0]);
 			}
 		}
-	}
+	}*/
 
 	return 0;
 }

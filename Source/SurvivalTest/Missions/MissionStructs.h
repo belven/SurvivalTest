@@ -25,6 +25,20 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FMissionItemData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+		int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+		EMissionType type;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+		int32 itemID;
+};
+
+USTRUCT(BlueprintType)
 struct FMissionLoadoutData
 {
 	GENERATED_USTRUCT_BODY()

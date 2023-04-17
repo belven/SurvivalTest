@@ -37,17 +37,22 @@ public:
 	virtual void Interact(ABasePlayerController* instigator) override;
 	virtual void Highlight(bool activate) override;
 
+	FContainerData GetContainerData() const { return containerData; }
+	void SetContainerData(FContainerData inContainerData) { containerData = inContainerData; }
+
 	UFUNCTION()
-		void ItemAdded(FInstanceItemData inItem);
+	void ItemAdded(FInstanceItemData inItem);
 
 	UFUNCTION()
 	void RemoveLootBox();
 
 	UFUNCTION()
-		void ItemRemoved(FInstanceItemData inItem);
+	void ItemRemoved(FInstanceItemData inItem);
 
 	UFUNCTION()
 	void SpawnLoot();
+
+	void SetItemTypes(TArray<int32>inItemTypes) { itemTypes = inItemTypes; }
 
 protected:
 	FInstanceItemData CreateLoot(FItemData id);
@@ -57,33 +62,21 @@ protected:
 	virtual void BeginPlay() override;
 
 	UBaseGameInstance* GetGame();
-	TMap<EItemType, TArray<FItemData>> GetItemList();
+	//TMap<EItemType, TArray<FItemData>> GetItemList();
 	void CreateLootboxData();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
-		UStaticMesh* boxMesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* boxMeshComp;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
-	int32 containerID = 2;
-
+	FContainerData containerData;
 	FInstanceContainerData icd;
 	FInstanceBoxData ibd;
+
 	bool isHighlighted = false;
 	int32 minTime = 10;
-
-public:
-	void SetItemTypes(TMap<EItemType, int32> inItemTypes)
-	{
-		itemTypes = inItemTypes;
-	}
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		TMap<EItemType, int32> itemTypes;
-
+	
+	TArray<int32> itemTypes;
+	
 	UPROPERTY()
 	UItemContainer* container;
 

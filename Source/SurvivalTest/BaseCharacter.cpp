@@ -331,7 +331,7 @@ void ABaseCharacter::GetOverlapsOnSpawn()
 void ABaseCharacter::AddInteractable(IInteractable* inter)
 {
 	ABaseCharacter* other = Cast<ABaseCharacter>(inter);
-	if (!other || other->IsDead())
+	if (!other || (other != this && other->IsDead()))
 	{
 		inter->Highlight(true);
 		overlappingInteractables.AddUnique(inter);

@@ -16,6 +16,7 @@ class UConsumableTableData;
 class UMissionTable;
 class UMissionLoadoutTable;
 class UInstanceItemDataTable;
+class UMissionItemTable;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -35,6 +36,8 @@ public:
 	UMissionTable* GetMissionTable();
 	UMissionLoadoutTable* GetMissionLoadoutTable();
 	UInstanceItemDataTable* GetInstanceItemDataTable();
+	UMissionItemTable* GetMissionItemTable();
+
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
 	void SaveTableToFile(UCSVTable* table);
@@ -45,7 +48,7 @@ private:
 	UItemDataTable* ItemData;
 
 	UPROPERTY()
-		UInstanceItemDataTable* instanceItemDataTable;
+	UInstanceItemDataTable* instanceItemDataTable;
 
 	UPROPERTY()
 	UWeaponDataTable* WeaponData;
@@ -72,8 +75,11 @@ private:
 	UConsumableTableData* consumableData;
 
 	UPROPERTY()
-		UMissionTable* missionTable;
+	UMissionItemTable* missionItemTable;
 
 	UPROPERTY()
-		UMissionLoadoutTable* missionLoadoutTable;
+	UMissionTable* missionTable;
+
+	UPROPERTY()
+	UMissionLoadoutTable* missionLoadoutTable;
 };

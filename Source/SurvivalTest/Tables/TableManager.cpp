@@ -10,6 +10,7 @@
 #include "Weapons/WeaponDataTable.h"
 #include "ConsumableTableData.h"
 #include "Items/InstanceItemDataTable.h"
+#include "Mission/MissionItemTable.h"
 #include "Mission/MissionLoadoutTable.h"
 #include "Mission/MissionTable.h"
 
@@ -145,6 +146,12 @@ UInstanceItemDataTable* UTableManager::GetInstanceItemDataTable()
 {
 	if (instanceItemDataTable == nullptr) { instanceItemDataTable = NewObject<UInstanceItemDataTable>(); }
 	return instanceItemDataTable;
+}
+
+UMissionItemTable* UTableManager::GetMissionItemTable()
+{
+	if (missionItemTable == nullptr) { missionItemTable = NewObject<UMissionItemTable>(); }
+	return missionItemTable;
 }
 
 #pragma endregion Getters

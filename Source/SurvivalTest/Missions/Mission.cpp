@@ -9,15 +9,35 @@
 #include "SurvivalTest/Items/LootBox.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Events/BaseEvent.h"
-#include "SurvivalTest/Events/HealthChangeEvent.h"
 #include "SurvivalTest/Events/RPGEventManager.h"
+#include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/Tables/LoadoutTableData.h"
+#include "SurvivalTest/Tables/Mission/MissionItemTable.h"
 #include "SurvivalTest/Tables/Mission/MissionLoadoutTable.h"
 
 AMission::AMission()
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("Blueprint'/Game/FirstPerson/Blueprints/AI.AI_C'"));
 	AIClass = PlayerPawnClassFinder.Class;
+}
+
+FContainerData AMission::GetRandomContainerData()
+{
+	TArray<FContainerData> cds;
+
+	for (auto& cdFound : game->GetTableManager()->GetContainerData()->GetData())
+	{
+		if (cdFound.Value.type == missionType)
+		{
+			cds.Add(cdFound.Value);
+		}
+	}
+
+	if (cds.Num() > 0)
+	{
+		return cds[FMath::RandRange(0, cds.Num() - 1)];
+	}
+	return {};
 }
 
 void AMission::SetUpLootBoxes()
@@ -28,9 +48,22 @@ void AMission::SetUpLootBoxes()
 	for (AActor* actor : actors)
 	{
 		ALootBox* loot = Cast<ALootBox>(actor);
+		FContainerData cd = GetRandomContainerData();
+		TArray<int32> itemTypes;
 
-		loot->SetItemTypes(itemTypes);
-		loot->SpawnLoot();
+		for(FMissionItemData mid : game->GetTableManager()->GetMissionItemTable()->GetData())
+		{
+			if (mid.type == missionType)
+				itemTypes.Add(mid.itemID);
+		}
+
+		if (cd.ID != UItemStructs::InvalidInt)
+		{
+			loot->SetContainerData(cd);
+			loot->SetItemTypes(itemTypes);
+			loot->SetActorHiddenInGame(false);
+			loot->SpawnLoot();
+		}
 	}
 }
 
@@ -90,10 +123,11 @@ void AMission::EventTriggered(UBaseEvent* inEvent)
 		bool aiAlive = false;
 		for (ABaseCharacter* character : aiSpawned)
 		{
-			if (character->IsAlive()) {
+			if (character->IsAlive())
+			{
 				aiAlive = true;
 				break;
-			}		
+			}
 		}
 
 		if (!aiAlive)
@@ -103,7 +137,7 @@ void AMission::EventTriggered(UBaseEvent* inEvent)
 
 void AMission::MissionComplete()
 {
-	SetUpLootBoxes();	
+	SetUpLootBoxes();
 }
 
 void AMission::SpawnMission()
