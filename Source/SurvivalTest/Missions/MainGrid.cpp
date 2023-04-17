@@ -106,8 +106,8 @@ void AMainGrid::BeginPlay()
 
 			// Create a grid section at the correct location
 			AGridSection* gs = AGridSection::CreateGridSection(GetWorld(), FGridSectionData(location, boxSize));
-			gs->GetGridSectionComp()->SetStaticMesh(mesh);
-			gs->GetGridSectionComp()->SetWorldScale3D(FVector(boxSize / 100, boxSize / 100, 0.01f));
+			//gs->GetGridSectionComp()->SetStaticMesh(mesh);
+			//gs->GetGridSectionComp()->SetWorldScale3D(FVector(boxSize / 100, boxSize / 100, 0.01f));
 			gridSections.Add(gs);
 
 			//grid[ModValue(gs->GetActorLocation().X) / boxSize][ModValue(gs->GetActorLocation().Y) / boxSize] = gs;
