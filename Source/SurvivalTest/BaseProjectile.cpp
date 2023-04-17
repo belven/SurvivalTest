@@ -7,7 +7,7 @@
 #include "Interfaces/Team.h"
 #include "Items/Weapon.h"
 
-const float ABaseProjectile::Default_Initial_Speed = 3000.0f;
+const float ABaseProjectile::Default_Initial_Speed = 5000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 1.2f;
 
 ABaseProjectile::ABaseProjectile()

@@ -56,12 +56,12 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	AICharacter = mAsBaseCharacter(aPawn);
 	
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
-	constexpr int32 range = 3000;
+	constexpr int32 range = 10000;
 
 	// Set up sight config for AI perception
 	sightConfig->SightRadius = range * 0.9;
 	sightConfig->LoseSightRadius = range;
-	sightConfig->PeripheralVisionAngleDegrees = 90.0f;
+	sightConfig->PeripheralVisionAngleDegrees = 110.0f;
 
 	// This section is important, as without setting at least bDetectNeutrals to true, the AI will never perceive anything
 	// Still not tried to set this up correctly at all

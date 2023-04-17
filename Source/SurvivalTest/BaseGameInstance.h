@@ -28,6 +28,8 @@ class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
+
+
 	UFUNCTION(BlueprintCallable)
 	FItemData GetItemData(int32 itemID);
 
@@ -59,7 +61,7 @@ public:
 	int32 GetNextInstanceArmourDataID();
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
-
+	
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return tableManager->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
