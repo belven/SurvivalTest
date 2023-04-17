@@ -22,7 +22,7 @@ AMission::AMission()
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
 	navInvoker->SetGenerationRadii(size, size * 1.2);
-	navInvoker->AddToRoot();
+	//navInvoker->AddToRoot();
 }
 
 FContainerData AMission::GetRandomContainerData()
@@ -76,6 +76,7 @@ void AMission::BeginPlay()
 	Super::BeginPlay();
 	navInvoker->SetGenerationRadii(size, size * 1.2);
 	navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
+
 	game = mGameInstance();
 	game->GetMissionManager()->AddMission(this);
 	game->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &AMission::EventTriggered);
@@ -152,10 +153,13 @@ void AMission::SpawnMission()
 	if (!HasPlayers() && spawnMission)
 	{
 		spawnMission = false;
+		FNavLocation location;
 		UMissionLoadoutTable* mlt = game->GetTableManager()->GetMissionLoadoutTable();
+
 		FActorSpawnParameters params;
 		params.Owner = this;
-		FNavLocation location;
+		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
 
 		for (auto& mld : mlt->GetData())
 		{

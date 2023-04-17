@@ -64,7 +64,7 @@ ABaseCharacter::ABaseCharacter()
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
 	navInvoker->SetGenerationRadii(4000, 5000);
-	navInvoker->AddToRoot();
+	//navInvoker->AddToRoot();
 
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
