@@ -15,6 +15,8 @@
 #include "BaseGameInstance.h"
 #include "Items/Weapon.h"
 #include "BasePlayerController.h"
+#include "NavigationInvokerComponent.h"
+#include "NavigationSystem.h"
 #include "Components/SphereComponent.h"
 #include "Items/ItemContainer.h"
 #include "Missions/GridSectionData.h"
@@ -60,6 +62,9 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 80.0f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
+	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
+	navInvoker->SetGenerationRadii(4000, 5000);
+
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
 	interactionSphere->SetupAttachment(GetCapsuleComponent());
@@ -85,6 +90,8 @@ void ABaseCharacter::Highlight(bool activate)
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 	game = mGameInstance();
 	GetOverlapsOnSpawn();
 }

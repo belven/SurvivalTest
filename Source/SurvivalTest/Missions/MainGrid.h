@@ -16,6 +16,7 @@ public:
 	AGridSection* GetGridSection(FVector loc);
 	int32 ModValue(double value);
 	AMainGrid();
+	virtual ~AMainGrid() override;
 
 protected:
 	virtual void BeginPlay() override;

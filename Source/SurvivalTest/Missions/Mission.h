@@ -3,6 +3,7 @@
 #include "Engine/TargetPoint.h"
 #include "SurvivalTest/Items/ItemStructs.h"
 #include "MissionStructs.h"
+#include "NavigationInvokerComponent.h"
 #include "SurvivalTest/Events/EventListener.h"
 #include "Mission.generated.h"
 
@@ -35,6 +36,9 @@ protected:
 	UPROPERTY()
 	UBaseGameInstance* game;
 
+	UPROPERTY()
+	UNavigationInvokerComponent* navInvoker;
+
 	UFUNCTION()
 	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex);
 
@@ -43,7 +47,7 @@ protected:
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
-	int32 size;
+	int32 size = 5000;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats)
 	int32 enemyAmount;

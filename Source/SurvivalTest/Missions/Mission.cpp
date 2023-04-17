@@ -19,6 +19,9 @@ AMission::AMission()
 {
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnClassFinder(TEXT("Blueprint'/Game/FirstPerson/Blueprints/AI.AI_C'"));
 	AIClass = PlayerPawnClassFinder.Class;
+
+	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
+	navInvoker->SetGenerationRadii(size, size * 1.2);
 }
 
 FContainerData AMission::GetRandomContainerData()
@@ -70,6 +73,8 @@ void AMission::SetUpLootBoxes()
 void AMission::BeginPlay()
 {
 	Super::BeginPlay();
+	navInvoker->SetGenerationRadii(size, size * 1.2);
+	navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 	game = mGameInstance();
 	game->GetMissionManager()->AddMission(this);
 	game->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &AMission::EventTriggered);

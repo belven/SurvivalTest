@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "NavigationInvokerComponent.h"
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
 #include "GameFramework/Character.h"
@@ -72,6 +73,9 @@ public:
 	virtual void Interact(ABasePlayerController* instigator) override;
 	virtual void Highlight(bool activate) override;
 	FOnContainersUpdated OnContainersUpdated;
+
+	UPROPERTY()
+	UNavigationInvokerComponent* navInvoker;
 
 	UStaticMeshComponent* GetWeaponMeshComp() const { return weaponMeshComp; }
 	UPROPERTY()

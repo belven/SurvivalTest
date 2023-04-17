@@ -4,7 +4,14 @@ AGridSection::AGridSection()
 {
 	gridSectionComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Grid Mesh Comp"));
 	RootComponent = gridSectionComp;
-	//SetFolderPath("Grid");
+	SetFolderPath("Grid");
+}
+
+void AGridSection::BeginDestroy()
+{
+	//if(gridSectionComp && this)
+	//gridSectionComp->DestroyComponent(true);
+	Super::BeginDestroy();
 }
 
 AGridSection* AGridSection::CreateGridSection(UWorld* world, FGridSectionData data)

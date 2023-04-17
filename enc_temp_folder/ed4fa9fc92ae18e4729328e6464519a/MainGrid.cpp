@@ -1,7 +1,6 @@
 #include "MainGrid.h"
 
 #include "GridSectionData.h"
-#include "NavigationSystem.h"
 #include "SurvivalTest/BaseGameInstance.h"
 
 void AMainGrid::ClearGrid()
@@ -115,8 +114,6 @@ void AMainGrid::BeginPlay()
 			//DrawDebugBox(GetWorld(), location, extent, FColor::Blue, false, debugDuration);
 		}
 	}
-
-	UNavigationSystemV1::GetCurrent(GetWorld())->Build();
 }
 
 void AMainGrid::EndPlay(const EEndPlayReason::Type EndPlayReason)
