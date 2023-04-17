@@ -132,7 +132,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		EGearType existingIType = GetGame()->GetGearTypeForItem(existingItem.itemID);
 
 		// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
-		if (existingItem.itemID != itemToTransfer.itemID && IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType))
+		if (IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType))
 		{
 			// Switch the items in the containers
 			existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
