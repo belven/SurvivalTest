@@ -59,7 +59,7 @@ ABaseCharacter::ABaseCharacter()
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 80.0f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-	
+
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
 	interactionSphere->SetupAttachment(GetCapsuleComponent());
@@ -69,6 +69,7 @@ ABaseCharacter::ABaseCharacter()
 
 	weaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
 	weaponMeshComp->SetupAttachment(GetMesh(), FName(TEXT("GripPoint")));
+	GetMesh()->SetCustomDepthStencilValue(2);
 
 	ResetStats();
 }
@@ -118,7 +119,8 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 	gearTypes.AddUnique(EGearType::Sidearm);
 	gearTypes.AddUnique(EGearType::Vest);
 
-	for (EGearType type : gearTypes) {
+	for (EGearType type : gearTypes)
+	{
 		int32 slot = GetSlotForGear(type);
 		if (slot != UItemStructs::InvalidInt)
 			inventory->AddValidSlot(type, slot);
@@ -167,7 +169,8 @@ int32 ABaseCharacter::GetSlotForGear(EGearType type)
  */
 void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 {
-	if (itemID != UItemStructs::InvalidInt) {
+	if (itemID != UItemStructs::InvalidInt)
+	{
 		FItemData id = game->GetItemData(itemID);
 		TArray<int32> ids;
 		FInstanceItemData iid;
@@ -175,8 +178,10 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 		iid.amount = 1;
 		iid.slot = GetSlotForGear(game->GetGearTypeForItem(itemID));
 
-		if (inventory->AddItem(iid, ids).amount == 0) {
-			if (id.type == EItemType::Armour) {
+		if (inventory->AddItem(iid, ids).amount == 0)
+		{
+			if (id.type == EItemType::Armour)
+			{
 				EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
 			}
 			else if (id.type == EItemType::Weapon)
@@ -250,6 +255,8 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 
 	if (IsDead())
 	{
+		if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius)
+			health_change.source->AddInteractable(this);
 		//SetActorHiddenInGame(true);
 		//SetActorEnableCollision(false);
 		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
@@ -300,7 +307,8 @@ int32 ABaseCharacter::GetDamageResistance()
  */
 void ABaseCharacter::GetOverlapsOnSpawn()
 {
-	if (interactionSphere) {
+	if (interactionSphere)
+	{
 		TArray<AActor*> actors;
 		interactionSphere->GetOverlappingActors(actors);
 
@@ -323,7 +331,8 @@ void ABaseCharacter::GetOverlapsOnSpawn()
 void ABaseCharacter::AddInteractable(IInteractable* inter)
 {
 	ABaseCharacter* other = Cast<ABaseCharacter>(inter);
-	if (!other || other->IsDead()) {
+	if (!other || other->IsDead())
+	{
 		inter->Highlight(true);
 		overlappingInteractables.AddUnique(inter);
 		OnContainersUpdated.Broadcast();
@@ -345,10 +354,11 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 
 void ABaseCharacter::Consume(EConsumableType type, int32 value)
 {
-	switch (type) {
-		case EConsumableType::Food:
-			currentStats.hunger += value;
-			break;
+	switch (type)
+	{
+	case EConsumableType::Food:
+		currentStats.hunger += value;
+		break;
 	case EConsumableType::Drink:
 		currentStats.water += value;
 		break;
@@ -381,7 +391,8 @@ void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 {
 	FItemData id = game->GetItemData(inItem.itemID);
 
-	if (id.type == EItemType::Armour) {
+	if (id.type == EItemType::Armour)
+	{
 		FInstanceArmourData iad = game->GetInstanceArmourDataByInstanceItemID(inItem.ID);
 		EquipArmour(UArmour::CreateArmour(inItem.itemID, game, inItem.ID));
 	}

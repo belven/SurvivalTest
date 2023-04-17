@@ -35,6 +35,7 @@ ABaseProjectile* UWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRota
 	hc.source = GetCharacterOwner();
 	hc.heals = weaponData.heals;
 	projectile->SetHealthChange(hc);
+	projectile->SetWeaponUsed(this);
 	return projectile;
 }
 

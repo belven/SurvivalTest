@@ -5,6 +5,7 @@
 #include "BaseGameInstance.h"
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
+#include "Items/Weapon.h"
 
 const float ABaseProjectile::Default_Initial_Speed = 3000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 1.2f;
@@ -41,9 +42,27 @@ ABaseProjectile::ABaseProjectile()
 	InitialLifeSpan = Default_Initial_Lifespan;
 }
 
+float ABaseProjectile::CalculateDamageFalloff()
+{
+	float damage = healthChange.changeAmount;
+	float dist = FVector::Dist(GetActorLocation(), startLoc);	
+	int32 range = GetWeaponUsed()->GetWeaponData().range;
+	if(dist > range)
+	{
+		damage *= 1 - ((dist - range) / range);
+	}
+
+	return FMath::Max(damage, 1);
+}
+
 void ABaseProjectile::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if(startLoc == FVector::ZeroVector)
+	{
+		startLoc = GetActorLocation();
+	}
 
 	FHitResult hit;
 	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 50), ECollisionChannel::ECC_Pawn);
@@ -56,6 +75,7 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 
 			if (hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy) {
 				IDamagable* hitActor = Cast<IDamagable>(hit.GetActor());
+				healthChange.changeAmount = CalculateDamageFalloff();
 				hitActor->ChangeHealth(healthChange);
 				Destroy();
 			}
