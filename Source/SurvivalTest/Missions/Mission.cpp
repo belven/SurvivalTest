@@ -22,6 +22,7 @@ AMission::AMission()
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
 	navInvoker->SetGenerationRadii(size, size * 1.2);
+	navInvoker->AddToRoot();
 }
 
 FContainerData AMission::GetRandomContainerData()

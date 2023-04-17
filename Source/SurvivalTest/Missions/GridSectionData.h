@@ -38,7 +38,6 @@ class SURVIVALTEST_API AGridSection : public AActor
 
 public:
 	AGridSection();
-	virtual void BeginDestroy() override;
 
 	static AGridSection* CreateGridSection(UWorld* world, FGridSectionData data);
 
