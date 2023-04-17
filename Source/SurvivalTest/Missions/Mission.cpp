@@ -118,7 +118,7 @@ void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* Othe
 
 void AMission::EventTriggered(UBaseEvent* inEvent)
 {
-	if (inEvent->GetEventType() == EEventType::PostHealthChange && aiSpawned.Contains(inEvent->GetEventOwner()))
+	if (!missionComplete && inEvent->GetEventType() == EEventType::PostHealthChange && aiSpawned.Contains(inEvent->GetEventOwner()))
 	{
 		bool aiAlive = false;
 		for (ABaseCharacter* character : aiSpawned)
@@ -137,6 +137,7 @@ void AMission::EventTriggered(UBaseEvent* inEvent)
 
 void AMission::MissionComplete()
 {
+	missionComplete = true;
 	SetUpLootBoxes();
 }
 

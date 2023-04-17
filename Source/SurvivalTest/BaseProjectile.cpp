@@ -69,7 +69,7 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 	
 	if(hit.IsValidBlockingHit())
 	{
-		if (hit.GetActor()->Implements<UDamagable>())
+		if (hit.GetActor()->Implements<UDamagable>() && Cast<IDamagable>(hit.GetActor())->IsAlive())
 		{
 			ITeam* hitTeam = Cast<ITeam>(hit.GetActor());
 

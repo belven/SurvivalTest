@@ -137,6 +137,31 @@ public:
 	int32 range = -1;
 };
 
+UENUM(BlueprintType)
+enum class EFireMode : uint8
+{
+	SemiAuto,
+	FullAuto,
+	Burst,
+	End
+};
+
+USTRUCT(BlueprintType)
+struct FInstanceWeaponData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 ID = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 instanceItemID = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		int32 ammo = -1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+		EFireMode mode = EFireMode::FullAuto;
+};
+
 USTRUCT(BlueprintType)
 struct FMeleeWeaponData
 {
@@ -218,6 +243,8 @@ public:
 	static ECharacterType GetCharacterType(FString typeName);
 	static EContainerType GetContainerType(FString typeName);
 	static EConsumableType GetConsumableType(FString typeName);
+	static EFireMode GetFireMode(FString typeName);
+	static FString GetFireMode(EFireMode mode);
 	static bool GetBoolean(FString value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
 };

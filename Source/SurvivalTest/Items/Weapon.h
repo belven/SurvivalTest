@@ -19,8 +19,10 @@ class SURVIVALTEST_API UWeapon : public UItem
 
 public:
 	UWeapon();
-
 	UStaticMesh* GetItemMesh();
+
+	FInstanceWeaponData GetInstanceWeaponData() const { return instanceWeaponData; }
+	void SetInstanceWeaponData(FInstanceWeaponData inInstanceWeaponData) { instanceWeaponData = inInstanceWeaponData; }
 
 	FWeaponData GetWeaponData() const { return weaponData; }
 	void SetWeaponData(FWeaponData data) { weaponData = data; }
@@ -31,9 +33,9 @@ public:
 
 	void AttackComplete();
 
-
 protected:
 	FWeaponData weaponData;
+	FInstanceWeaponData instanceWeaponData;
 	FVector GunOffset;
 	bool canAttack;
 	FTimerHandle TimerHandle_ShotTimerExpired;
@@ -44,6 +46,5 @@ protected:
 	UPROPERTY()
 	UStaticMeshComponent* weaponMeshComp;
 
-protected:
 	ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass);
 };

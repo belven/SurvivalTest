@@ -154,6 +154,34 @@ EConsumableType UItemStructs::GetConsumableType(FString typeName)
 	return EConsumableType::Drink;
 }
 
+EFireMode UItemStructs::GetFireMode(FString typeName)
+{
+	if (typeName.Equals("FullAuto"))
+	{
+		return EFireMode::FullAuto;
+	}
+	if (typeName.Equals("SemiAuto"))
+	{
+		return EFireMode::SemiAuto;
+	}
+	if (typeName.Equals("Burst"))
+	{
+		return EFireMode::Burst;
+	}
+	return EFireMode::End;
+}
+
+FString UItemStructs::GetFireMode(EFireMode mode)
+{
+	switch (mode) {
+		case EFireMode::SemiAuto: return "SemiAuto";
+	case EFireMode::FullAuto: return "FullAuto";
+	case EFireMode::Burst: return "Burst";
+	case EFireMode::End: return "End";
+	default: return "End";
+	}
+}
+
 bool UItemStructs::GetBoolean(FString value)
 {
 	return value.Equals("true") ? true : false;

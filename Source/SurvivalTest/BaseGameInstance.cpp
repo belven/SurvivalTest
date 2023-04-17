@@ -12,6 +12,7 @@
 #include "Tables/Weapons/ProjectileWeaponDataTable.h"
 #include "Tables/Weapons/RangedWeaponDataTable.h"
 #include "Tables/TableManager.h"
+#include "Tables/Items/WeaponInstanceTable.h"
 #include "Tables/Weapons/WeaponDataTable.h"
 
 #define mTable() GetTableManager()
@@ -74,6 +75,34 @@ int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 	if (GetInstancedContainers().Num() > 0)
 	{
 		instanceContainerDataID = GetInstancedContainers()[GetInstancedContainers().Num() - 1].ID + 1;
+	}
+	return instanceContainerDataID;
+}
+
+FInstanceWeaponData UBaseGameInstance::GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID)
+{
+	int32 instanceContainerDataID = 0;
+	TMap<int32, FInstanceWeaponData> instancedWeapons = GetTableManager()->GetWeaponInstanceTable()->GetData();
+
+	for(auto& iwd : instancedWeapons)
+	{
+		if(iwd.Value.instanceItemID == instanceItemID)
+		{
+			return iwd.Value;
+		}
+	}
+
+	return {};
+}
+
+int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
+{
+	int32 instanceContainerDataID = 0;
+	TMap<int32, FInstanceWeaponData> instancedWeapons = GetTableManager()->GetWeaponInstanceTable()->GetData();
+
+	if (instancedWeapons.Num() > 0)
+	{
+		instanceContainerDataID = instancedWeapons[instancedWeapons.Num() - 1].ID + 1;
 	}
 	return instanceContainerDataID;
 }

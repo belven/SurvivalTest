@@ -186,7 +186,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 			}
 			else if (id.type == EItemType::Weapon)
 			{
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld()));
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), ids[0]));
 			}
 		}
 	}
@@ -403,12 +403,12 @@ void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 			FWeaponData wd = game->GetWeaponData(inItem.itemID);
 			if (GetEquippedWeapon()->GetWeaponData().gearType == wd.gearType)
 			{
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));
 			}
 		}
 		else
 		{
-			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld()));
+			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));
 		}
 	}
 	OnContainersUpdated.Broadcast();

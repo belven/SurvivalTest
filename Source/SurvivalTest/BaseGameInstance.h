@@ -46,6 +46,7 @@ public:
 	FArmourData GetArmourDataByItemID(int32 itemID);
 	FLoadoutData GetLoadoutData(FString loadoutName);
 	FConsumableData GetConsumableData(int32 itemID);
+	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID);
 
 	EGearType GetGearTypeForItem(int32 itemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
@@ -56,6 +57,7 @@ public:
 	int32 GetNextInstanceBoxDataID();
 	int32 GetNextInstanceArmourDataID();
 	int32 GetNextInstanceContainerDataID();
+	int32 GetNextInstanceWeaponDataID();
 
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return tableManager->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }

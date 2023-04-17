@@ -6,7 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "../BaseGameInstance.h"
 
-UWeapon* UWeaponCreator::CreateWeapon(const int32 itemID, const UWorld* world)
+UWeapon* UWeaponCreator::CreateWeapon(const int32 itemID, const UWorld* world, int32 instanceItemID)
 {
 	UWeapon* weaponOut = NULL;
 	UBaseGameInstance* gameIn = GameInstance(world);
@@ -22,6 +22,18 @@ UWeapon* UWeaponCreator::CreateWeapon(const int32 itemID, const UWorld* world)
 			pw->SetWeaponData(w);
 			pw->SetRangedWeaponData(gameIn->GetRangedWeaponData(w.ID));
 			pw->SetProjectileWeaponData(gameIn->GetProjectileWeaponData(pw->GetRangedWeaponData().ID));
+
+			FInstanceWeaponData iwd = gameIn->GetInstanceWeaponDataByInstanceItemID(instanceItemID);
+
+			if (iwd.ID == UItemStructs::InvalidInt) {
+				iwd.ID = gameIn->GetNextInstanceWeaponDataID();
+				iwd.instanceItemID = instanceItemID;
+				iwd.mode = EFireMode::FullAuto;
+				iwd.ammo = pw->GetProjectileWeaponData().magazineSize;
+			}
+
+			pw->SetInstanceWeaponData(iwd);
+
 			weaponOut = pw;
 		}
 		else if (w.type == EWeaponType::Melee) {

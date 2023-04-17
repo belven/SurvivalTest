@@ -17,6 +17,7 @@ class UMissionTable;
 class UMissionLoadoutTable;
 class UInstanceItemDataTable;
 class UMissionItemTable;
+class UWeaponInstanceTable;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -37,6 +38,7 @@ public:
 	UMissionLoadoutTable* GetMissionLoadoutTable();
 	UInstanceItemDataTable* GetInstanceItemDataTable();
 	UMissionItemTable* GetMissionItemTable();
+	UWeaponInstanceTable* GetWeaponInstanceTable();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
@@ -82,4 +84,7 @@ private:
 
 	UPROPERTY()
 	UMissionLoadoutTable* missionLoadoutTable;
+
+	UPROPERTY()
+	UWeaponInstanceTable* weaponInstances;
 };

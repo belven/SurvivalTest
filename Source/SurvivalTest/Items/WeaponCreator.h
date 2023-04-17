@@ -11,5 +11,5 @@ class SURVIVALTEST_API UWeaponCreator : public UObject
 {
 	GENERATED_BODY()
 public:
-		static UWeapon* CreateWeapon(const int32 itemID, const UWorld* world);
+		static UWeapon* CreateWeapon(const int32 itemID, const UWorld* world, int32 instanceItemID);
 };
