@@ -18,6 +18,7 @@
 #include "NavigationInvokerComponent.h"
 #include "NavigationSystem.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Items/ItemContainer.h"
 #include "Missions/GridSectionData.h"
 #include "Missions/MainGrid.h"
@@ -496,6 +497,10 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 	else
 	{
+		GetCharacterMovement()->bUseRVOAvoidance = true;
+		GetCharacterMovement()->AvoidanceConsiderationRadius = 1000.f;
+		GetCharacterMovement()->AvoidanceWeight = 2000.f;
+		GetCharacterMovement()->SetAvoidanceEnabled(true);
 		interactionSphere->DestroyComponent();
 	}
 }

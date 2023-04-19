@@ -4,6 +4,7 @@
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "Events/EventListener.h"
 #include "Perception/AIPerceptionTypes.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "BaseAIController.generated.h"
 
 class ABaseCharacter;
@@ -34,6 +35,9 @@ public:
 	void CalculateCombat();
 	void AttackLocation(FVector FireDirection);
 	void LookAt(FVector lookAtLocation);
+	
+	void MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result);
+
 	virtual void OnPossess(APawn* aPawn) override;
 	void FindNewTarget();
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
@@ -48,6 +52,7 @@ private:
 	IDamagable* target;
 	FVector lastKnowLocation;
 	bool canSee = false;
+	bool finishedMove = true;
 
 	UPROPERTY()
 	UAISenseConfig_Sight* sightConfig;

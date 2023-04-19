@@ -50,13 +50,20 @@ void ABaseAIController::LookAt(FVector lookAtLocation)
 	GetCharacter()->SetActorRotation(lookAt);
 }
 
+void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result)
+{
+		finishedMove = true;
+}
+
 void ABaseAIController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	AICharacter = mAsBaseCharacter(aPawn);
-	
+
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 10000;
+
+	GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABaseAIController::MoveComplete);
 
 	// Set up sight config for AI perception
 	sightConfig->SightRadius = range * 0.9;
@@ -97,13 +104,13 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "I don't see you!");
 		}
 		// Have we seen them again?
-		else {
+		else
+		{
 			// We can see them again
 			canSee = true;
 
 			//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "I see you!");
 		}
-
 	}
 	// If we don't have a target, then check if this is a new viable target
 	else if (target == NULL)
@@ -111,8 +118,8 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 		// Get the Actors team, if it has one, and check if we're enemies
 		ITeam* otherTeam = Cast<ITeam>(Actor);
 
-		if (otherTeam != NULL) {
-
+		if (otherTeam != NULL)
+		{
 			// Are we enemies with the perceived actor?
 			if (AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Enemy)
 			{
@@ -129,8 +136,8 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 void ABaseAIController::WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result)
 {
 	// Did we find a new location to move to?
-	if (Result->IsSuccessful()) {
-
+	if (Result->IsSuccessful())
+	{
 		// Get the first item as a location, this will be the highest scoring location in the array, as it orders items by score
 		const FVector loc = Result->GetItemAsLocation(0);
 
@@ -161,16 +168,16 @@ void ABaseAIController::Patrol()
 {
 	// Check if we aren't moving or we have an invalid Path
 	// (the currentPathPoint is set to -1 when we didn't find any patrol paths in the world)
-	if(GetPathFollowingComponent()->GetStatus() != EPathFollowingStatus::Moving && currentPathPoint > -1)
+	if (finishedMove && currentPathPoint > -1)
 	{
 		// Do we already have a patrol path
-		if(currentPath == NULL)
+		if (currentPath == NULL)
 		{
 			// Get the first patrol path from the game instance
 			currentPath = GameInstance(GetWorld())->paths[0];
 
 			// Check if the path is valid
-			if(currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
+			if (currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
 			{
 				currentPath = NULL;
 
@@ -179,17 +186,18 @@ void ABaseAIController::Patrol()
 			}
 			else
 			{
-				currentPathPoint = 0;				
+				currentPathPoint = 0;
 			}
 		}
 
 		if (currentPath != NULL)
 		{
+			finishedMove = false;
 			// Get the spline of the patrol path
 			const USplineComponent* spline = currentPath->GetSpline();
 
 			// Ensure the path point doesn't exceed the amount of points
-			if(currentPathPoint > spline->GetNumberOfSplinePoints() - 1)
+			if (currentPathPoint > spline->GetNumberOfSplinePoints() - 1)
 			{
 				currentPathPoint = 0;
 			}
@@ -198,7 +206,7 @@ void ABaseAIController::Patrol()
 			const FVector loc = spline->GetWorldLocationAtSplinePoint(currentPathPoint);
 
 			// Move to the spline point
-			MoveToLocation(loc);
+			MoveToLocation(loc, 400);
 
 			// Increment the path point, to move onto the next one
 			currentPathPoint++;
@@ -219,14 +227,16 @@ void ABaseAIController::CalculateCombat()
 	const UWeapon* weapon = mCurrentWeapon();
 
 	// Can we see our current target?
-	if (canSee) {
+	if (canSee)
+	{
 		LookAt(targetLocation);
-		
-		// if we haven't used an ability and have a valid weapon, attack the target
-		if (weapon != NULL) {
 
+		// if we haven't used an ability and have a valid weapon, attack the target
+		if (weapon != NULL)
+		{
 			// Check we're in range of the target
-			if (FVector::Dist(mActorLocation, targetLocation) <= weapon->GetWeaponData().range) {
+			if (FVector::Dist(mActorLocation, targetLocation) <= weapon->GetWeaponData().range)
+			{
 				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(GetBaseCharacter()->GetActorLocation(), target->asActor()->GetActorLocation());
 
 				AttackLocation(rotation.Vector());
@@ -292,15 +302,17 @@ void ABaseAIController::FindNewTarget()
 void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 {
 	// Check if the event is a post health change
-	if (inEvent->GetEventType() == EEventType::PostHealthChange) {
+	if (inEvent->GetEventType() == EEventType::PostHealthChange)
+	{
 		UHealthChangeEvent* hce = Cast<UHealthChangeEvent>(inEvent);
 
 		// If our target is NULL, we can check if we're being attacked and maybe assign a new target
-		if (target == NULL) {
-
+		if (target == NULL)
+		{
 			// Only trigger after health changed, the change isn't a heal and the owner of change is our Pawn and if the source is alive still
 			// It's possible we take damage from a dead source
-			if (!hce->GetChange().heals && hce->GetEventOwner() == GetCharacter() && !hce->GetChange().source->IsDead()) {
+			if (!hce->GetChange().heals && hce->GetEventOwner() == GetCharacter() && !hce->GetChange().source->IsDead())
+			{
 				target = hce->GetChange().source;
 			}
 		}
