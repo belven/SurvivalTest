@@ -7,7 +7,7 @@
 #include "Interfaces/Team.h"
 #include "Items/Weapon.h"
 
-const float ABaseProjectile::Default_Initial_Speed = 5000.0f;
+const float ABaseProjectile::Default_Initial_Speed = 8000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 1.2f;
 
 ABaseProjectile::ABaseProjectile()
@@ -18,7 +18,6 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::BeginOverlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 
 	RootComponent = CollisionComp;
@@ -86,29 +85,6 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 		}
 	}
 }
-
-//void ABaseProjectile::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-//{
-//	ABaseCharacter* us = healthChange.source;
-//
-//	if (OtherActor != NULL && OtherActor != this && OtherActor != us && us != NULL && OtherComp->GetName().Equals("CollisionCylinder"))
-//	{
-//		if (OtherActor->Implements<UDamagable>())
-//		{
-//			ITeam* hitTeam = Cast<ITeam>(OtherActor);
-//
-//			if (hitTeam->GetRelationship(us, mGameInstance()) == ERelationshipType::Enemy) {
-//				IDamagable* hit = Cast<IDamagable>(OtherActor);
-//				hit->ChangeHealth(healthChange);
-//				Destroy();
-//			}
-//		}
-//		else
-//		{
-//			Destroy();
-//		}
-//	}
-//}
 
 void ABaseProjectile::SetHealthChange(FHealthChange inHealthChange)
 {

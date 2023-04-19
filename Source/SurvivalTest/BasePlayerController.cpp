@@ -41,18 +41,18 @@ void ABasePlayerController::TimelineCallback()
 
 	if (leanDirection == 0)
 	{
-		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetFirstPersonCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->cameraCenter, TimelineValue);
+		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->cameraCenter, TimelineValue);
 	}
 	else if (leanDirection == 1)
 	{
-		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetFirstPersonCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->rightLean, TimelineValue);
+		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->rightLean, TimelineValue);
 	}
 	else
 	{
-		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetFirstPersonCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->leftLean, TimelineValue);
+		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->leftLean, TimelineValue);
 	}
 
-	GetBaseCharacter()->GetFirstPersonCameraComponent()->SetRelativeLocation(cameraPosition);
+	GetBaseCharacter()->GetBaseCameraComponent()->SetRelativeLocation(cameraPosition);
 }
 
 void ABasePlayerController::TimelineFinishedCallback()

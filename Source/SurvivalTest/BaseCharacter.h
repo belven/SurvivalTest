@@ -69,76 +69,88 @@ class ABaseCharacter : public ACharacter, public IDamagable, public ITeam, publi
 
 public:
 	ABaseCharacter();
-	virtual UItemContainer* GetItemContainer() override { return inventory;  }
-	virtual void Interact(ABasePlayerController* instigator) override;
-	virtual void Highlight(bool activate) override;
-	FOnContainersUpdated OnContainersUpdated;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void PossessedBy(AController* NewController) override;
+
+	static const FVector cameraCenter;
+	static const FVector leftLean;
+	static const FVector rightLean;
 
 	UPROPERTY()
-	UNavigationInvokerComponent* navInvoker;
+	UNavigationInvokerComponent* navInvoker;	
 
+	UCameraComponent* GetBaseCameraComponent() const { return baseCameraComponent; }
+
+#pragma region Combat
 	UStaticMeshComponent* GetWeaponMeshComp() const { return weaponMeshComp; }
-	UPROPERTY()
-	UStaticMeshComponent* weaponMeshComp;
+	FORCEINLINE UWeapon* GetEquippedWeapon() { return equippedWeapon; }
+	void SetEquippedWeapon(UWeapon* weapon);
+	void EquipArmour(UArmour* armour);
 
-	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
+	UStaticMesh* GetItemMesh(FItemData data);
+
+	virtual EFaction GetFaction() override { return faction; }
+	void SetFaction(EFaction inFaction) { faction = inFaction; }
+#pragma endregion Combat
+
+#pragma region Stats
+	virtual void ChangeHealth(FHealthChange& health_change) override;
+
+	float GetDamageAfterResistance(float damage);
+	int32 GetDamageResistance();
+
+	virtual bool IsDead() override { return currentStats.health < 1; };
+
+	virtual float GetCurrentHealth() override { return currentStats.health; }
+	virtual float GetMaxHealth() override { return maxStats.health; }
 
 	FCharacterStats GetCurrentStats() const { return currentStats; }
 	FCharacterStats GetMaxStats() const { return maxStats; }
 
-	virtual void Tick(float DeltaSeconds) override;
-
-	FORCEINLINE UWeapon* GetEquippedWeapon() { return equippedWeapon; }
-	void SetEquippedWeapon(UWeapon* weapon);
-	UStaticMesh* GetItemMesh(FItemData data);
-
-	void EquipArmour(UArmour* armour);
-
-	virtual void ChangeHealth(FHealthChange& health_change) override;
-	virtual bool IsDead() override { return currentStats.health <= 0; };
-	virtual float GetCurrentHealth() override { return currentStats.health; }
-	virtual float GetMaxHealth() override { return maxStats.health; }
-	virtual EFaction GetFaction() override { return faction; }
-	void SetFaction(EFaction inFaction) { faction = inFaction; }
-	float GetDamageAfterResistance(float damage);
-	int32 GetDamageResistance();
+	void Consume(EConsumableType type, int32 value);
+#pragma endregion Stats
+	
+#pragma region Interactables
 	void GetOverlapsOnSpawn();
 	void AddInteractable(IInteractable* inter);
 	void RemoveInteractable(IInteractable* inter);
-	void Consume(EConsumableType type, int32 value);
-
 	TArray<IInteractable*> GetOverlappingInteractables() const { return overlappingInteractables; }
+	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
+	virtual void Interact(ABasePlayerController* instigator) override;
+	virtual void Highlight(bool activate) override;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetNearbyContainersNum() { return overlappingInteractables.Num(); }
 
-	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
+	UFUNCTION()
+		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
-	virtual void PossessedBy(AController* NewController) override;
+	UFUNCTION()
+		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
+#pragma endregion Interactables
+
+#pragma region Inventory
+	FOnContainersUpdated OnContainersUpdated;
+
+	virtual UItemContainer* GetItemContainer() override { return inventory; }
 	UItemContainer* GetInventory() const { return inventory; }
+
 	void SetInventory(UItemContainer* inInventory) { inventory = inInventory; }
 
-	UBaseGameInstance* GetGame() const	{		return game;	}
-	void SetGame(UBaseGameInstance* inGame)	{		game = inGame;	}
-
-	UFUNCTION()
-	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
-
-	UFUNCTION()
-	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	UBaseGameInstance* GetGame() const { return game; }
+	void SetGame(UBaseGameInstance* inGame) { game = inGame; }
+	
 	UFUNCTION()
 	void ItemAdded(FInstanceItemData inItem);
 
 	UFUNCTION()
 	void ItemRemoved(FInstanceItemData inItem);
 	int32 GetSlotForGear(EGearType type);
-	static const FVector cameraCenter;
-	static const FVector leftLean;
-	static const FVector rightLean;
 	void SetupLoadout(FString loadoutName);
-
+	
+#pragma endregion Inventory
+	
 protected:
 	static float interactionRadius;
 	void ResetStats();
@@ -148,6 +160,9 @@ protected:
 	UFUNCTION()
 	void CreateNewItemForInventory(int32 itemID);
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
+
+	UPROPERTY()
+		UStaticMeshComponent* weaponMeshComp;
 
 	UPROPERTY()
 	USphereComponent* interactionSphere;
@@ -167,7 +182,7 @@ protected:
 	EFaction faction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCameraComponent;
+	UCameraComponent* baseCameraComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	FCharacterStats currentStats;
@@ -176,5 +191,5 @@ protected:
 	UItemContainer* inventory;
 
 	UPROPERTY()
-	FCharacterStats maxStats;	
+	FCharacterStats maxStats;
 };
