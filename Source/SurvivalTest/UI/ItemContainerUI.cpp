@@ -31,9 +31,11 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 {
 	container = inContainer;
 
-	// Set up add and remove listeners for our new container, so we can update our UI as things are added and removed
-	container->OnItemRemoved.AddUniqueDynamic(this, &UItemContainerUI::ItemRemoved);
-	container->OnItemAdded.AddUniqueDynamic(this, &UItemContainerUI::ItemAdded);
+	if (container != NULL) {
+		// Set up add and remove listeners for our new container, so we can update our UI as things are added and removed
+		container->OnItemRemoved.AddUniqueDynamic(this, &UItemContainerUI::ItemRemoved);
+		container->OnItemAdded.AddUniqueDynamic(this, &UItemContainerUI::ItemAdded);
+	}
 }
 
 FString UItemContainerUI::GetContainerName()

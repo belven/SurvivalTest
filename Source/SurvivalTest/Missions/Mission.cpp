@@ -159,8 +159,7 @@ void AMission::SpawnMission()
 		FActorSpawnParameters params;
 		params.Owner = this;
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-
+		
 		for (auto& mld : mlt->GetData())
 		{
 			FLoadoutData ld = game->GetTableManager()->GetLoadoutTableData()->GetLoadoutDataByID(mld.loadoutID);

@@ -41,9 +41,8 @@ public:
 
 	static AGridSection* CreateGridSection(UWorld* world, FGridSectionData data);
 
-	UStaticMeshComponent* GetGridSectionComp() const { return gridSectionComp; }
-
-	void SetGridSectionComp(UStaticMeshComponent* inGridSectionComp) { gridSectionComp = inGridSectionComp; }
+	//UStaticMeshComponent* GetGridSectionComp() const { return gridSectionComp; }
+	//void SetGridSectionComp(UStaticMeshComponent* inGridSectionComp) { gridSectionComp = inGridSectionComp; }
 
 	FGridSectionData GetSectionData() const { return sectionData; }
 
@@ -53,8 +52,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* gridSectionComp;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
+	//UStaticMeshComponent* gridSectionComp;
 
 	FGridSectionData sectionData;
 };

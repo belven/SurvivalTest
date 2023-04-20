@@ -43,6 +43,4 @@ private:
 
 	UPROPERTY(VisibleDefaultsOnly)
 	UStaticMesh* mesh;
-	//UE::Math::TVector2<AGridSection*> grid;
-	//AGridSection* grid[][];
 };

@@ -34,7 +34,7 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	ProjectileMovement->InitialSpeed = Default_Initial_Speed;
-	ProjectileMovement->MaxSpeed = 30000;
+	ProjectileMovement->MaxSpeed = 60000;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
@@ -64,7 +64,7 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 	}
 
 	FHitResult hit;
-	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 300), ECollisionChannel::ECC_Pawn);
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 400), ECollisionChannel::ECC_Pawn);
 	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 300), FColor::Red, false, 1);
 	
 	if(hit.IsValidBlockingHit())

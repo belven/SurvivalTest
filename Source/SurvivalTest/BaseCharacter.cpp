@@ -135,6 +135,8 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 			inventory->AddValidSlot(type, slot);
 	}
 
+	currentStats.health = ld.health;
+	maxStats.health = ld.health;
 	CreateNewItemForInventory(ld.weaponID);
 	CreateNewItemForInventory(ld.headArmourID);
 	CreateNewItemForInventory(ld.chestArmourID);
