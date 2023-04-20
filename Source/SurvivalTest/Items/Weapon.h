@@ -26,7 +26,7 @@ public:
 
 	FWeaponData GetWeaponData() const { return weaponData; }
 	void SetWeaponData(FWeaponData data) { weaponData = data; }
-	virtual void UseWeapon(const FVector& LookAtRotation);
+	virtual void UseWeapon(const FRotator& LookAtRotation);
 
 	ABaseCharacter* GetCharacterOwner() const { return owner; }
 	void SetOwner(ABaseCharacter* val);

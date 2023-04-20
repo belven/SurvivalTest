@@ -28,7 +28,7 @@ public:
 
 	UWeapon* GetWeaponUsed() const	{		return weaponUsed;	}
 	void SetWeaponUsed(UWeapon* inWeaponUsed)	{		weaponUsed = inWeaponUsed;	}
-
+	UProjectileMovementComponent* GetProjectileMovement() { return ProjectileMovement; }
 protected:
 	FHealthChange healthChange;
 	FVector startLoc = FVector::ZeroVector;

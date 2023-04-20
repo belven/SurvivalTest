@@ -7,7 +7,7 @@
 
 #define mSphereTraceMultiWeapon(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::None, hits, true);
 
-void UMeleeWeapon::UseWeapon(const FVector& LookAtRotation)
+void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 {
 	if (canAttack) {
 		canAttack = false;

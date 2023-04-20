@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "Events/EventListener.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "BaseAIController.generated.h"
@@ -26,6 +27,11 @@ public:
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
+	/*explicit ABaseAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get())
+	{
+		Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")));
+	}*/
+
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 	void MoveToCombatLocation();
 
@@ -33,7 +39,7 @@ public:
 	void Patrol();
 	void KillAI();
 	void CalculateCombat();
-	void AttackLocation(FVector FireDirection);
+	void AttackWithWeapon(FRotator FireDirection);
 	void LookAt(FVector lookAtLocation);
 	
 	void MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result);

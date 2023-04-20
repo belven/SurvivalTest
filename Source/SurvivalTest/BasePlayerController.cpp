@@ -74,7 +74,7 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 
 	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr)
 	{
-		GetBaseCharacter()->GetEquippedWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation().Vector());
+		GetBaseCharacter()->GetEquippedWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation());
 	}
 }
 

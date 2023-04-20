@@ -16,6 +16,7 @@ void UProjectileWeaponDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.projectileClass = row[index++];
 		data.magazineSize = GetIntFromString(row[index++]);
 		data.reloadSpeed = GetFloatFromString(row[index++]);
+		data.bulletVelocity = GetIntFromString(row[index++]);
 		weaponData.Add(data);
 	}
 }

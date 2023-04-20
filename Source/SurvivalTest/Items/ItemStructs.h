@@ -192,6 +192,8 @@ public:
 	int32 magazineSize = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	float reloadSpeed = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	int32 bulletVelocity = 1;
 };
 
 USTRUCT(BlueprintType)

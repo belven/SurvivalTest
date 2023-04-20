@@ -39,7 +39,7 @@ ABaseProjectile* UWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRota
 	return projectile;
 }
 
-void UWeapon::UseWeapon(const FVector& LookAtRotation)
+void UWeapon::UseWeapon(const FRotator& LookAtRotation)
 {
 
 }

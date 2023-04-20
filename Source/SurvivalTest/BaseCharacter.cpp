@@ -497,10 +497,10 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 	else
 	{
-		GetCharacterMovement()->bUseRVOAvoidance = true;
-		GetCharacterMovement()->AvoidanceConsiderationRadius = 1000.f;
-		GetCharacterMovement()->AvoidanceWeight = 2000.f;
-		GetCharacterMovement()->SetAvoidanceEnabled(true);
+		//GetCharacterMovement()->bUseRVOAvoidance = true;
+		//GetCharacterMovement()->AvoidanceConsiderationRadius = 300.0f;
+		//GetCharacterMovement()->AvoidanceWeight = 0.5f;
+		//GetCharacterMovement()->SetAvoidanceEnabled(true);
 		interactionSphere->DestroyComponent();
 	}
 }

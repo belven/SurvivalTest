@@ -15,6 +15,7 @@
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Missions/PatrolPath.h"
+#include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
@@ -52,7 +53,7 @@ void ABaseAIController::LookAt(FVector lookAtLocation)
 
 void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result)
 {
-		finishedMove = true;
+	finishedMove = true;
 }
 
 void ABaseAIController::OnPossess(APawn* aPawn)
@@ -62,6 +63,7 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 10000;
+	//SetPathFollowingComponent(NewObject<UCrowdFollowingComponent>());
 
 	GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABaseAIController::MoveComplete);
 
@@ -154,13 +156,21 @@ void ABaseAIController::Tick(float DeltaTime)
 	{
 		KillAI();
 	}
-	else if (target != NULL)
-	{
-		CalculateCombat();
-	}
 	else
 	{
-		Patrol();
+		if (target != NULL && target->IsAlive())
+		{
+			CalculateCombat();
+		}
+		else if(target != NULL && target->IsDead())
+		{
+			target = NULL;
+			FindNewTarget();
+		}
+		else
+		{
+			Patrol();
+		}
 	}
 }
 
@@ -186,7 +196,8 @@ void ABaseAIController::Patrol()
 			}
 			else
 			{
-				currentPathPoint = 0;
+				const USplineComponent* spline = currentPath->GetSpline();
+				currentPathPoint = FMath::RandRange(0, spline->GetNumberOfSplinePoints() - 1);
 			}
 		}
 
@@ -223,7 +234,7 @@ void ABaseAIController::KillAI()
 
 void ABaseAIController::CalculateCombat()
 {
-	const FVector targetLocation = target->asActor()->GetActorLocation();
+	const FVector targetLocation = target->asActor()->GetActorLocation() + FVector(0, 0, 50);
 	const UWeapon* weapon = mCurrentWeapon();
 
 	// Can we see our current target?
@@ -239,7 +250,7 @@ void ABaseAIController::CalculateCombat()
 			{
 				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(GetBaseCharacter()->GetActorLocation(), target->asActor()->GetActorLocation());
 
-				AttackLocation(rotation.Vector());
+				AttackWithWeapon(rotation);
 			}
 			// Otherwise move towards the targets current location
 			else
@@ -265,7 +276,7 @@ void ABaseAIController::MoveToCombatLocation()
 	FindViableCombatLocationRequest.Execute(EEnvQueryRunMode::SingleResult, this, &ABaseAIController::WeaponLocationQueryFinished);
 }
 
-void ABaseAIController::AttackLocation(FVector FireDirection)
+void ABaseAIController::AttackWithWeapon(FRotator FireDirection)
 {
 	mCurrentWeapon()->UseWeapon(FireDirection);
 }

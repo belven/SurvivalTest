@@ -77,7 +77,8 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 				ItemLocation.Z += controllerBaseCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
 				// Create a sphere trace, slightly larger than the characters capsule, so we make sure there's enough room to shoot
-				mSphereTraceMultiEQS(ItemLocation, targetLocation, con->GetCharacter()->GetCapsuleComponent()->GetScaledCapsuleRadius()* 1.5, hits);
+				// con->GetCharacter()->GetCapsuleComponent()->GetScaledCapsuleRadius()* 1.5
+				mSphereTraceMultiEQS(ItemLocation, targetLocation, 50, hits);
 
 				bool canSee = true;
 

@@ -8,7 +8,7 @@
 #include "Items/Weapon.h"
 
 const float ABaseProjectile::Default_Initial_Speed = 8000.0f;
-const float ABaseProjectile::Default_Initial_Lifespan = 1.2f;
+const float ABaseProjectile::Default_Initial_Lifespan = 20.0f;
 
 ABaseProjectile::ABaseProjectile()
 {
@@ -34,7 +34,7 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	ProjectileMovement->InitialSpeed = Default_Initial_Speed;
-	ProjectileMovement->MaxSpeed = Default_Initial_Speed;
+	ProjectileMovement->MaxSpeed = 30000;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
@@ -64,10 +64,12 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 	}
 
 	FHitResult hit;
-	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 50), ECollisionChannel::ECC_Pawn);
+	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 300), ECollisionChannel::ECC_Pawn);
+	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 300), FColor::Red, false, 1);
 	
 	if(hit.IsValidBlockingHit())
 	{
+
 		if (hit.GetActor()->Implements<UDamagable>() && Cast<IDamagable>(hit.GetActor())->IsAlive())
 		{
 			ITeam* hitTeam = Cast<ITeam>(hit.GetActor());
@@ -75,6 +77,11 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 			if (hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy) {
 				IDamagable* hitActor = Cast<IDamagable>(hit.GetActor());
 				healthChange.changeAmount = CalculateDamageFalloff();
+
+				FVector start = healthChange.source->GetActorLocation() + (healthChange.source->GetActorForwardVector() * 200);
+				start.Z += 20;
+				DrawDebugCrosshairs(GetWorld(), start, GetActorRotation(), 20, FColor::Blue, false, 3);
+
 				hitActor->ChangeHealth(healthChange);
 				Destroy();
 			}
