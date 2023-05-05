@@ -75,6 +75,18 @@ TArray<FString> UTableManager::CleanData(TArray<FString> strings)
 	return newStrings;
 }
 
+TArray<int32> UTableManager::GetItemsForMissionType(EMissionType type)
+{
+	TArray<int32> itemTypes;
+
+	for (FMissionItemData mid : GetMissionItemTable()->GetData())
+	{
+		if (mid.type == type)
+			itemTypes.Add(mid.itemID);
+	}
+
+	return itemTypes;
+}
 
 #pragma region Getters
 

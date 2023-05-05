@@ -12,6 +12,7 @@
 #include "EnvironmentQuery/EnvQuery.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Items/ProjectileWeapon.h"
 #include "Items/Weapon.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Missions/PatrolPath.h"
@@ -248,7 +249,9 @@ void ABaseAIController::CalculateCombat()
 			// Check we're in range of the target
 			if (FVector::Dist(mActorLocation, targetLocation) <= weapon->GetWeaponData().range)
 			{
-				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(GetBaseCharacter()->GetActorLocation(), target->asActor()->GetActorLocation());
+				FVector targetLoc = GetPredictedLocation(target->asActor());
+
+				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(GetBaseCharacter()->GetActorLocation(), targetLoc);
 
 				AttackWithWeapon(rotation);
 			}
@@ -269,6 +272,24 @@ void ABaseAIController::CalculateCombat()
 		lastKnowLocation = target->asActor()->GetActorLocation();
 		MoveToCombatLocation();
 	}
+}
+
+FVector ABaseAIController::GetPredictedLocation(AActor* actor) {
+	float lead = 0;
+
+	if(GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+		lead = pw->GetProjectileWeaponData().bulletVelocity;
+	}
+	else // This would account for melee weapons, dunno if  I need lead at all.
+	{
+		lead = 1;
+	}
+
+	float time = FVector::Dist(GetBaseCharacter()->GetActorLocation(), actor->GetActorLocation()) / lead;
+	//time = FMath::RandRange(time * 0.9f, time * 1.1f);
+	return actor->GetActorLocation() + (actor->GetVelocity() * time);
 }
 
 void ABaseAIController::MoveToCombatLocation()

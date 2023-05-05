@@ -410,6 +410,11 @@ public:
 		return newData;
 	}
 
+	bool HasSpace(int32 maxStackSize)
+	{
+		return GetRemainingSpace(maxStackSize) > 0;
+	}
+
 	int GetRemainingSpace(int32 maxStackSize)
 	{
 		return maxStackSize - amount;

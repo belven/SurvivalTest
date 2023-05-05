@@ -8,19 +8,6 @@
 
 class UItemContainer;
 
-class FSpawnLootRunnable : public FRunnable
-{
-public:
-	FSpawnLootRunnable();
-
-	//override Init,Run and Stop.
-	virtual bool Init() override;
-	virtual uint32 Run() override;
-	FInstanceItemData CreateLoot(FItemData id);
-
-	ALootBox* lootBox;
-};
-
 UCLASS(HideCategories = ("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
 class SURVIVALTEST_API ALootBox : public AActor, public IInteractable, public IItemContainerInterface
 {
@@ -51,6 +38,7 @@ public:
 
 	UFUNCTION()
 	void SpawnLoot();
+	void ClearData();
 
 	void SetItemTypes(TArray<int32>inItemTypes) { itemTypes = inItemTypes; }
 
@@ -58,17 +46,19 @@ protected:
 	FInstanceItemData CreateLoot(FItemData id);
 
 	FTimerHandle TimerHandle_LootboxClear;
-	FSpawnLootRunnable* runnable;
 	virtual void BeginPlay() override;
 
 	UBaseGameInstance* GetGame();
-	//TMap<EItemType, TArray<FItemData>> GetItemList();
 	void CreateLootboxData();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* boxMeshComp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
+		FString defaultContainer;
 	
 	FContainerData containerData;
+
 	FInstanceContainerData icd;
 	FInstanceBoxData ibd;
 

@@ -19,7 +19,8 @@ class SURVIVALTEST_API AMission : public ATargetPoint, public IEventListener
 public:
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
 	void MissionComplete();
-	bool IsSpawnMission() const { return spawnMission; }
+	bool ShouldSpawnMission() const { return spawnMission; }
+	bool MissionSpawned() const { return missionSpawned; }
 	void SetSpawnMission(bool inSpawnMission) { spawnMission = inSpawnMission; }
 	void SpawnMission();
 	EMissionType GetMissionType() const { return missionType; }
@@ -38,6 +39,7 @@ protected:
 	FTimerHandle TimerHandle_CheckNoPlayers;
 	EMissionType missionType;
 	bool spawnMission = true;
+	bool missionSpawned = false;
 
 	UPROPERTY()
 	UBaseGameInstance* game;

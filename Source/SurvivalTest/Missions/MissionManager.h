@@ -22,6 +22,7 @@ public:
 
 	void AddMission(AMission* inMission);
 	void StartPlay();
+	int32 GetRandomMissionAmount();
 
 private:
 	TArray<AMission*> missions;

@@ -54,6 +54,7 @@ public:
 	int32 GetItemStackSize(int32 itemID);
 	int32 GetNextEmptySlotForItem(int32 itemID);
 	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
+	bool CheckForArmourInventory(FInstanceItemData itemToTransfer);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
 	void RemoveFilledSlots(TArray<int32>& slots);

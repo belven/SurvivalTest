@@ -348,6 +348,7 @@ URPGEventManager* UBaseGameInstance::GetEventManager()
 	return eventManager;
 }
 
+
 UTableManager* UBaseGameInstance::GetTableManager()
 {
 	if (tableManager == nullptr) { tableManager = NewObject<UTableManager>(); }

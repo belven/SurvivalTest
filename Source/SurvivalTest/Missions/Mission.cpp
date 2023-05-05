@@ -22,7 +22,6 @@ AMission::AMission()
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
 	navInvoker->SetGenerationRadii(boxSize, boxSize * 1.2);
-	//navInvoker->AddToRoot();
 }
 
 FContainerData AMission::GetRandomContainerData()
@@ -53,19 +52,14 @@ void AMission::SetUpLootBoxes()
 	{
 		ALootBox* loot = Cast<ALootBox>(actor);
 		FContainerData cd = GetRandomContainerData();
-		TArray<int32> itemTypes;
-
-		for(FMissionItemData mid : game->GetTableManager()->GetMissionItemTable()->GetData())
-		{
-			if (mid.type == missionType)
-				itemTypes.Add(mid.itemID);
-		}
+		TArray<int32> itemTypes = game->GetTableManager()->GetItemsForMissionType(missionType);	
 
 		if (cd.ID != UItemStructs::InvalidInt)
 		{
 			loot->SetContainerData(cd);
 			loot->SetItemTypes(itemTypes);
 			loot->SetActorHiddenInGame(false);
+			loot->ClearData();
 			loot->SpawnLoot();
 		}
 	}
@@ -153,6 +147,7 @@ void AMission::SpawnMission()
 	if (!HasPlayers() && spawnMission)
 	{
 		spawnMission = false;
+		missionSpawned = true;
 		FNavLocation location;
 		UMissionLoadoutTable* mlt = game->GetTableManager()->GetMissionLoadoutTable();
 
@@ -175,6 +170,10 @@ void AMission::SpawnMission()
 				aiSpawned.Add(character);
 			}
 		}
+	}
+	else
+	{
+		SetUpLootBoxes();
 	}
 }
 

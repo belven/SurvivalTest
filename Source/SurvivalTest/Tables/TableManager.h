@@ -45,6 +45,8 @@ public:
 	void SaveTableToFile(UCSVTable* table);
 	TArray<FString> CleanData(TArray<FString> strings);
 
+	TArray<int32> GetItemsForMissionType(EMissionType type);
+
 private:
 	UPROPERTY()
 	UItemDataTable* ItemData;

@@ -39,6 +39,7 @@ public:
 	void Patrol();
 	void KillAI();
 	void CalculateCombat();
+	FVector GetPredictedLocation(AActor* actor);
 	void AttackWithWeapon(FRotator FireDirection);
 	void LookAt(FVector lookAtLocation);
 	

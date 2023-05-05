@@ -2,6 +2,7 @@
 #include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
+#include "SurvivalTest/Tables/ContainerTableData.h"
 
 ALootBox::ALootBox()
 {
@@ -31,7 +32,21 @@ void ALootBox::SetUpBox()
 void ALootBox::BeginPlay()
 {
 	Super::BeginPlay();
-	SetActorHiddenInGame(true);
+	SetActorHiddenInGame(false);
+
+	if (!defaultContainer.Equals("")) {
+		for (auto cd : GetGame()->GetTableManager()->GetContainerData()->GetData())
+		{
+			if (cd.Value.name.Equals(defaultContainer))
+			{
+				SetContainerData(cd.Value);
+				itemTypes = GetGame()->GetTableManager()->GetItemsForMissionType(cd.Value.type);
+			}
+		}
+
+		if (GetContainerData().ID != UItemStructs::InvalidInt)
+			SpawnLoot();
+	}
 }
 
 void ALootBox::Interact(ABasePlayerController* instigator)
@@ -56,28 +71,19 @@ UBaseGameInstance* ALootBox::GetGame()
 	return gameIn;
 }
 
-//TMap<EItemType, TArray<FItemData>> ALootBox::GetItemList()
-//{
-//	TMap<EItemType, TArray<FItemData>> items;
-//	TArray<EItemType> types;
-//	itemTypes.GenerateKeyArray(types);
-//
-//	for (auto item : GetGame()->GetTableManager()->GetItemDataTable()->GetData())
-//	{
-//		if (types.Contains(item.type)) {
-//			items.FindOrAdd(item.type).Add(item);
-//		}
-//	}
-//
-//	return items;
-//}
+void ALootBox::ClearData()
+{
+	itemTypes.Empty();
+
+	for (FInstanceItemData iid : GetGame()->GetInstancedItemsForContainer(container->GetInstanceContainerData().ID))
+	{
+		GetGame()->GetInstancedItems().Remove(iid.ID);
+	}
+}
 
 void ALootBox::SpawnLoot()
 {
 	SetUpBox();
-	// runnable = new FSpawnLootRunnable();
-	//runnable->lootBox = this;
-	//FRunnableThread* thread = FRunnableThread::Create(runnable, TEXT(""));
 
 	for (auto& lootItem : itemTypes)
 	{
@@ -151,54 +157,4 @@ void ALootBox::ItemRemoved(FInstanceItemData inItem)
 void ALootBox::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-}
-
-FSpawnLootRunnable::FSpawnLootRunnable() : lootBox(nullptr)
-{
-
-}
-
-bool FSpawnLootRunnable::Init()
-{
-	return true;
-}
-
-uint32 FSpawnLootRunnable::Run()
-{
-	/*TMap<EItemType, TArray<FItemData>> itemList = lootBox->GetItemList();
-
-	for (auto& lootItem : lootBox->itemTypes)
-	{
-		TArray<FItemData> items = itemList.FindOrAdd(lootItem.Key);
-
-		for (int i = 0; i < lootItem.Value; ++i)
-		{
-			FItemData id = items[FMath::RandRange(0, items.Num() - 1)];
-			FInstanceItemData iid = CreateLoot(id);
-
-			TArray<int32> ids;
-			lootBox->container->AddItem(iid, ids);
-
-			if (id.type == EItemType::Armour)
-			{
-				UArmour::CreateArmour(id.ID, lootBox->GetGame(), ids[0]);
-			}
-		}
-	}*/
-
-	return 0;
-}
-
-FInstanceItemData FSpawnLootRunnable::CreateLoot(FItemData id)
-{
-	FInstanceItemData iid;
-	if (id.ID != UItemStructs::InvalidInt)
-	{
-		iid.ID = lootBox->GetGame()->GetNextInstanceItemDataID();
-		iid.amount = FMath::RandRange(1, id.maxStack);
-		iid.containerInstanceID = lootBox->icd.ID;
-		iid.itemID = id.ID;
-		iid.slot = lootBox->container->GetNextEmptySlot();
-	}
-	return iid;
 }
