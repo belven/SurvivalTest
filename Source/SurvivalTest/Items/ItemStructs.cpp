@@ -42,13 +42,9 @@ EGearType UItemStructs::GetGearType(FString typeName)
 	{
 		return EGearType::Head;
 	}
-	else if (typeName.Equals("Primary_Weapon"))
+	else if (typeName.Equals("Weapon"))
 	{
-		return EGearType::Primary_Weapon;
-	}
-	else if (typeName.Equals("Secondary_Weapon"))
-	{
-		return EGearType::Secondary_Weapon;
+		return EGearType::Weapon;
 	}
 	else if (typeName.Equals("Sidearm"))
 	{

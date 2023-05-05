@@ -98,17 +98,17 @@ void ABasePlayerController::OnPrimaryActionReleased()
 
 void ABasePlayerController::OnPrimaryWeapon()
 {
-	EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Primary_Weapon), EGearType::Primary_Weapon);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetPrimaryWeaponSlot(), EGearType::Weapon);
 }
 
 void ABasePlayerController::OnSecondaryWeapon()
 {
-	EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Secondary_Weapon), EGearType::Secondary_Weapon);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetSecondaryWeaponSlot(), EGearType::Weapon);
 }
 
 void ABasePlayerController::OnSidearm()
 {
-	EquipWeaponAtSlot(GetBaseCharacter()->GetSlotForGear(EGearType::Sidearm), EGearType::Sidearm);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetSidearmWeaponSlot(), EGearType::Sidearm);
 }
 
 void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)

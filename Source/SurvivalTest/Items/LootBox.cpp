@@ -85,7 +85,7 @@ void ALootBox::SpawnLoot()
 {
 	SetUpBox();
 
-	for (int i = 0; i < FMath::RandRange(1, GetContainerData().slots); ++i)
+	for (int i = 0; i < FMath::RandRange(minItems, GetContainerData().slots); ++i)
 	{
 		int32 lootItem = GetRandom<int32>(itemTypes);
 		FItemData id = GetGame()->GetItemData(lootItem);

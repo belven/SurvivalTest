@@ -302,7 +302,7 @@ int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 
 	// If the gear type isn't End, then we found a slot for the item type, therefore we need to see if we have valid slots for the item
 	// Otherwise, we found no gear type and can simply add the item to the next empty slot
-	return gearType != EGearType::End ? FindNextEmptyValidSlot(gearType) : GetNextEmptySlot();
+	return FindNextEmptyValidSlot(gearType);
 }
 
 /**
@@ -427,14 +427,7 @@ UBaseGameInstance* UItemContainer::GetGame()
 
 void UItemContainer::AddValidSlot(EGearType type, int32 slot)
 {
-	FValidSlots slots;
-	slots.validSlots.Add(slot);
-	validSlots.Add(type, slots);
-}
-
-void UItemContainer::AddValidSlots(EGearType type, FValidSlots slots)
-{
-	validSlots.Add(type, slots);
+	validSlots.FindOrAdd(slot).validGear.Add(type);
 }
 
 /**
@@ -466,12 +459,16 @@ bool UItemContainer::IsValidForSlot(int32 slot, EGearType inType)
 	if (validSlots.Num() > 0)
 	{
 		// Get the array of valid slots based on the gear type
-		FValidSlots* slots = validSlots.Find(inType);
+		FValidSlots* slots = validSlots.Find(slot);
 
 		// Check the valid slots found, if any, and return true if the slot we're checking is valid for that type of gear
-		if (slots && slots->validSlots.Contains(slot))
+		if (!slots)
 		{
 			return true;
+		}
+
+		if(slots->validGear.Contains(inType)) {
+				return true;
 		}
 
 		// Either there were no slots defined for that gear type or no valid slots were found for the gear type at all

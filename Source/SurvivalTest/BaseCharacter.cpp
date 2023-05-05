@@ -124,17 +124,17 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 	gearTypes.AddUnique(EGearType::Head);
 	gearTypes.AddUnique(EGearType::Legs);
 	gearTypes.AddUnique(EGearType::Chest);
-	gearTypes.AddUnique(EGearType::Primary_Weapon);
-	gearTypes.AddUnique(EGearType::Secondary_Weapon);
+	gearTypes.AddUnique(EGearType::Weapon);
 	gearTypes.AddUnique(EGearType::Bag);
 	gearTypes.AddUnique(EGearType::Sidearm);
 	gearTypes.AddUnique(EGearType::Vest);
 
 	for (EGearType type : gearTypes)
 	{
-		int32 slot = GetSlotForGear(type);
-		if (slot != UItemStructs::InvalidInt)
-			inventory->AddValidSlot(type, slot);
+		for (int32 slot : GetSlotForGear(type)) {
+			if (slot != UItemStructs::InvalidInt)
+				inventory->AddValidSlot(type, slot);
+		}
 	}
 
 	currentStats.health = ld.health;
@@ -157,20 +157,46 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
  *
  *@param type The type of gear to get the slot for
  */
-int32 ABaseCharacter::GetSlotForGear(EGearType type)
+TArray<int32> ABaseCharacter::GetSlotForGear(EGearType type)
 {
+	TArray<int32> validSlots;
 	switch (type)
 	{
-	case EGearType::Head: return 0;
-	case EGearType::Chest: return 1;
-	case EGearType::Vest: return 2;
-	case EGearType::Legs: return 3;
-	case EGearType::Primary_Weapon: return 4;
-	case EGearType::Secondary_Weapon: return 5;
-	case EGearType::Sidearm: return 6;
-	case EGearType::Bag: return 7;
-	default: return UItemStructs::InvalidInt;
+	case EGearType::Head: validSlots.Add(0);
+		break;
+	case EGearType::Chest: validSlots.Add(1);
+		break;
+	case EGearType::Vest: validSlots.Add(2);
+		break;
+	case EGearType::Legs: validSlots.Add(3);
+		break;
+	case EGearType::Weapon:
+		validSlots.Add(4);
+		validSlots.Add(5);
+		break;
+	case EGearType::Sidearm: validSlots.Add(6);
+		break;
+	case EGearType::Bag: validSlots.Add(7);
+		break;
+	default:
+		break;
 	}
+	return  validSlots;
+}
+
+int32 ABaseCharacter::GetPrimaryWeaponSlot()
+{
+	return GetSlotForGear(EGearType::Weapon)[0];
+}
+
+int32 ABaseCharacter::GetSecondaryWeaponSlot()
+{
+	return GetSlotForGear(EGearType::Weapon)[1];
+}
+
+int32 ABaseCharacter::GetSidearmWeaponSlot()
+{
+	return GetSlotForGear(EGearType::Sidearm)[0];
 }
 
 /**
@@ -190,7 +216,6 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 		FInstanceItemData iid;
 		iid.itemID = itemID;
 		iid.amount = 1;
-		iid.slot = GetSlotForGear(game->GetGearTypeForItem(itemID));
 
 		if (inventory->AddItem(iid, ids).amount == 0)
 		{

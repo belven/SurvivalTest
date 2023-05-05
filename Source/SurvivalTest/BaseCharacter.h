@@ -146,7 +146,10 @@ public:
 
 	UFUNCTION()
 	void ItemRemoved(FInstanceItemData inItem);
-	int32 GetSlotForGear(EGearType type);
+	TArray<int32> GetSlotForGear(EGearType type);
+	int32 GetPrimaryWeaponSlot();
+	int32 GetSecondaryWeaponSlot();
+	int32 GetSidearmWeaponSlot();
 	void SetupLoadout(FString loadoutName);
 	
 #pragma endregion Inventory

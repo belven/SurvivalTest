@@ -16,7 +16,7 @@ struct FValidSlots
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	TArray<int32> validSlots;
+	TArray<EGearType> validGear;
 };
 
 USTRUCT(BlueprintType)
@@ -127,12 +127,9 @@ public:
 		UBaseGameInstance* GetGame();
 
 	void AddValidSlot(EGearType type, int32 slot);
-
-	void AddValidSlots(EGearType type, FValidSlots slots);
-
 private:
 	UPROPERTY()
-	TMap<EGearType, FValidSlots> validSlots;
+	TMap<int32, FValidSlots> validSlots;
 
 	UPROPERTY()
 	FContainerData containerData;

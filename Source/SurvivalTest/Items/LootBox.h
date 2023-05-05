@@ -55,6 +55,9 @@ protected:
 	UStaticMeshComponent* boxMeshComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
+		int32 minItems = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
 		FString defaultContainer;
 	
 	FContainerData containerData;
