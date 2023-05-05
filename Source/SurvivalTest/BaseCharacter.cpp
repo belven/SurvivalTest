@@ -146,6 +146,7 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 	CreateNewItemForInventory(ld.legsArmourID);
 
 	inventory->OnItemAdded.AddUniqueDynamic(this, &ABaseCharacter::ItemAdded);
+	inventory->OnItemUpdated.AddUniqueDynamic(this, &ABaseCharacter::ItemAdded);
 	inventory->OnItemRemoved.AddUniqueDynamic(this, &ABaseCharacter::ItemRemoved);
 }
 

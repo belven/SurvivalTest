@@ -29,6 +29,6 @@ private:
 
 	UPROPERTY()
 	UBaseGameInstance* game;
-	template<class T>
-	T GetRandom(TArray<T> itemArray);
+
+	template<class T> T GetRandom(TArray<T> itemArray);
 };

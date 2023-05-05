@@ -15,5 +15,6 @@
 "14","Wood","Resource","Texture2D'/Game/FirstPerson/Icons/wood.wood'","","20"
 "15","Nails","Resource","Texture2D'/Game/FirstPerson/Icons/nails.nails'","","20"
 "16","Bandage","Consumable","Texture2D'/Game/FirstPerson/Icons/bandage.bandage'","","5"
-"17","Soda","Consumable","Texture2D'/Game/FirstPerson/Icons/soda.soda'","","5"
-"18","Sandwich","Consumable","Texture2D'/Game/FirstPerson/Icons/sandwich.sandwich'","","5"
+"17","First Aid Kit","Consumable","Texture2D'/Game/FirstPerson/Icons/FirstAidKit.FirstAidKit'","","5"
+"18","Soda","Consumable","Texture2D'/Game/FirstPerson/Icons/soda.soda'","","5"
+"19","Sandwich","Consumable","Texture2D'/Game/FirstPerson/Icons/sandwich.sandwich'","","5"

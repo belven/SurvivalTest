@@ -145,18 +145,41 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		if (existingItem.ID != UItemStructs::InvalidInt)
 		{
 			EGearType existingIType = GetGame()->GetGearTypeForItem(existingItem.itemID);
+			bool canSwitchPlaces = IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType);
 
 			// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
-			if (IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType))
+			if (canSwitchPlaces)
 			{
 				// Are we dropping something that can stack more than once and the item we're dropping onto is the same
-				if (id.maxStack > 1 && itemToTransfer.itemID == existingItem.itemID && existingItem.HasSpace(id.maxStack))
+				if (id.maxStack > 1 && itemToTransfer.itemID == existingItem.itemID)
 				{
-					existingItem.TakeFrom(itemToTransfer, id.maxStack);
+					// Does the existing item have space?
+					// If so, we're trying to add an item to another
+					if(existingItem.HasSpace(id.maxStack))
+					{
+						existingItem.TakeFrom(itemToTransfer, id.maxStack);			
+					}
+					// Otherwise we're just swapping the items, as existingItem.amount is at max.
+					// This would be like swapping a half stack for a full stack
+					else
+					{
+						itemToTransfer.TakeFrom(existingItem, id.maxStack);
+					}
 
 					// Update each amount increase
 					GetGame()->AddUpdateData(existingItem);
-					GetGame()->AddUpdateData(itemToTransfer);
+					OnItemUpdated.Broadcast(existingItem);
+
+					// If amount is 0, then remove us
+					if (itemToTransfer.amount == 0)
+					{
+						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
+						other->OnItemRemoved.Broadcast(itemToTransfer);
+					}
+					else {
+						GetGame()->AddUpdateData(itemToTransfer);
+						other->OnItemUpdated.Broadcast(itemToTransfer);
+					}
 				}
 				else
 				{
@@ -164,11 +187,13 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 					existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
 					existingItem.slot = itemToTransfer.slot;
 
-					GetGame()->AddUpdateData(existingItem);
-					other->OnItemAdded.Broadcast(existingItem);
-					OnItemRemoved.Broadcast(existingItem);
-
 					itemToTransfer.slot = droppedSlot;
+
+					GetGame()->AddUpdateData(existingItem);
+					GetGame()->AddUpdateData(itemToTransfer);
+
+					OnItemUpdated.Broadcast(existingItem);
+					OnItemUpdated.Broadcast(itemToTransfer);
 				}
 			}
 			else
@@ -198,6 +223,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 
 								// Update each amount increase
 								GetGame()->AddUpdateData(iid);
+								OnItemUpdated.Broadcast(iid);
 							}
 						}
 
@@ -206,8 +232,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 						{
 							GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
 							other->OnItemRemoved.Broadcast(itemToTransfer);
-							OnItemAdded.Broadcast(itemToTransfer);
-							UpdateDebugItemsList();
+							//OnItemAdded.Broadcast(itemToTransfer);
 						}
 						// If there's still some left, try and add the remainder to the next empty slot
 						else
@@ -227,15 +252,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		else if (IsValidForSlot(droppedSlot, type))
 		{
 			itemToTransfer.slot = droppedSlot;
-		}
-		else
-		{
-			itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
-		}
 
-		// If we found a valid slot then transfer the item
-		if (itemToTransfer.slot != UItemStructs::InvalidInt && itemToTransfer.amount > 0)
-		{
 			// Set the containerInstanceID to this container, this will move the item to belong to us
 			itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
 
@@ -245,9 +262,28 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 			// Tell our listeners that we've made changes, so things like UI can be updated
 			other->OnItemRemoved.Broadcast(itemToTransfer);
 			OnItemAdded.Broadcast(itemToTransfer);
-			UpdateDebugItemsList();
+		}
+		else
+		{
+			itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
+
+			// If we found a valid slot then transfer the item
+			if (itemToTransfer.slot != UItemStructs::InvalidInt && itemToTransfer.amount > 0)
+			{
+				// Set the containerInstanceID to this container, this will move the item to belong to us
+				itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
+
+				// Update the itemToTransfer in the database
+				GetGame()->AddUpdateData(itemToTransfer);
+
+				// Tell our listeners that we've made changes, so things like UI can be updated
+				other->OnItemRemoved.Broadcast(itemToTransfer);
+				OnItemAdded.Broadcast(itemToTransfer);
+			}
 		}
 	}
+
+	UpdateDebugItemsList();
 	return itemToTransfer;
 }
 
@@ -295,6 +331,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
 				newItem.amount = itemToAdd.amount;
 				GetGame()->AddUpdateData(newItem);
+				OnItemAdded.Broadcast(newItem);
 				ids.Add(newItem.ID);
 				itemToAdd.amount = 0;
 				itemAdded = true;
@@ -313,6 +350,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 				existingItem = GetExistingItemWithSpace(itemToAdd);
 				GetGame()->GetInstancedItems().Add(existingItem.ID, existingItem);
 				itemAdded = true;
+				OnItemUpdated.Broadcast(existingItem);
 			}
 
 			// Keep adding new items until we're either full or added all items
@@ -332,6 +370,7 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 					ids.Add(newItem.ID);
 					GetGame()->AddUpdateData(newItem);
 					itemAdded = true;
+					OnItemAdded.Broadcast(newItem);
 				}
 				// We found no more valid slots for the item
 				else
@@ -343,11 +382,6 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 	}
 
 	UpdateDebugItemsList();
-
-	if (itemAdded)
-	{
-		OnItemAdded.Broadcast(itemToAdd);
-	}
 	return itemToAdd;
 }
 

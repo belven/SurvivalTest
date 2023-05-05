@@ -6,7 +6,7 @@
 #include "ItemContainer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInstanceItemData, item);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemUpdated, FInstanceItemData, item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemAdded, FInstanceItemData, item);
 
 USTRUCT(BlueprintType)
@@ -101,6 +101,9 @@ public:
 	
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 	FItemRemoved OnItemRemoved;
+
+	UPROPERTY(BlueprintCallable, Category = "Item Container")
+		FItemUpdated OnItemUpdated;
 
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 	FItemAdded OnItemAdded;

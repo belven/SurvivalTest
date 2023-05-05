@@ -72,4 +72,6 @@ protected:
 
 	UPROPERTY()
 	UBaseGameInstance* gameIn;
+
+	template<class T> T GetRandom(TArray<T> itemArray);
 };
