@@ -133,6 +133,8 @@ bool UItemContainer::CheckForArmourInventory(FInstanceItemData itemToTransfer) {
  */
 FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot)
 {
+	// Store a copy of the data so we can use it to update the UI
+	FInstanceItemData oldData = itemToTransfer;
 	FItemData id = GetGame()->GetItemData(itemToTransfer.itemID);
 
 	if (CheckForArmourInventory(itemToTransfer)) {
@@ -174,7 +176,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 					if (itemToTransfer.amount == 0)
 					{
 						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
-						other->OnItemRemoved.Broadcast(itemToTransfer);
+						oldData.ID = UItemStructs::InvalidInt;
+						other->OnItemRemoved.Broadcast(oldData);
 					}
 					else {
 						GetGame()->AddUpdateData(itemToTransfer);
@@ -231,8 +234,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 						if (itemToTransfer.amount == 0)
 						{
 							GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
+							itemToTransfer.ID = UItemStructs::InvalidInt;
 							other->OnItemRemoved.Broadcast(itemToTransfer);
-							//OnItemAdded.Broadcast(itemToTransfer);
 						}
 						// If there's still some left, try and add the remainder to the next empty slot
 						else
@@ -260,7 +263,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 			GetGame()->AddUpdateData(itemToTransfer);
 
 			// Tell our listeners that we've made changes, so things like UI can be updated
-			other->OnItemRemoved.Broadcast(itemToTransfer);
+			oldData.ID = UItemStructs::InvalidInt;
+			other->OnItemRemoved.Broadcast(oldData);
 			OnItemAdded.Broadcast(itemToTransfer);
 		}
 		else
@@ -277,7 +281,7 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 				GetGame()->AddUpdateData(itemToTransfer);
 
 				// Tell our listeners that we've made changes, so things like UI can be updated
-				other->OnItemRemoved.Broadcast(itemToTransfer);
+				other->OnItemRemoved.Broadcast(oldData);
 				OnItemAdded.Broadcast(itemToTransfer);
 			}
 		}

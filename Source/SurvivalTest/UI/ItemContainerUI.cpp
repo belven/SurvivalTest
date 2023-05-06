@@ -73,15 +73,15 @@ UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData da
 
 void UItemContainerUI::ItemAdded(FInstanceItemData inItem)
 {
-	GenerateInventory();
+	AddItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
 }
 
 void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
 {
-	GenerateInventory();
+	RemoveItem(inItem);
 }
 
 void UItemContainerUI::ItemUpdated(FInstanceItemData inItem)
 {
-	GenerateInventory();
+	UpdateItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
 }

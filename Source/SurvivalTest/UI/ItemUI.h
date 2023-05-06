@@ -22,6 +22,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
 	void UpdateItemDetails();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+		void ClearItem();
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UTexture2D* GetItemIcon();
 

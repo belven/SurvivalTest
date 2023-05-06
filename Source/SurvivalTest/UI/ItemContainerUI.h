@@ -15,6 +15,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
 		void GenerateInventory();
 
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+		void UpdateItem(FInstanceItemData instanceItemData, FItemData itemData);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+		void RemoveItem(FInstanceItemData instanceItemData);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+		void AddItem(FInstanceItemData instanceItemData, FItemData itemData);
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		int32 GetColumn();
 
