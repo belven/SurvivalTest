@@ -1,5 +1,6 @@
 #include "MissionManager.h"
 #include "Mission.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 void UMissionManager::CreateMissions()
 {
@@ -28,10 +29,10 @@ void UMissionManager::StartPlay()
 		
 		while(mission == nullptr)
 		{
-			mission = GetRandom<AMission*>(missions);
+			mission = mGetRandom<AMission*>(missions);
 
 			if (!mission->MissionSpawned()) {
-				EMissionType mt = GetRandom<EMissionType>(types);
+				EMissionType mt = mGetRandom<EMissionType>(types);
 				mission->SetMissionType(mt);
 				mission->SpawnMission();
 			}
@@ -67,7 +68,3 @@ int32 UMissionManager::GetRandomMissionAmount()
 	return amount;
 }
 
-template <class T> T UMissionManager::GetRandom(TArray<T> itemArray)
-{
-	return itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
-}

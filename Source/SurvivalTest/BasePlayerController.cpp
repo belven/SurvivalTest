@@ -27,10 +27,7 @@ ABasePlayerController::ABasePlayerController() : Super()
 	if (mainHUDClassFound.Class != nullptr)
 	{
 		mainHUDClass = mainHUDClassFound.Class;
-	}
-	
-	//leanTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("LeanTimeline"));
-	//leanTimeline->CreationMethod = EComponentCreationMethod::Native;
+	}	
 }
 
 void ABasePlayerController::TimelineCallback()
@@ -74,7 +71,7 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 
 	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr)
 	{
-		GetBaseCharacter()->GetEquippedWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation());
+		mCurrentWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation());
 	}
 }
 
@@ -115,7 +112,7 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 {
 	FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
 
-	UWeapon* equippedWeapon = GetBaseCharacter()->GetEquippedWeapon();
+	UWeapon* equippedWeapon = mCurrentWeapon();
 
 	// TODO need to check if we are quipping the same weapon
 	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetWeaponData().gearType != type))

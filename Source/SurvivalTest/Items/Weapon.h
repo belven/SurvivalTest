@@ -3,11 +3,10 @@
 #include "Item.h"
 #include "ItemStructs.h"
 #include "Engine/EngineTypes.h"
+#include "SurvivalTest/HelperFunctions.h"
 #include "Weapon.generated.h"
 
 #define mSpawnProjectile(projectileClass) owner->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
-#define mSetTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
-#define mClearTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
 
 class ABaseCharacter;
 class ABaseProjectile;

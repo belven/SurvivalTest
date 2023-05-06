@@ -3,6 +3,7 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 ALootBox::ALootBox()
 {
@@ -87,7 +88,7 @@ void ALootBox::SpawnLoot()
 
 	for (int i = 0; i < FMath::RandRange(minItems, GetContainerData().slots); ++i)
 	{
-		int32 lootItem = GetRandom<int32>(itemTypes);
+		int32 lootItem = mGetRandom<int32>(itemTypes);
 		FItemData id = GetGame()->GetItemData(lootItem);
 		FInstanceItemData iid = CreateLoot(id);
 
@@ -131,11 +132,6 @@ FInstanceItemData ALootBox::CreateLoot(FItemData id)
 		iid.slot = container->GetNextEmptySlot();
 	}
 	return iid;
-}
-
-template <class T> T ALootBox::GetRandom(TArray<T> itemArray)
-{
-	return itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
 }
 
 void ALootBox::ItemAdded(FInstanceItemData inItem)

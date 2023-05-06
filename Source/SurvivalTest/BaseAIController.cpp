@@ -20,10 +20,6 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
-#define mActorLocation GetCharacter()->GetActorLocation()
-#define mActorRotation GetCharacter()->GetActorRotation()
-#define mCurrentWeapon() GetBaseCharacter()->GetEquippedWeapon()
-
 ABaseAIController::ABaseAIController() : Super()
 {
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));

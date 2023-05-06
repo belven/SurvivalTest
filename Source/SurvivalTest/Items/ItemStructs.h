@@ -4,12 +4,6 @@
 #include "SurvivalTest/Missions/MissionStructs.h"
 #include "ItemStructs.generated.h"
 
-#define mSetTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
-#define mSetTimer(handle, method, delay) mSetTimerWorld(GetWorld(), handle, method, delay)
-#define mTimeRemaining(handle) GetWorld()->GetTimerManager().GetTimerRemaining(handle)
-#define mIsTimerActive(handle) GetWorld()->GetTimerManager().IsTimerActive(handle)
-#define mClearTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
-
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
