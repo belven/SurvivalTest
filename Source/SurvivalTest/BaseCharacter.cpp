@@ -225,6 +225,22 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 			}
 			else if (id.type == EItemType::Weapon)
 			{
+				FWeaponData wd = GetGame()->GetWeaponData(id.ID);
+
+				if(wd.type == EWeaponType::Projectile)
+				{
+					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(wd.ID);
+					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
+
+					for (int i = 0; i < 3; ++i)
+					{
+						iid.amount = ammoData.maxStack;
+						iid.itemID = pwd.ammoID;
+
+						ids.Empty();
+						GetInventory()->AddItem(iid, ids);
+					}
+				}
 				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), ids[0]));
 			}
 		}

@@ -13,7 +13,7 @@ void UProjectileWeaponDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		FProjectileWeaponData data;
 		data.ID = GetIntFromString(row[index++]);
 		data.rangedWeaponID = GetIntFromString(row[index++]);
-		data.projectileClass = row[index++];
+		data.ammoID = GetIntFromString(row[index++]);
 		data.magazineSize = GetIntFromString(row[index++]);
 		data.reloadSpeed = GetFloatFromString(row[index++]);
 		data.bulletVelocity = GetIntFromString(row[index++]);

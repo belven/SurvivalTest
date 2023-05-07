@@ -224,21 +224,38 @@ void ABasePlayerController::MoveRight(float Val)
 	}
 }
 
+void ABasePlayerController::OpenInventory()
+{
+	if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
+	{
+		inventoryWidget->SetVisibility(ESlateVisibility::Visible);
+		inventoryWidget->GenerateInventory();
+		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, inventoryWidget);
+		bShowMouseCursor = true;
+	}
+}
+
+void ABasePlayerController::CloseInventory()
+{
+	if (inventoryWidget->GetVisibility() == ESlateVisibility::Visible)
+	{
+		inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+		UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
+		bShowMouseCursor = false;
+	}
+}
+
 void ABasePlayerController::LoadInventories()
 {
 	if (inventoryWidget)
 	{
 		if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
 		{
-			inventoryWidget->SetVisibility(ESlateVisibility::Visible);
-			inventoryWidget->GenerateInventory();
-			UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, inventoryWidget);
+			OpenInventory();
 		}
 		else
 		{
-			inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
-			UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
+			CloseInventory();
 		}
-		ShowCursor();
 	}
 }

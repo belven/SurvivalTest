@@ -45,6 +45,8 @@ public:
 	void OnPrimaryAction();
 	void MoveForward(float Val);
 	void MoveRight(float Val);
+	void OpenInventory();
+	void CloseInventory();
 	void LoadInventories();
 
 	ABaseCharacter* GetBaseCharacter() const { return baseCharacter; }

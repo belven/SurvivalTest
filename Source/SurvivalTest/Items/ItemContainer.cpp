@@ -176,7 +176,6 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 					if (itemToTransfer.amount == 0)
 					{
 						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
-						oldData.ID = UItemStructs::InvalidInt;
 						other->OnItemRemoved.Broadcast(oldData);
 					}
 					else {
@@ -234,7 +233,6 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 						if (itemToTransfer.amount == 0)
 						{
 							GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
-							itemToTransfer.ID = UItemStructs::InvalidInt;
 							other->OnItemRemoved.Broadcast(itemToTransfer);
 						}
 						// If there's still some left, try and add the remainder to the next empty slot
@@ -263,7 +261,6 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 			GetGame()->AddUpdateData(itemToTransfer);
 
 			// Tell our listeners that we've made changes, so things like UI can be updated
-			oldData.ID = UItemStructs::InvalidInt;
 			other->OnItemRemoved.Broadcast(oldData);
 			OnItemAdded.Broadcast(itemToTransfer);
 		}
@@ -565,6 +562,9 @@ FInstanceItemData UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 			{
 				itemToRemove.amount = 0;
 				item.amount -= amountToTake;
+
+				GetGame()->AddUpdateData(item);
+				OnItemUpdated.Broadcast(item);
 			}
 		}
 

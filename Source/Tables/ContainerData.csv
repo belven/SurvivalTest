@@ -1,7 +1,7 @@
 "0","0","Zero Base","","End"
 "1","5","Five base","","End"
 "2","10","Ten base","","End"
-"3","8","Character Inventory","","End"
+"3","15","Character Inventory","","End"
 "4","20","Wooden Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Crate.Crate'","Civilian"
 "5","5","Medical Case","StaticMesh'/Game/FirstPerson/LootBoxes/Medical_Case.Medical_Case'","Medical"
 "6","10","Medical Supplies","StaticMesh'/Game/FirstPerson/LootBoxes/Medical_Supplies.Medical_Supplies'","Medical"

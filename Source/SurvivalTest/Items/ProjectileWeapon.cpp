@@ -28,14 +28,28 @@ void UProjectileWeapon::UseWeapon(const FRotator& LookAtRotation)
 
 		if (instanceWeaponData.ammo == 0)
 		{
-			canAttack = false;
-			mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, projectileWeaponData.reloadSpeed);
+			int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
+
+			if (ammoLeft > 0) {
+				canAttack = false;
+				mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, projectileWeaponData.reloadSpeed);
+			}
 		}
 	}
 }
 
 void UProjectileWeapon::ReloadExpired()
 {
-	canAttack = true;
-	instanceWeaponData.ammo = projectileWeaponData.magazineSize;
+	int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
+	int32 ammoToTake = FMath::Min(ammoLeft, projectileWeaponData.magazineSize);
+
+	if (ammoLeft > 0) {
+		FInstanceItemData iid;
+		iid.amount = ammoToTake;
+		iid.itemID = GetProjectileWeaponData().ammoID;
+		GetCharacterOwner()->GetInventory()->RemoveItem(iid);
+
+		canAttack = true;
+		instanceWeaponData.ammo = ammoToTake;
+	}
 }

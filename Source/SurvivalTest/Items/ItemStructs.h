@@ -180,7 +180,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 rangedWeaponID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
-	FString projectileClass = "";
+	int32 ammoID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 magazineSize = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")

@@ -2,6 +2,7 @@
 #include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
+#include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/HelperFunctions.h"
 
@@ -22,7 +23,8 @@ ALootBox::~ALootBox()
 
 void ALootBox::SetUpBox()
 {
-	if (!containerData.mesh.Equals("")) {
+	if (!containerData.mesh.Equals(""))
+	{
 		UStaticMesh* mesh = LoadObject<UStaticMesh>(this, *containerData.mesh);
 		boxMeshComp->SetStaticMesh(mesh);
 		//boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -35,7 +37,8 @@ void ALootBox::BeginPlay()
 	Super::BeginPlay();
 	SetActorHiddenInGame(false);
 
-	if (!defaultContainer.Equals("")) {
+	if (!defaultContainer.Equals(""))
+	{
 		for (auto cd : GetGame()->GetTableManager()->GetContainerData()->GetData())
 		{
 			if (cd.Value.name.Equals(defaultContainer))
@@ -52,6 +55,7 @@ void ALootBox::BeginPlay()
 
 void ALootBox::Interact(ABasePlayerController* instigator)
 {
+	instigator->OpenInventory();
 }
 
 void ALootBox::Highlight(bool activate)
@@ -136,7 +140,6 @@ FInstanceItemData ALootBox::CreateLoot(FItemData id)
 
 void ALootBox::ItemAdded(FInstanceItemData inItem)
 {
-
 }
 
 void ALootBox::RemoveLootBox()
