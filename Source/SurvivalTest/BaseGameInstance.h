@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #pragma once
 #include "CoreMinimal.h"
+#include "MainLight.h"
 #include "Engine/GameInstance.h"
 #include "Items/ItemStructs.h"
 #include "Kismet/GameplayStatics.h"
@@ -61,11 +62,14 @@ public:
 	int32 GetNextInstanceArmourDataID();
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
-	
+
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return tableManager->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
+	void SetMainLight(AMainLight* inMainLight) { mainLight = inMainLight; }
+
+	AMainLight* GetMainLight() const { return mainLight; }
 
 	TArray<APatrolPath*> paths;
 
@@ -85,6 +89,9 @@ private:
 
 	UPROPERTY()
 	UMissionManager* missionManager;
+
+	UPROPERTY()
+	AMainLight* mainLight;
 
 	UPROPERTY()
 	URPGEventManager* eventManager;

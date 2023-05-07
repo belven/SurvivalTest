@@ -15,9 +15,9 @@ void UMissionManager::AddMission(AMission* inMission)
 void UMissionManager::StartPlay()
 {
 	TArray<EMissionType> types;
-	//types.Add(EMissionType::Civilian);
+	types.Add(EMissionType::Civilian);
 	types.Add(EMissionType::Medical);
-	//types.Add(EMissionType::Military);
+	types.Add(EMissionType::Military);
 	//types.Add(EMissionType::Secret);
 
 	// Spawn Random Missions
