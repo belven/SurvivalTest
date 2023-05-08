@@ -72,11 +72,6 @@ UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData da
 	return nullptr;
 }
 
-bool UItemContainerUI::IsArmour(FItemData id)
-{
-	return id.type == EItemType::Armour;
-}
-
 UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widgets)
 {
 	for(UWidget* widget : widgets)

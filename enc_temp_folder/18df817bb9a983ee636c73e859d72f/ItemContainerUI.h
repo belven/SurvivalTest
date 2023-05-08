@@ -69,8 +69,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UItemContainer* GetItemContainerForArmour(FInstanceItemData data);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool IsArmour(FItemData id);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -83,9 +81,6 @@ public:
 		void ItemRemoved(FInstanceItemData inItem);
 
 private:
-	UPROPERTY()
-		UInventoryUI* inventory;
-
 	UPROPERTY()
 		UItemContainer* container;
 
