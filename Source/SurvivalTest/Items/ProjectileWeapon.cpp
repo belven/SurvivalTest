@@ -1,11 +1,14 @@
 #include "ProjectileWeapon.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BaseProjectile.h"
 
 #define mSetReloadTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, GetProjectileWeaponData().reloadSpeed)
 
 #define mSetFireTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::AttackComplete, GetWeaponData().useRate)
+
+#define mSetRecoilResetTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_RecoilReset, &UProjectileWeapon::RecoilReset, 0.33)
 
 void UProjectileWeapon::UseWeapon(const FRotator& LookAtRotation)
 {
@@ -45,24 +48,29 @@ void UProjectileWeapon::ConsumeAmmo()
 void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 {
 	FVector startLoc = GetCharacterOwner()->GetActorLocation() + (GetCharacterOwner()->GetActorForwardVector() * 30);
-		
+	const FVector gunLocation = startLoc + GunOffset;
 	FRotator rot = FireRotation;
 
-	double percent =1 - GetRangedWeaponData().accuracy ;
-	rot.Pitch += FMath::RandRange(-(rot.Pitch * percent), rot.Pitch * percent);
-	rot.Roll += FMath::RandRange(-(rot.Roll * percent), rot.Roll * percent);
-	rot.Yaw += FMath::RandRange(-(rot.Yaw * percent), rot.Yaw * percent);
-	const FVector gunLocation = startLoc + GunOffset;
+	if (!firstShot) {
+		double angle = 360 * (1 - GetRangedWeaponData().accuracy);
+		rot = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FireRotation.Vector(), angle).Rotation();
+	}
+	else
+	{
+		firstShot = false;
+	}
 	
-
 	ABaseProjectile* proj = UWeapon::SpawnProjectile(gunLocation, rot, ABaseProjectile::StaticClass());
 	FVector velocity = FVector(1.f, 0.f, 0.f).GetSafeNormal() * GetProjectileWeaponData().bulletVelocity;
 	proj->GetProjectileMovement()->SetVelocityInLocalSpace(velocity);
+
+	mSetRecoilResetTimer();
 }
 
 void UProjectileWeapon::Reload()
 {
 	canAttack = false;
+	RecoilReset();
 	mSetReloadTimer();
 }
 
@@ -84,4 +92,9 @@ void UProjectileWeapon::ReloadExpired()
 		canAttack = true;
 		OnReloadComplete.Broadcast();
 	}
+}
+
+void UProjectileWeapon::RecoilReset()
+{
+	firstShot = true;
 }

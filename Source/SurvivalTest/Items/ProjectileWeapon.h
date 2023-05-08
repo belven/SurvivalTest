@@ -24,9 +24,11 @@ public:
 	FReloadComplete OnReloadComplete;
 
 	FTimerHandle TimerHandle_ReloadExpired;
+	FTimerHandle TimerHandle_RecoilReset;
 	void ReloadExpired();
+	void RecoilReset();
 protected:
 	FProjectileWeaponData projectileWeaponData;
 	int32 currentAmmo;
-	
+	bool firstShot;
 };
