@@ -32,6 +32,11 @@ public:
 
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
+
+	UFUNCTION()
+	void Reload();
+
+	bool HasAmmoForWeapon();
 	void OnPrimaryActionReleased();
 	void OnPrimaryWeapon();
 	void OnSecondaryWeapon();
@@ -40,6 +45,7 @@ public:
 	void LeanRight();
 	void LeanLeft();
 	void LeanCenter();
+
 	virtual void SetupInputComponent() override;
 	void ShowCursor();
 	void OnPrimaryAction();

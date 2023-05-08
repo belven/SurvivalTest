@@ -28,20 +28,25 @@ void UProjectileWeapon::UseWeapon(const FRotator& LookAtRotation)
 
 		if (instanceWeaponData.ammo == 0)
 		{
-			int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
-
-			if (ammoLeft > 0) {
-				canAttack = false;
-				mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, projectileWeaponData.reloadSpeed);
-			}
+			OnOutOfAmmo.Broadcast();		
 		}
+	}
+}
+
+void UProjectileWeapon::Reload()
+{
+	int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
+
+	if (ammoLeft > 0) {
+		canAttack = false;
+		mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, projectileWeaponData.reloadSpeed);
 	}
 }
 
 void UProjectileWeapon::ReloadExpired()
 {
 	int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
-	int32 ammoToTake = FMath::Min(ammoLeft, projectileWeaponData.magazineSize);
+	int32 ammoToTake = FMath::Min(ammoLeft, projectileWeaponData.magazineSize - GetInstanceWeaponData().ammo);
 
 	if (ammoLeft > 0) {
 		FInstanceItemData iid;
@@ -50,6 +55,7 @@ void UProjectileWeapon::ReloadExpired()
 		GetCharacterOwner()->GetInventory()->RemoveItem(iid);
 
 		canAttack = true;
-		instanceWeaponData.ammo = ammoToTake;
+		instanceWeaponData.ammo = GetInstanceWeaponData().ammo + ammoToTake;
+		owner->GetGame()->AddUpdateData(instanceWeaponData);		
 	}
 }

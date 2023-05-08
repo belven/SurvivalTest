@@ -53,14 +53,37 @@ void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowin
 	finishedMove = true;
 }
 
+void ABaseAIController::OutOfAmmo()
+{
+	if(HasAmmoForWeapon())
+	{
+		Reload();
+	}
+}
+
+void ABaseAIController::WeaponEquipped()
+{
+	if (GetBaseCharacter()->GetEquippedWeapon()
+		&& GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+		pw->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
+	}
+}
+
 void ABaseAIController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	AICharacter = mAsBaseCharacter(aPawn);
+	AICharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABaseAIController::WeaponEquipped);
+
+	if(AICharacter->GetEquippedWeapon())
+	{
+		WeaponEquipped();
+	}
 
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 13000;
-	//SetPathFollowingComponent(NewObject<UCrowdFollowingComponent>());
 
 	GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABaseAIController::MoveComplete);
 
@@ -268,6 +291,32 @@ void ABaseAIController::CalculateCombat()
 		lastKnowLocation = target->asActor()->GetActorLocation();
 		MoveToCombatLocation();
 	}
+}
+
+bool ABaseAIController::HasAmmoForWeapon()
+{
+	if(GetBaseCharacter()->GetEquippedWeapon())
+	{
+		if (GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+		{
+			UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+
+			return GetBaseCharacter()->GetInventory()->GetItemAmount(pw->GetProjectileWeaponData().ammoID) > 0;
+		}
+		return true;
+
+	}
+	return false;
+}
+
+void ABaseAIController::Reload()
+{
+	if (GetBaseCharacter()->GetEquippedWeapon() 
+		&& GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+		pw->Reload();
+	}	
 }
 
 FVector ABaseAIController::GetPredictedLocation(AActor* actor) {

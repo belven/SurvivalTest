@@ -9,6 +9,7 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "Components/TimelineComponent.h"
+#include "Items/ProjectileWeapon.h"
 #include "UI/HUDUI.h"
 
 class ABaseCharacter;
@@ -81,11 +82,38 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
 	baseCharacter->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
+	InputComponent->BindAction("Reload", IE_Pressed, this, &ABasePlayerController::Reload);
 
 	InputComponent->BindAction("Jump", IE_Pressed, GetCharacter(), &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, GetCharacter(), &ACharacter::StopJumping);
 	InputComponent->BindAxis("Turn Right / Left Mouse", GetCharacter(), &APawn::AddControllerYawInput);
 	InputComponent->BindAxis("Look Up / Down Mouse", GetCharacter(), &APawn::AddControllerPitchInput);
+}
+
+void ABasePlayerController::Reload()
+{
+	if (GetBaseCharacter()->GetEquippedWeapon()
+		&& GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+		pw->Reload();
+	}
+}
+
+bool ABasePlayerController::HasAmmoForWeapon()
+{
+	if (GetBaseCharacter()->GetEquippedWeapon())
+	{
+		if (GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+		{
+			UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+
+			return GetBaseCharacter()->GetInventory()->GetItemAmount(pw->GetProjectileWeaponData().ammoID) > 0;
+		}
+		return true;
+
+	}
+	return false;
 }
 
 void ABasePlayerController::OnPrimaryActionReleased()

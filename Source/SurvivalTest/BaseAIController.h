@@ -39,12 +39,21 @@ public:
 	void Patrol();
 	void KillAI();
 	void CalculateCombat();
+	bool HasAmmoForWeapon();
+	void Reload();
 	FVector GetPredictedLocation(AActor* actor);
 	void AttackWithWeapon(FRotator FireDirection);
 	void LookAt(FVector lookAtLocation);
 	
 	void MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result);
 
+	UFUNCTION()
+	void OutOfAmmo();
+
+	UFUNCTION()
+	void WeaponEquipped();
+
+	UFUNCTION()
 	virtual void OnPossess(APawn* aPawn) override;
 	void FindNewTarget();
 	virtual void EventTriggered(UBaseEvent* inEvent) override;

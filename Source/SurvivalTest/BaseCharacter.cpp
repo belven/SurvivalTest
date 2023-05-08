@@ -257,8 +257,11 @@ void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
 {
 	equippedWeapon = weapon;
 
-	if (equippedWeapon)
+	if (equippedWeapon) {
 		equippedWeapon->SetOwner(this);
+	}
+
+	OnWeaponEquipped.Broadcast();
 }
 
 UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)

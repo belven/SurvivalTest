@@ -22,6 +22,7 @@ class UItemContainer;
 class UWeapon;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponEquipped);
 
 USTRUCT(BlueprintType)
 struct FCharacterStats
@@ -88,6 +89,8 @@ public:
 	void EquipArmour(UArmour* armour);
 
 	UStaticMesh* GetItemMesh(FItemData data);
+
+	FWeaponEquipped OnWeaponEquipped;
 
 	virtual EFaction GetFaction() override { return faction; }
 	void SetFaction(EFaction inFaction) { faction = inFaction; }

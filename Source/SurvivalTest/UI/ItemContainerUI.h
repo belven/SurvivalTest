@@ -6,6 +6,7 @@
 
 class UBaseGameInstance;
 class UItemUI;
+class UInventoryUI;
 
 UCLASS(Blueprintable)
 class SURVIVALTEST_API UItemContainerUI : public UUserWidget
