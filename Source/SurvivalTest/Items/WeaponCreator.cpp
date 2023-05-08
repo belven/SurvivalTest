@@ -33,7 +33,6 @@ UWeapon* UWeaponCreator::CreateWeapon(const int32 itemID, const UWorld* world, i
 			}
 
 			pw->SetInstanceWeaponData(iwd);
-
 			weaponOut = pw;
 		}
 		else if (w.type == EWeaponType::Melee) {

@@ -10,8 +10,8 @@ ABaseLight::ABaseLight()
 void ABaseLight::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	 game = Cast<UBaseGameInstance>(GetGameInstance());
+
+	game = Cast<UBaseGameInstance>(GetGameInstance());
 }
 
 void ABaseLight::Tick(float DeltaTime)

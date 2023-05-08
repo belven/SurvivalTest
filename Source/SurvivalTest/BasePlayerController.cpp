@@ -113,9 +113,8 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 	FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
 
 	UWeapon* equippedWeapon = mCurrentWeapon();
-
-	// TODO need to check if we are quipping the same weapon
-	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetWeaponData().gearType != type))
+	
+	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
 	{
 		GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID));
 	}

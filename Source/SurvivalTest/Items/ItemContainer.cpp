@@ -194,8 +194,11 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 					GetGame()->AddUpdateData(existingItem);
 					GetGame()->AddUpdateData(itemToTransfer);
 
-					OnItemUpdated.Broadcast(existingItem);
-					OnItemUpdated.Broadcast(itemToTransfer);
+					other->OnItemAdded.Broadcast(existingItem);
+					other->OnItemRemoved.Broadcast(oldData);
+
+					OnItemRemoved.Broadcast(existingItem);
+					OnItemAdded.Broadcast(itemToTransfer);
 				}
 			}
 			else

@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "Blueprint/UserWidget.h"
 #include "UObject/NoExportTypes.h"
 #include "HelperFunctions.generated.h"
 
@@ -20,6 +21,21 @@ class SURVIVALTEST_API UHelperFunctions : public UObject
 {
 	GENERATED_BODY()
 public:
+	UFUNCTION(BlueprintCallable)
+	static void ToggleUIVisibility(UUserWidget* widget)
+	{
+		if (widget) {
+			if (widget->GetVisibility() == ESlateVisibility::Visible)
+			{
+				widget->SetVisibility(ESlateVisibility::Collapsed);
+			}
+			else
+			{
+				widget->SetVisibility(ESlateVisibility::Visible);
+			}
+		}
+	}
+
 		 template<class T> static T GetRandom(TArray<T> itemArray) {
 			 return itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
 		 }

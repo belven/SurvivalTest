@@ -1,8 +1,10 @@
 #include "ItemUI.h"
 
+#include "Components/Image.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Items/ItemContainer.h"
+#include "Widgets/Images/SImage.h"
 
 void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemData, UItemContainer* inItemContainer)
 {
@@ -40,10 +42,35 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
+FString UItemUI::GetItemAmount()
+{
+	return instanceItemData.amount == 1 ? "" : FString::FromInt(instanceItemData.amount);
+}
+
 UTexture2D* UItemUI::GetItemIcon()
 {
 	if (GetItemData().icon.Equals(""))
 		return nullptr;
 
 	return LoadObject<UTexture2D>(this, *GetItemData().icon);
+}
+
+void UItemUI::SetImage(UImage* image)
+{
+	if(!GetItemData().icon.Equals(""))
+	{
+		FSlateBrush imageB;
+		imageB.ImageSize = FVector2D(imageSize);
+		imageB.SetResourceObject(GetItemIcon());
+		image->SetBrush(imageB);
+		image->SetColorAndOpacity(FLinearColor::White);
+	}
+}
+
+void UItemUI::ClearItemData()
+{
+	FInstanceItemData iid;
+	iid.slot = GetInstanceItemData().slot;
+	SetInstanceItemData(iid);
+	SetItemData(FItemData());
 }

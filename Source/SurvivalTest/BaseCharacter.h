@@ -77,7 +77,7 @@ public:
 	static const FVector rightLean;
 
 	UPROPERTY()
-	UNavigationInvokerComponent* navInvoker;	
+	UNavigationInvokerComponent* navInvoker;
 
 	UCameraComponent* GetBaseCameraComponent() const { return baseCameraComponent; }
 
@@ -109,7 +109,7 @@ public:
 
 	void Consume(EConsumableType type, int32 value);
 #pragma endregion Stats
-	
+
 #pragma region Interactables
 	void GetOverlapsOnSpawn();
 	void AddInteractable(IInteractable* inter);
@@ -123,10 +123,10 @@ public:
 	int32 GetNearbyContainersNum() { return overlappingInteractables.Num(); }
 
 	UFUNCTION()
-		void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
+	void EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* otherActor, UPrimitiveComponent* otherComp, int32 otherBodyIndex);
 
 	UFUNCTION()
-		void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 #pragma endregion Interactables
 
@@ -140,20 +140,26 @@ public:
 
 	UBaseGameInstance* GetGame() const { return game; }
 	void SetGame(UBaseGameInstance* inGame) { game = inGame; }
-	
+
 	UFUNCTION()
 	void ItemAdded(FInstanceItemData inItem);
 
 	UFUNCTION()
 	void ItemRemoved(FInstanceItemData inItem);
+	UFUNCTION()
+	void ItemUpdated(FInstanceItemData inItem);
+
 	TArray<int32> GetSlotForGear(EGearType type);
 	int32 GetPrimaryWeaponSlot();
 	int32 GetSecondaryWeaponSlot();
 	int32 GetSidearmWeaponSlot();
+
+	UFUNCTION()
 	void SetupLoadout(FString loadoutName);
-	
+
+
 #pragma endregion Inventory
-	
+
 protected:
 	static float interactionRadius;
 	void ResetStats();
@@ -165,7 +171,7 @@ protected:
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
 
 	UPROPERTY()
-		UStaticMeshComponent* weaponMeshComp;
+	UStaticMeshComponent* weaponMeshComp;
 
 	UPROPERTY()
 	USphereComponent* interactionSphere;
