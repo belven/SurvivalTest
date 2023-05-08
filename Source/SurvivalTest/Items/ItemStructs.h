@@ -391,7 +391,7 @@ public:
 		amount += amountToTake;
 		itemToAdd.amount -= amountToTake;
 	}
-
+	
 	FInstanceItemData CopyItem(int32 emptySlot, int32 nextID, int32 instanceContainerID)
 	{
 		FInstanceItemData newData;

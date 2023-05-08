@@ -19,8 +19,8 @@ UStaticMesh* UWeapon::GetItemMesh()
 
 void UWeapon::SetOwner(ABaseCharacter* val)
 {
-	owner = val;
-	owner->GetWeaponMeshComp()->SetStaticMesh(GetItemMesh());
+	characterOwner = val;
+	characterOwner->GetWeaponMeshComp()->SetStaticMesh(GetItemMesh());
 }
 
 void UWeapon::AttackComplete()

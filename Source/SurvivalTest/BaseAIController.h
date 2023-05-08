@@ -38,6 +38,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void Patrol();
 	void KillAI();
+	bool IsInWeaponsRange(float dist);
 	void CalculateCombat();
 	bool HasAmmoForWeapon();
 	void Reload();
@@ -49,6 +50,9 @@ public:
 
 	UFUNCTION()
 	void OutOfAmmo();
+
+	UFUNCTION()
+	void ReloadComplete();
 
 	UFUNCTION()
 	void WeaponEquipped();

@@ -12,7 +12,7 @@ void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 	if (canAttack) {
 		canAttack = false;
 
-		mSetTimerWorld(owner->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::AttackComplete, GetWeaponData().useRate);
+		mSetTimerWorld(characterOwner->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::AttackComplete, GetWeaponData().useRate);
 		TArray<FHitResult> hits;
 		TArray<IDamagable*> hitTargets;
 		TArray<AActor*> ignore;

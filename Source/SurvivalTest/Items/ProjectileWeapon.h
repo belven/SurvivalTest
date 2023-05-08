@@ -4,6 +4,7 @@
 #include "ProjectileWeapon.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfAmmo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadComplete);
 
 UCLASS()
 class SURVIVALTEST_API UProjectileWeapon : public URangedWeapon
@@ -13,9 +14,14 @@ public:
 	FProjectileWeaponData GetProjectileWeaponData() const { return projectileWeaponData; }
 	void SetProjectileWeaponData(FProjectileWeaponData data) { projectileWeaponData = data; currentAmmo = data.magazineSize;  }
 	virtual void UseWeapon(const FRotator& LookAtRotation) override;
+	bool HasAmmo();
+	void SetCanFireTimer();
+	void ConsumeAmmo();
+	void SpawnProjectile(const FRotator& FireRotation);
 	void Reload();
 
 	FOutOfAmmo OnOutOfAmmo;
+	FReloadComplete OnReloadComplete;
 
 	FTimerHandle TimerHandle_ReloadExpired;
 	void ReloadExpired();

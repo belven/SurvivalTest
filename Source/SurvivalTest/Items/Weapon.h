@@ -6,7 +6,7 @@
 #include "SurvivalTest/HelperFunctions.h"
 #include "Weapon.generated.h"
 
-#define mSpawnProjectile(projectileClass) owner->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
+#define mSpawnProjectile(projectileClass) GetCharacterOwner()->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
 
 class ABaseCharacter;
 class ABaseProjectile;
@@ -20,14 +20,14 @@ public:
 	UWeapon();
 	UStaticMesh* GetItemMesh();
 
-	FInstanceWeaponData GetInstanceWeaponData() const { return instanceWeaponData; }
+	FInstanceWeaponData& GetInstanceWeaponData() { return instanceWeaponData; }
 	void SetInstanceWeaponData(FInstanceWeaponData inInstanceWeaponData) { instanceWeaponData = inInstanceWeaponData; }
 
-	FWeaponData GetWeaponData() const { return weaponData; }
+	FWeaponData& GetWeaponData() { return weaponData; }
 	void SetWeaponData(FWeaponData data) { weaponData = data; }
 	virtual void UseWeapon(const FRotator& LookAtRotation);
 
-	ABaseCharacter* GetCharacterOwner() const { return owner; }
+	ABaseCharacter* GetCharacterOwner() const { return characterOwner; }
 	void SetOwner(ABaseCharacter* val);
 
 	void AttackComplete();
@@ -40,7 +40,7 @@ protected:
 	FTimerHandle TimerHandle_ShotTimerExpired;
 
 	UPROPERTY()
-	ABaseCharacter* owner;
+	ABaseCharacter* characterOwner;
 
 	UPROPERTY()
 	UStaticMeshComponent* weaponMeshComp;
