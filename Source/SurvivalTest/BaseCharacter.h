@@ -22,7 +22,7 @@ class UItemContainer;
 class UWeapon;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponEquipped);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponEquipped, UWeapon*, oldWeapon);
 
 USTRUCT(BlueprintType)
 struct FCharacterStats

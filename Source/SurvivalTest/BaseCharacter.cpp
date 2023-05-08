@@ -230,10 +230,11 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 
 				if (wd.type == EWeaponType::Projectile)
 				{
-					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(wd.ID);
+					FRangedWeaponData rwd = GetGame()->GetRangedWeaponData(wd.ID);
+					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
 
-					for (int i = 0; i < 3; ++i)
+					for (int i = 0; i < 2; ++i)
 					{
 						iid.amount = ammoData.maxStack;
 						iid.itemID = pwd.ammoID;
@@ -255,13 +256,14 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
  */
 void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
 {
+	UWeapon* oldWeapon = equippedWeapon;
 	equippedWeapon = weapon;
 
 	if (equippedWeapon) {
 		equippedWeapon->SetOwner(this);
 	}
 
-	OnWeaponEquipped.Broadcast();
+	OnWeaponEquipped.Broadcast(oldWeapon);
 }
 
 UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)

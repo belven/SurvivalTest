@@ -69,7 +69,6 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	leanTimeline.TickTimeline(DeltaTime);
 
-
 	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr)
 	{
 		mCurrentWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation());
@@ -82,7 +81,12 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
 	baseCharacter->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
-	InputComponent->BindAction("Reload", IE_Pressed, this, &ABasePlayerController::Reload);
+	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
+
+	if (baseCharacter->GetEquippedWeapon())
+	{
+		WeaponEquipped(nullptr);
+	}
 
 	InputComponent->BindAction("Jump", IE_Pressed, GetCharacter(), &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, GetCharacter(), &ACharacter::StopJumping);
@@ -90,28 +94,59 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	InputComponent->BindAxis("Look Up / Down Mouse", GetCharacter(), &APawn::AddControllerPitchInput);
 }
 
+void ABasePlayerController::OutOfAmmo()
+{
+	Reload();
+}
+
+void ABasePlayerController::ReloadComplete()
+{
+
+}
+
+void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
+{
+	if (oldWeapon && oldWeapon->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
+		pw->OnOutOfAmmo.RemoveAll(this);
+		pw->OnReloadComplete.RemoveAll(this);
+	}
+
+	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
+
+	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
+		pw->OnOutOfAmmo.AddUniqueDynamic(this, &ABasePlayerController::OutOfAmmo);
+		pw->OnReloadComplete.AddUniqueDynamic(this, &ABasePlayerController::ReloadComplete);
+	}
+}
+
 void ABasePlayerController::Reload()
 {
-	if (GetBaseCharacter()->GetEquippedWeapon()
-		&& GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
+
+	if (weapon	&& weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
 		pw->Reload();
 	}
 }
 
 bool ABasePlayerController::HasAmmoForWeapon()
 {
-	if (GetBaseCharacter()->GetEquippedWeapon())
+	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
+
+	if (weapon)
 	{
-		if (GetBaseCharacter()->GetEquippedWeapon()->GetWeaponData().type == EWeaponType::Projectile)
+		if (weapon->GetWeaponData().type == EWeaponType::Projectile)
 		{
-			UProjectileWeapon* pw = Cast<UProjectileWeapon>(GetBaseCharacter()->GetEquippedWeapon());
+			UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
 
 			return GetBaseCharacter()->GetInventory()->GetItemAmount(pw->GetProjectileWeaponData().ammoID) > 0;
 		}
 		return true;
-
 	}
 	return false;
 }
@@ -172,6 +207,8 @@ void ABasePlayerController::SetupInputComponent()
 
 	check(InputComponent);
 
+	InputComponent->BindAction("Reload", IE_Pressed, this, &ABasePlayerController::Reload);
+
 	InputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ABasePlayerController::OnPrimaryAction);
 	InputComponent->BindAction("PrimaryAction", IE_Released, this, &ABasePlayerController::OnPrimaryActionReleased);
 
@@ -186,6 +223,7 @@ void ABasePlayerController::SetupInputComponent()
 	InputComponent->BindAction("Sidearm", IE_Pressed, this, &ABasePlayerController::OnSidearm);
 	InputComponent->BindAction("Load Inventories", IE_Pressed, this, &ABasePlayerController::LoadInventories);
 	InputComponent->BindAction("Show Cursor", IE_Pressed, this, &ABasePlayerController::ShowCursor);
+
 	InputComponent->BindAxis("Move Forward / Backward", this, &ABasePlayerController::MoveForward);
 	InputComponent->BindAxis("Move Right / Left", this, &ABasePlayerController::MoveRight);
 }

@@ -3,6 +3,7 @@
 #include "AIController.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "Events/EventListener.h"
+#include "Items/Weapon.h"
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "Navigation/PathFollowingComponent.h"
@@ -55,7 +56,7 @@ public:
 	void ReloadComplete();
 
 	UFUNCTION()
-	void WeaponEquipped();
+	void WeaponEquipped(UWeapon* oldWeapon);
 
 	UFUNCTION()
 	virtual void OnPossess(APawn* aPawn) override;

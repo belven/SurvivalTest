@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/TimelineComponent.h"
 #include "Items/ItemStructs.h"
+#include "Items/Weapon.h"
 #include "BasePlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
@@ -32,6 +33,15 @@ public:
 
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
+
+	UFUNCTION()
+	void OutOfAmmo();
+
+	UFUNCTION()
+	void ReloadComplete();
+
+	UFUNCTION()
+		void WeaponEquipped(UWeapon* oldWeapon);
 
 	UFUNCTION()
 	void Reload();

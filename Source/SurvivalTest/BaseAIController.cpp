@@ -55,7 +55,7 @@ void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowin
 
 void ABaseAIController::OutOfAmmo()
 {
-	if(HasAmmoForWeapon())
+	if (HasAmmoForWeapon())
 	{
 		Reload();
 	}
@@ -63,14 +63,20 @@ void ABaseAIController::OutOfAmmo()
 
 void ABaseAIController::ReloadComplete()
 {
-	
 }
 
-void ABaseAIController::WeaponEquipped()
+void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
 {
+	if(oldWeapon && oldWeapon->GetWeaponData().type == EWeaponType::Projectile)
+	{
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
+		pw->OnOutOfAmmo.RemoveAll(this);
+		pw->OnReloadComplete.RemoveAll(this);
+	}
+
 	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
 
-	if (weapon	&& weapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
 		pw->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
@@ -84,9 +90,9 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	AICharacter = mAsBaseCharacter(aPawn);
 	AICharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABaseAIController::WeaponEquipped);
 
-	if(AICharacter->GetEquippedWeapon())
+	if (AICharacter->GetEquippedWeapon())
 	{
-		WeaponEquipped();
+		WeaponEquipped(nullptr);
 	}
 
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
@@ -189,7 +195,7 @@ void ABaseAIController::Tick(float DeltaTime)
 		{
 			CalculateCombat();
 		}
-		else if(target != NULL && target->IsDead())
+		else if (target != NULL && target->IsDead())
 		{
 			target = NULL;
 			FindNewTarget();
@@ -309,7 +315,7 @@ bool ABaseAIController::HasAmmoForWeapon()
 {
 	UWeapon* weapon = mCurrentWeapon();
 
-	if(weapon)
+	if (weapon)
 	{
 		if (weapon->GetWeaponData().type == EWeaponType::Projectile)
 		{
@@ -331,15 +337,16 @@ void ABaseAIController::Reload()
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
 		pw->Reload();
-	}	
+	}
 }
 
-FVector ABaseAIController::GetPredictedLocation(AActor* actor) {
+FVector ABaseAIController::GetPredictedLocation(AActor* actor)
+{
 	float lead;
 
 	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
 
-	if(weapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
 		lead = pw->GetProjectileWeaponData().bulletVelocity;
