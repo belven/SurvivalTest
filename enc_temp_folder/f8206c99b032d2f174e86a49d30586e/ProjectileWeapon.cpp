@@ -48,7 +48,7 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 		
 	FRotator rot = FireRotation;
 
-	double percent =1 - GetRangedWeaponData().accuracy ;
+	double percent = 0.01;
 	rot.Pitch += FMath::RandRange(-(rot.Pitch * percent), rot.Pitch * percent);
 	rot.Roll += FMath::RandRange(-(rot.Roll * percent), rot.Roll * percent);
 	rot.Yaw += FMath::RandRange(-(rot.Yaw * percent), rot.Yaw * percent);

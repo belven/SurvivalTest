@@ -18,20 +18,22 @@ UWeapon* UWeaponCreator::CreateWeapon(const int32 itemID, const UWorld* world, i
 		if (w.type == EWeaponType::Projectile)
 		{
 			UProjectileWeapon* pw = mNewObject(UProjectileWeapon);
-			pw->SetItemData(id);
-			pw->SetWeaponData(w);
-			pw->SetRangedWeaponData(gameIn->GetRangedWeaponData(w.ID));
-			pw->SetProjectileWeaponData(gameIn->GetProjectileWeaponData(pw->GetRangedWeaponData().ID));
-
+			FRangedWeaponData rwd = gameIn->GetRangedWeaponData(w.ID);
 			FInstanceWeaponData iwd = gameIn->GetInstanceWeaponDataByInstanceItemID(instanceItemID);
-
+			FProjectileWeaponData pwd = gameIn->GetProjectileWeaponData(rwd.ID);
+						
 			if (iwd.ID == UItemStructs::InvalidInt) {
 				iwd.ID = gameIn->GetNextInstanceWeaponDataID();
 				iwd.instanceItemID = instanceItemID;
 				iwd.mode = EFireMode::FullAuto;
-				iwd.ammo = pw->GetProjectileWeaponData().magazineSize;
+				iwd.ammo = pwd.magazineSize;
+				gameIn->AddUpdateData(iwd);
 			}
 
+			pw->SetItemData(id);
+			pw->SetWeaponData(w);
+			pw->SetRangedWeaponData(rwd);
+			pw->SetProjectileWeaponData(pwd);
 			pw->SetInstanceWeaponData(iwd);
 			weaponOut = pw;
 		}

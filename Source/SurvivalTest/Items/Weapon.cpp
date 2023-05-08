@@ -5,7 +5,7 @@
 
 UWeapon::UWeapon()
 {
-	GunOffset = FVector(100.f, 0.f, 0.f);
+	GunOffset = FVector(0.f, 0.f, 0.f);
 	canAttack = true;
 }
 

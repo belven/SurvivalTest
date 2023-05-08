@@ -97,14 +97,14 @@ FInstanceWeaponData UBaseGameInstance::GetInstanceWeaponDataByInstanceItemID(int
 
 int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
 {
-	int32 instanceContainerDataID = 0;
+	int32 instanceWeaponDataID = 0;
 	TMap<int32, FInstanceWeaponData> instancedWeapons = GetTableManager()->GetWeaponInstanceTable()->GetData();
 
 	if (instancedWeapons.Num() > 0)
 	{
-		instanceContainerDataID = instancedWeapons[instancedWeapons.Num() - 1].ID + 1;
+		instanceWeaponDataID = instancedWeapons[instancedWeapons.Num() - 1].ID + 1;
 	}
-	return instanceContainerDataID;
+	return instanceWeaponDataID;
 }
 
 TArray<FInstanceItemData> UBaseGameInstance::GetInstancedItemsForContainer(int32 instanceContainerID)
