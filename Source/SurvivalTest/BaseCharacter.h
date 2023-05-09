@@ -7,6 +7,7 @@
 #include "Interfaces/Interactable.h"
 #include "Interfaces/ItemContainerInterface.h"
 #include "Items/ItemStructs.h"
+#include "CharacterStructs.h"
 #include "BaseCharacter.generated.h"
 
 class UInputComponent;
@@ -25,57 +26,6 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponEquipped, UWeapon*, oldWeapon);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
 
-USTRUCT(BlueprintType)
-struct FCharacterStats
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	void CopyStats(FCharacterStats other)
-	{
-		health = other.health;
-		water = other.water;
-		hunger = other.hunger;
-		rest = other.rest;
-		stamina = other.stamina;
-		waterLossRate = other.waterLossRate;
-		hungerLossRate = other.hungerLossRate;
-		restLossRate = other.restLossRate;
-		staminaLossRate = other.staminaLossRate;
-		staminaRecoverRate = other.staminaRecoverRate;
-	}
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float health = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float water = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float hunger = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float stamina = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float rest = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float waterLossRate = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float hungerLossRate = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float restLossRate = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	float staminaLossRate = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-		float staminaRecoverRate = 0;
-};
-
 UCLASS(config = Game)
 class ABaseCharacter : public ACharacter, public IDamagable, public ITeam, public IItemContainerInterface, public IInteractable
 {
@@ -85,14 +35,18 @@ public:
 	ABaseCharacter();
 	void StopSprinting();
 	void StartSprinting();
+	void SetMovementSpeed(EMovementState state);
+	void SetMovementState(EMovementState inState);
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
+	void CalculateSprint(float DeltaSeconds);
 
 	static const FVector cameraCenter;
 	static const FVector leftLean;
 	static const FVector rightLean;
 
 	float baseWalkSpeed;
+	EMovementState currentMovementState;
 
 	UPROPERTY()
 	UNavigationInvokerComponent* navInvoker;
@@ -120,7 +74,7 @@ public:
 	float GetDamageAfterResistance(float damage);
 	int32 GetDamageResistance();
 
-	bool IsSprinting() { return isSprinting; }
+	bool IsSprinting() { return isRequestingSprint; }
 
 	virtual bool IsDead() override { return currentStats.health < 1; };
 
@@ -187,7 +141,7 @@ protected:
 	static float interactionRadius;
 	float timeMoved;
 	bool inCombat;
-	bool isSprinting;
+	bool isRequestingSprint;
 
 	void ResetStats();
 	virtual void BeginPlay() override;

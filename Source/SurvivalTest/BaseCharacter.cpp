@@ -40,6 +40,8 @@ void ABaseCharacter::ResetStats()
 	maxStats.rest = 100.0f;
 	maxStats.stamina = 100.0f;
 
+	currentMovementState = EMovementState::Base;
+
 	// Seconds
 	constexpr float minute = 60.0f;
 	constexpr float hour = 60.0f * minute;
@@ -85,22 +87,53 @@ ABaseCharacter::ABaseCharacter()
 
 void ABaseCharacter::StopSprinting()
 {
-	isSprinting = false;
+	isRequestingSprint = false;
 }
 
 void ABaseCharacter::StartSprinting()
 {
 	if (GetCurrentStats().stamina > 0) {
-		isSprinting = true;
+		isRequestingSprint = true;
+	}
+}
+
+void ABaseCharacter::SetMovementSpeed(EMovementState state)
+{
+	switch (state)
+	{
+	case EMovementState::Sprinting:
+		GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * 1.3;
+		break;
+	case EMovementState::Base:
+		GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
+		break;
+	case EMovementState::Steady:
+		GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * 0.8;
+		break;
+	case EMovementState::Slow:
+		GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * 0.5;
+		break;
+	default: ;
+	}
+}
+
+void ABaseCharacter::SetMovementState(EMovementState inState)
+{
+	if(currentMovementState != inState)
+	{
+		currentMovementState = inState;
+		SetMovementSpeed(inState);
 	}
 }
 
 void ABaseCharacter::Interact(ABasePlayerController* instigator)
 {
+
 }
 
 void ABaseCharacter::Highlight(bool activate)
 {
+
 }
 
 void ABaseCharacter::BeginPlay()
@@ -625,6 +658,46 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
+void ABaseCharacter::CalculateSprint(float DeltaSeconds)
+{
+	// Check if we're moving more than a low speed
+	if(!GetVelocity().IsNearlyZero())
+	{
+		timeMoved += DeltaSeconds;
+	}
+	// If we're not moving, reset timeMoved
+	else
+	{
+		timeMoved = 0;
+	}
+
+	// If we're sprinting and we've been moving for more than a third of a second, start sprinting speed
+	if(isRequestingSprint && timeMoved > 0.33)
+	{
+		// Consume Stamina
+		DrainStat(currentStats.stamina, currentStats.staminaLossRate, 0.0f, DeltaSeconds);
+
+		// Stop sprinting if we have no stamina
+		if(currentStats.stamina <= 0)
+		{
+			StopSprinting();
+			SetMovementState(EMovementState::Base);
+		}
+		else 
+		{
+			SetMovementState(EMovementState::Sprinting);
+		}
+	}
+	else if(currentStats.stamina <= maxStats.stamina)
+	{
+		currentStats.stamina += currentStats.staminaRecoverRate * DeltaSeconds;
+
+		SetMovementState(EMovementState::Base);
+	}
+
+	FMath::Clamp(currentStats.stamina, 0, maxStats.stamina);
+}
+
 /**
  * Almost entirely used for passive stat draining like food and water.
  */
@@ -645,31 +718,6 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 		DrainStat(currentStats.rest, currentStats.restLossRate, 0.25f, DeltaSeconds);
 		DrainStat(currentStats.hunger, currentStats.hungerLossRate, 0.1f, DeltaSeconds);
 
-		if(!GetVelocity().IsNearlyZero())
-		{
-			timeMoved += DeltaSeconds;
-		}
-		else
-		{
-			timeMoved = 0;
-		}
-
-		if(isSprinting && timeMoved > 0.35)
-		{
-			GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * 1.3;
-			DrainStat(currentStats.stamina, currentStats.staminaLossRate, 0.0f, DeltaSeconds);
-
-			if(currentStats.stamina <= 0)
-			{
-				StopSprinting();
-			}
-		}
-		else if(currentStats.stamina <= maxStats.stamina)
-		{
-			GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
-			currentStats.stamina += currentStats.staminaRecoverRate * DeltaSeconds;
-		}
-
-		FMath::Clamp(currentStats.stamina, 0, maxStats.stamina);
+		CalculateSprint(DeltaSeconds);
 	}
 }
