@@ -37,9 +37,12 @@ public:
 		water = other.water;
 		hunger = other.hunger;
 		rest = other.rest;
+		stamina = other.stamina;
 		waterLossRate = other.waterLossRate;
 		hungerLossRate = other.hungerLossRate;
 		restLossRate = other.restLossRate;
+		staminaLossRate = other.staminaLossRate;
+		staminaRecoverRate = other.staminaRecoverRate;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
@@ -52,6 +55,9 @@ public:
 	float hunger = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	float stamina = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	float rest = 0;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
@@ -62,6 +68,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	float restLossRate = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	float staminaLossRate = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+		float staminaRecoverRate = 0;
 };
 
 UCLASS(config = Game)
@@ -71,12 +83,16 @@ class ABaseCharacter : public ACharacter, public IDamagable, public ITeam, publi
 
 public:
 	ABaseCharacter();
+	void StopSprinting();
+	void StartSprinting();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 
 	static const FVector cameraCenter;
 	static const FVector leftLean;
 	static const FVector rightLean;
+
+	float baseWalkSpeed;
 
 	UPROPERTY()
 	UNavigationInvokerComponent* navInvoker;
@@ -103,6 +119,8 @@ public:
 
 	float GetDamageAfterResistance(float damage);
 	int32 GetDamageResistance();
+
+	bool IsSprinting() { return isSprinting; }
 
 	virtual bool IsDead() override { return currentStats.health < 1; };
 
@@ -167,8 +185,11 @@ public:
 
 protected:
 	static float interactionRadius;
-	void ResetStats();
+	float timeMoved;
 	bool inCombat;
+	bool isSprinting;
+
+	void ResetStats();
 	virtual void BeginPlay() override;
 
 	UFUNCTION()

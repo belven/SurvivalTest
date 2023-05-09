@@ -46,6 +46,9 @@ public:
 	UFUNCTION()
 	void Reload();
 
+	UFUNCTION()
+	void Sprint();
+
 	bool HasAmmoForWeapon();
 	void OnPrimaryActionReleased();
 	void OnPrimaryWeapon();

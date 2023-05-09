@@ -38,6 +38,7 @@ void ABaseCharacter::ResetStats()
 	maxStats.water = 100.0f;
 	maxStats.hunger = 100.0f;
 	maxStats.rest = 100.0f;
+	maxStats.stamina = 100.0f;
 
 	// Seconds
 	constexpr float minute = 60.0f;
@@ -48,7 +49,8 @@ void ABaseCharacter::ResetStats()
 	maxStats.waterLossRate = maxStats.water / dayLengthSeconds;
 	maxStats.hungerLossRate = maxStats.hunger / (dayLengthSeconds * 3.0f);
 	maxStats.restLossRate = maxStats.rest / (dayLengthSeconds * 5.0f);
-
+	maxStats.staminaLossRate = maxStats.stamina / 2.0f;
+	maxStats.staminaRecoverRate = maxStats.stamina / 5.0f;
 	currentStats.CopyStats(maxStats);
 }
 
@@ -79,6 +81,18 @@ ABaseCharacter::ABaseCharacter()
 	GetMesh()->SetCustomDepthStencilValue(2);
 	
 	ResetStats();
+}
+
+void ABaseCharacter::StopSprinting()
+{
+	isSprinting = false;
+}
+
+void ABaseCharacter::StartSprinting()
+{
+	if (GetCurrentStats().stamina > 0) {
+		isSprinting = true;
+	}
 }
 
 void ABaseCharacter::Interact(ABasePlayerController* instigator)
@@ -144,6 +158,8 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 	CreateNewItemForInventory(ld.chestArmourID);
 	CreateNewItemForInventory(ld.vestArmourID);
 	CreateNewItemForInventory(ld.legsArmourID);
+
+	baseWalkSpeed = ld.moveSpeed;
 
 	inventory->OnItemAdded.AddUniqueDynamic(this, &ABaseCharacter::ItemAdded);
 	inventory->OnItemUpdated.AddUniqueDynamic(this, &ABaseCharacter::ItemUpdated);
@@ -628,5 +644,32 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 		DrainStat(currentStats.water, currentStats.waterLossRate, 0.5f, DeltaSeconds);
 		DrainStat(currentStats.rest, currentStats.restLossRate, 0.25f, DeltaSeconds);
 		DrainStat(currentStats.hunger, currentStats.hungerLossRate, 0.1f, DeltaSeconds);
+
+		if(!GetVelocity().IsNearlyZero())
+		{
+			timeMoved += DeltaSeconds;
+		}
+		else
+		{
+			timeMoved = 0;
+		}
+
+		if(isSprinting && timeMoved > 0.35)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * 1.3;
+			DrainStat(currentStats.stamina, currentStats.staminaLossRate, 0.0f, DeltaSeconds);
+
+			if(currentStats.stamina <= 0)
+			{
+				StopSprinting();
+			}
+		}
+		else if(currentStats.stamina <= maxStats.stamina)
+		{
+			GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed;
+			currentStats.stamina += currentStats.staminaRecoverRate * DeltaSeconds;
+		}
+
+		FMath::Clamp(currentStats.stamina, 0, maxStats.stamina);
 	}
 }

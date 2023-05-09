@@ -9,6 +9,7 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "Components/TimelineComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Items/ProjectileWeapon.h"
 #include "UI/HUDUI.h"
 
@@ -201,6 +202,18 @@ void ABasePlayerController::LeanCenter()
 	leanTimeline.PlayFromStart();
 }
 
+void ABasePlayerController::Sprint()
+{
+	if (!GetBaseCharacter()->IsSprinting()) 
+	{
+		GetBaseCharacter()->StartSprinting();
+	}
+	else
+	{
+		GetBaseCharacter()->StopSprinting();
+	}
+}
+
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -208,6 +221,7 @@ void ABasePlayerController::SetupInputComponent()
 	check(InputComponent);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ABasePlayerController::Reload);
+	InputComponent->BindAction("Sprint", IE_Pressed, this, &ABasePlayerController::Sprint);
 
 	InputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ABasePlayerController::OnPrimaryAction);
 	InputComponent->BindAction("PrimaryAction", IE_Released, this, &ABasePlayerController::OnPrimaryActionReleased);

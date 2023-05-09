@@ -51,7 +51,7 @@ void ABaseAIController::LookAt(FVector lookAtLocation)
 
 void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result)
 {
-	finishedMove = true;
+	finishedMoving = true;
 }
 
 void ABaseAIController::OutOfAmmo()
@@ -210,6 +210,7 @@ void ABaseAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
 	if (GetBaseCharacter() != NULL && GetBaseCharacter()->IsDead())
 	{
 		KillAI();
@@ -240,7 +241,7 @@ void ABaseAIController::Patrol()
 {
 	// Check if we aren't moving or we have an invalid Path
 	// (the currentPathPoint is set to -1 when we didn't find any patrol paths in the world)
-	if (finishedMove && currentPathPoint > -1)
+	if (finishedMoving && currentPathPoint > -1)
 	{
 		// Do we already have a patrol path
 		if (currentPath == NULL)
@@ -265,7 +266,7 @@ void ABaseAIController::Patrol()
 
 		if (currentPath != NULL)
 		{
-			finishedMove = false;
+			finishedMoving = false;
 			// Get the spline of the patrol path
 			const USplineComponent* spline = currentPath->GetSpline();
 
@@ -304,17 +305,24 @@ void ABaseAIController::CalculateCombat()
 	const FVector targetLocation = target->asActor()->GetActorLocation() + FVector(0, 0, 50);
 	const UWeapon* weapon = mCurrentWeapon();
 
+	if (!finishedMoving && !GetBaseCharacter()->IsSprinting())
+	{
+		GetBaseCharacter()->StartSprinting();
+	}
+
 	// Can we see our current target?
 	if (canSee)
 	{
 		LookAt(targetLocation);
 
-		// if we haven't used an ability and have a valid weapon, attack the target
+		// if we have a valid weapon, attack the target
 		if (weapon != NULL)
 		{
 			// Check we're in range of the target
 			if (IsInWeaponsRange(FVector::Dist(mActorLocation, targetLocation)))
 			{
+				StopMovement();
+				GetBaseCharacter()->StopSprinting();
 				FVector targetLoc = GetPredictedLocation(target->asActor());
 				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(mActorLocation, targetLoc);
 				AttackWithWeapon(rotation);
@@ -329,7 +337,7 @@ void ABaseAIController::CalculateCombat()
 		}
 	}
 	// We can't see the target, make sure we're not already trying to move to the target
-	else if (finishedMove)
+	else if (finishedMoving)
 	{
 		// Move to the last known location
 		LookAt(lastKnowLocation);
@@ -389,7 +397,7 @@ FVector ABaseAIController::GetPredictedLocation(AActor* actor)
 
 void ABaseAIController::MoveToCombatLocation()
 {
-	finishedMove = false;
+	finishedMoving = false;
 	FindViableCombatLocationRequest.Execute(EEnvQueryRunMode::SingleResult, this, &ABaseAIController::WeaponLocationQueryFinished);
 }
 
@@ -422,7 +430,7 @@ bool ABaseAIController::FindAllyWithAmmo()
 	{
 		if (ally->IsDead() && HasAmmo(ally))
 		{
-			finishedMove = false;
+			finishedMoving = false;
 			MoveToActor(ally);
 			return true;
 		}
@@ -432,32 +440,49 @@ bool ABaseAIController::FindAllyWithAmmo()
 
 void ABaseAIController::EquipKnife()
 {
+	bool knifeEquipped = false;
 	UBaseGameInstance* game = GetBaseCharacter()->GetGame();
 	int32 containerID = GetBaseCharacter()->GetInventory()->GetInstanceContainerData().ID;
 
+	// Get the AIs inventory items
 	for (auto iid : game->GetInstancedItemsForContainer(containerID))
 	{
 		FItemData id = game->GetItemData(iid.itemID);
+
+		// Find the knife, all AI should have one by default
 		if (id.name.Equals("Knife"))
 		{
 			GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID));
+			knifeEquipped = true;
 			break;
 		}
+	}
+
+	if (!knifeEquipped)
+	{
+		GetBaseCharacter()->SetEquippedWeapon(nullptr);
 	}
 }
 
 void ABaseAIController::GetAmmo()
 {
-	if (finishedMove)
+	// Have we finished moving?
+	if (finishedMoving)
 	{
+		// Set that we need ammo
+		// Either Tick has run HasAmmoForWeapon or OutOfAmmo has run HasAmmoForWeapon
 		needsAmmo = true;
 
+		// See if there's any allies with ammo nearby
 		GetNearbyAmmo();
 
+		// Do we still need ammo?
 		if (needsAmmo)
 		{
+			// Find an ally we've seen, with ammo
 			if (!FindAllyWithAmmo())
 			{
+				// We didn't find a dead ally with ammo, so equip our knife
 				EquipKnife();
 			}
 		}

@@ -28,6 +28,9 @@ public:
 	float GetRestProgress();
 
 	UFUNCTION(BlueprintCallable)
+	float GetStaminaProgress();
+	
+	UFUNCTION(BlueprintCallable)
 	ABaseCharacter* GetPlayer() const { return player; }
 
 	UFUNCTION(BlueprintCallable)

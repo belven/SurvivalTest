@@ -73,7 +73,7 @@ private:
 	IDamagable* target;
 	FVector lastKnowLocation;
 	bool canSee = false;
-	bool finishedMove = true;
+	bool finishedMoving = true;
 	bool needsAmmo = false;
 
 	TArray<ABaseCharacter*> alliesSeen;

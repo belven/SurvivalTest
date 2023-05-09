@@ -40,3 +40,8 @@ float UHUDUI::GetRestProgress()
 {
 	return (GetPlayer()->GetCurrentStats().rest / GetPlayer()->GetMaxStats().rest);
 }
+
+float UHUDUI::GetStaminaProgress()
+{
+	return (GetPlayer()->GetCurrentStats().stamina / GetPlayer()->GetMaxStats().stamina);
+}
