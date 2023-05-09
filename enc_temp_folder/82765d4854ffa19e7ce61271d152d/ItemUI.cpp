@@ -49,8 +49,12 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 
 			if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
 			{
-				playerInventory->TransferItem(playerInventory, instanceItemData, UItemStructs::InvalidInt);
+				playerInventory->TransferItem(GetItemContainer(), instanceItemData, UItemStructs::InvalidInt);
 			}
+		}
+		else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())
+		{
+			GetItemContainer()->SplitItem(GetInstanceItemData());			
 		}
 		else
 		{

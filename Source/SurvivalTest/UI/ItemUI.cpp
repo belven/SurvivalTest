@@ -52,6 +52,10 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 				playerInventory->TransferItem(GetItemContainer(), instanceItemData, UItemStructs::InvalidInt);
 			}
 		}
+		else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())
+		{
+			GetItemContainer()->SplitItem(instanceItemData);			
+		}
 		else
 		{
 			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;

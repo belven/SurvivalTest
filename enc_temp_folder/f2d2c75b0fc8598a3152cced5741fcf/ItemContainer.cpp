@@ -508,7 +508,7 @@ int32 UItemContainer::GetNextEmptySlot()
 	return UItemStructs::InvalidInt;
 }
 
-void UItemContainer::SplitItem(FInstanceItemData& inInstanceItemData)
+void UItemContainer::SplitItem(const FInstanceItemData& inInstanceItemData)
 {
 	if (HasSpace() && inInstanceItemData.amount > 1 && GetItemStackSize(inInstanceItemData.itemID) > 1)
 	{
@@ -529,7 +529,7 @@ void UItemContainer::SplitItem(FInstanceItemData& inInstanceItemData)
 			newData.itemID = iid.itemID;
 			newData.amount = total - halfAmountInt;
 			
-			UpdateItemData(this, iid, inInstanceItemData);
+			UpdateItemData(iid);
 
 			FInstanceItemData newItem = newData.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
 			newItem.amount = newData.amount;

@@ -106,7 +106,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetNextEmptySlot();
-	
+	void SplitItem(FInstanceItemData& inInstanceItemData);
+
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 	FItemRemoved OnItemRemoved;
 
