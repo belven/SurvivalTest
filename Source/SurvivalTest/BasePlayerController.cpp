@@ -115,7 +115,7 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 	}
 
 	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
-
+	
 	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);

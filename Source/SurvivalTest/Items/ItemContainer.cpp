@@ -344,8 +344,6 @@ int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 */
 FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<int32>& ids)
 {
-	bool itemAdded = false;
-
 	// Are we adding a whole item, i.e. an item that is at it's max stack size? If so, just add it
 	if (HasSpace())
 	{
@@ -362,7 +360,6 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 				OnItemAdded.Broadcast(newItem);
 				ids.Add(newItem.ID);
 				itemToAdd.amount = 0;
-				itemAdded = true;
 			}
 		}
 		else
@@ -377,7 +374,6 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 				// Try to find another item to add to
 				existingItem = GetExistingItemWithSpace(itemToAdd);
 				GetGame()->GetInstancedItems().Add(existingItem.ID, existingItem);
-				itemAdded = true;
 				OnItemUpdated.Broadcast(existingItem);
 			}
 
@@ -397,7 +393,6 @@ FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<in
 					// Add the new item
 					ids.Add(newItem.ID);
 					GetGame()->AddUpdateData(newItem);
-					itemAdded = true;
 					OnItemAdded.Broadcast(newItem);
 				}
 				// We found no more valid slots for the item

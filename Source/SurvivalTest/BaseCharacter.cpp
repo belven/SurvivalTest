@@ -268,6 +268,8 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 
 		if (inventory->AddItem(iid, ids).amount == 0)
 		{
+			int32 weaponInstanceItemID = ids.IsEmpty() ? UItemStructs::InvalidInt : ids[0];
+
 			if (id.type == EItemType::Armour)
 			{
 				EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
@@ -281,7 +283,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 					FRangedWeaponData rwd = GetGame()->GetRangedWeaponData(wd.ID);
 					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
-
+					
 					for (int i = 0; i < 1; ++i)
 					{
 						iid.amount = ammoData.maxStack;
@@ -291,8 +293,8 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 						GetInventory()->AddItem(iid, ids);
 					}
 				}
-				
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), ids.IsEmpty() ? UItemStructs::InvalidInt : ids[0]));
+
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), weaponInstanceItemID));
 			}
 		}
 	}
@@ -549,7 +551,8 @@ void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
 	// If we added a weapon and don't have one equipped, then equip it
 	else if (id.type == EItemType::Weapon)
 	{
-		if (!GetEquippedWeapon())
+		FWeaponData wd = game->GetWeaponData(id.ID);
+		if (!GetEquippedWeapon() && GetSlotForGear(wd.gearType).Contains(inItem.slot))
 		{
 			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));
 		}
