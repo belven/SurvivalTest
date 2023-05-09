@@ -86,7 +86,7 @@ TArray<FInstanceItemData> UItemContainer::GetExistingItemsWithSpace(int32 itemID
  *
  * @return True if should continue with the exchange, False if not
  */
-bool UItemContainer::CheckForArmourInventory(FInstanceItemData itemToTransfer)
+bool UItemContainer::CheckForArmourInventory(FInstanceItemData& itemToTransfer)
 {
 	FItemData id = GetGame()->GetItemData(itemToTransfer.itemID);
 
@@ -156,7 +156,15 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 
 		// Update each amount increase
 		UpdateItemData(this, existingItem, oldData);
-		UpdateItemData(other, itemToTransfer, oldData);
+
+		if (itemToTransfer.amount == 0)
+		{
+			RemoveInstanceItem(other, itemToTransfer, oldData);
+		}
+		else 
+		{
+			UpdateItemData(other, itemToTransfer, oldData);
+		}
 	}
 	else if (other == this)
 	{
@@ -236,7 +244,7 @@ void UItemContainer::MoveItemToEmptySlot(UItemContainer* other, FInstanceItemDat
 	}
 }
 
-FInstanceItemData UItemContainer::FillExistingItems(FInstanceItemData itemToTransfer, FItemData id)
+FInstanceItemData UItemContainer::FillExistingItems(FInstanceItemData& itemToTransfer, FItemData id)
 {
 	TArray<FInstanceItemData> itemsFound = GetExistingItemsWithSpace(itemToTransfer.itemID);
 
@@ -260,7 +268,7 @@ FInstanceItemData UItemContainer::FillExistingItems(FInstanceItemData itemToTran
 	return itemToTransfer;
 }
 
-void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData existingItem, EGearType type)
+void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData& oldData, FItemData id, FInstanceItemData& existingItem, EGearType type)
 {
 	EGearType existingType = GetGame()->GetGearTypeForItem(existingItem.itemID);
 	bool canSwitchPlaces = IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingType);
@@ -297,18 +305,18 @@ void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData
 	}
 }
 
-void UItemContainer::UpdateItemData(FInstanceItemData existingItem)
+void UItemContainer::UpdateItemData(FInstanceItemData& existingItem)
 {
 	GetGame()->AddUpdateData(existingItem);
 }
 
-void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData existingItem, FInstanceItemData oldData)
+void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData& existingItem, FInstanceItemData& oldData)
 {
 	UpdateItemData(existingItem);
 	container->OnItemUpdated.Broadcast(existingItem, oldData);
 }
 
-void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData itemToTransfer, FInstanceItemData oldData)
+void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData& oldData)
 {
 	GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
 	other->OnItemRemoved.Broadcast(oldData);
@@ -317,7 +325,7 @@ void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData
 /**
  *
  */
-FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot)
+FInstanceItemData& UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot)
 {
 	// Store a copy of the data so we can use it to update the UI
 	FInstanceItemData oldData = itemToTransfer;
@@ -398,7 +406,7 @@ int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
-FInstanceItemData UItemContainer::AddItem(FInstanceItemData itemToAdd, TArray<int32>& ids)
+FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<int32>& ids)
 {
 	// Are we adding a whole item, i.e. an item that is at it's max stack size? If so, just add it
 	if (HasSpace())

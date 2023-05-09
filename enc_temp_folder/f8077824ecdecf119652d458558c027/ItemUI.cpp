@@ -49,7 +49,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 
 			if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
 			{
-				playerInventory->TransferItem(GetItemContainer(), instanceItemData, UItemStructs::InvalidInt);
+				playerInventory->TransferItem(playerInventory, instanceItemData, UItemStructs::InvalidInt);
 			}
 		}
 		else
