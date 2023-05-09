@@ -103,7 +103,12 @@ void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
 	RemoveItem(inItem);
 }
 
-void UItemContainerUI::ItemUpdated(FInstanceItemData inItem)
+void UItemContainerUI::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
 {
+	if(!GetItemContainer()->GetInstanceItemAtSlot(oldItem.slot).isValid())
+	{
+		RemoveItem(oldItem);
+	}
+
 	UpdateItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
 }

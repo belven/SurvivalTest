@@ -6,7 +6,7 @@
 #include "ItemContainer.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInstanceItemData, item);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemUpdated, FInstanceItemData, item);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemUpdated, FInstanceItemData, item, FInstanceItemData, oldItem);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemAdded, FInstanceItemData, item);
 
 USTRUCT(BlueprintType)
@@ -58,7 +58,11 @@ public:
 	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData& existingItem);
 	void MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData);
 	void MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData);
+	FInstanceItemData FillExistingItems(FInstanceItemData itemToTransfer, FItemData id);
 	void DropOnExistingItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData existingItem, EGearType type);
+	void UpdateItemData(FInstanceItemData existingItem);
+	void UpdateItemData(UItemContainer* container, FInstanceItemData existingItem, FInstanceItemData oldData);
+	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData itemToTransfer, FInstanceItemData oldData);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
 	void RemoveFilledSlots(TArray<int32>& slots);

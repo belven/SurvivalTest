@@ -495,7 +495,7 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
-void ABaseCharacter::ItemUpdated(FInstanceItemData inItem)
+void ABaseCharacter::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
 {
 	FItemData id = game->GetItemData(inItem.itemID);
 

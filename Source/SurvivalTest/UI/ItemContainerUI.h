@@ -54,7 +54,7 @@ public:
 		UItemContainer* GetItemContainer() const { return container; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void ItemUpdated(FInstanceItemData inItem);
+	void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void SetItemContainer(UItemContainer* inContainer);

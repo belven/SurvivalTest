@@ -1,5 +1,6 @@
 #include "ItemUI.h"
 
+#include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BasePlayerController.h"
@@ -39,6 +40,24 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 			}
 		}
 	}
+	else if (InMouseEvent.GetPressedButtons().Contains(EKeys::LeftMouseButton) && itemData.ID != UItemStructs::InvalidInt)
+	{
+		if (InMouseEvent.GetModifierKeys().IsLeftShiftDown())
+		{
+			ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
+			UItemContainer* playerInventory = basePlayerController->GetBaseCharacter()->GetInventory();
+
+			if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
+			{
+				int32 slot = playerInventory->GetNextEmptySlotForItem(instanceItemData.itemID);
+				playerInventory->TransferItem(playerInventory, instanceItemData, slot);
+			}
+		}
+		else
+		{
+			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
+		}
+	}
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
 
@@ -57,7 +76,7 @@ UTexture2D* UItemUI::GetItemIcon()
 
 void UItemUI::SetImage(UImage* image)
 {
-	if(!GetItemData().icon.Equals(""))
+	if (!GetItemData().icon.Equals(""))
 	{
 		FSlateBrush imageB;
 		imageB.ImageSize = FVector2D(imageSize);

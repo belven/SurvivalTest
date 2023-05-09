@@ -124,7 +124,7 @@ public:
 	UFUNCTION()
 	void ItemRemoved(FInstanceItemData inItem);
 	UFUNCTION()
-	void ItemUpdated(FInstanceItemData inItem);
+	void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
 
 	TArray<int32> GetSlotForGear(EGearType type);
 	int32 GetPrimaryWeaponSlot();
