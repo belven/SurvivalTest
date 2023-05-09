@@ -86,7 +86,8 @@ TArray<FInstanceItemData> UItemContainer::GetExistingItemsWithSpace(int32 itemID
  *
  * @return True if should continue with the exchange, False if not
  */
-bool UItemContainer::CheckForArmourInventory(FInstanceItemData itemToTransfer) {
+bool UItemContainer::CheckForArmourInventory(FInstanceItemData itemToTransfer)
+{
 	FItemData id = GetGame()->GetItemData(itemToTransfer.itemID);
 
 	// If the item type is armour, check we're not adding to ourselves
@@ -101,8 +102,8 @@ bool UItemContainer::CheckForArmourInventory(FInstanceItemData itemToTransfer) {
 			return false;
 		}
 		else
-			// TODO This only works for 1 layer of container, would be worth making a recursive method for this
-			// This is also solved by simply not allowing armour in armour etc.
+		// TODO This only works for 1 layer of container, would be worth making a recursive method for this
+		// This is also solved by simply not allowing armour in armour etc.
 		{
 			bool selfFound = false;
 			// Other is the container for the item we've dragged
@@ -128,6 +129,157 @@ bool UItemContainer::CheckForArmourInventory(FInstanceItemData itemToTransfer) {
 	return true;
 }
 
+void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData& existingItem)
+{
+	// Are we dropping something that can stack more than once and the item we're dropping onto is the same
+	if (id.maxStack > 1 && itemToTransfer.itemID == existingItem.itemID)
+	{
+		// Does the existing item have space?
+		// If so, we're trying to add an item to another
+		if (existingItem.HasSpace(id.maxStack))
+		{
+			existingItem.TakeFrom(itemToTransfer, id.maxStack);
+		}
+		// Otherwise we're just swapping the items, as existingItem.amount is at max.
+		// This would be like swapping a half stack for a full stack
+		else
+		{
+			itemToTransfer.TakeFrom(existingItem, id.maxStack);
+		}
+
+		// Update each amount increase
+		GetGame()->AddUpdateData(existingItem);
+		OnItemUpdated.Broadcast(existingItem);
+
+		// If amount is 0, then remove us
+		if (itemToTransfer.amount == 0)
+		{
+			GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
+			other->OnItemRemoved.Broadcast(oldData);
+		}
+		else
+		{
+			GetGame()->AddUpdateData(itemToTransfer);
+			other->OnItemUpdated.Broadcast(itemToTransfer);
+		}
+	}
+	// We have an item that either has only 1 stack size or the item we dropped onto isn't the same item as the dropped one
+	else
+	{
+		// Switch the items in the containers
+		existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
+		itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
+
+		existingItem.slot = itemToTransfer.slot;
+		itemToTransfer.slot = droppedSlot;
+
+		GetGame()->AddUpdateData(existingItem);
+		GetGame()->AddUpdateData(itemToTransfer);
+
+		other->OnItemRemoved.Broadcast(oldData);
+		other->OnItemAdded.Broadcast(existingItem);
+
+		OnItemRemoved.Broadcast(existingItem);
+		OnItemAdded.Broadcast(itemToTransfer);
+	}
+}
+
+void UItemContainer::MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData)
+{
+	itemToTransfer.slot = droppedSlot;
+
+	// Set the containerInstanceID to this container, this will move the item to belong to us
+	itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
+
+	// Update the itemToTransfer in the database
+	GetGame()->AddUpdateData(itemToTransfer);
+
+	// Tell our listeners that we've made changes, so things like UI can be updated
+	other->OnItemRemoved.Broadcast(oldData);
+	OnItemAdded.Broadcast(itemToTransfer);
+}
+
+void UItemContainer::MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData)
+{
+	itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
+
+	// If we found a valid slot then transfer the item
+	if (itemToTransfer.slot != UItemStructs::InvalidInt && itemToTransfer.amount > 0)
+	{
+		// Set the containerInstanceID to this container, this will move the item to belong to us
+		itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
+
+		// Update the itemToTransfer in the database
+		GetGame()->AddUpdateData(itemToTransfer);
+
+		// Tell our listeners that we've made changes, so things like UI can be updated
+		other->OnItemRemoved.Broadcast(oldData);
+		OnItemAdded.Broadcast(itemToTransfer);
+	}
+}
+
+void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData existingItem, EGearType type)
+{
+	EGearType existingType = GetGame()->GetGearTypeForItem(existingItem.itemID);
+	bool canSwitchPlaces = IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingType);
+
+	// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
+	if (canSwitchPlaces)
+	{
+		SwapItems(other, itemToTransfer, droppedSlot, oldData, id, existingItem);
+	}
+	else
+	{
+		// If the item has no space, then it's a whole stack and should go into the next valid slot, if any
+		// No point adding it to others if it's a whole stack, this also helps dealing with single item stacks of armour and weapons
+		if (!HasSpace(itemToTransfer))
+		{
+			MoveItemToEmptySlot(other, itemToTransfer, oldData);
+		}
+		// We're not full so try and find existing items OR add it to the inventory as is
+		else
+		{
+			TArray<FInstanceItemData> itemsFound = GetExistingItemsWithSpace(itemToTransfer.itemID);
+
+			// If we found items, then try and add to them
+			if (itemsFound.Num() > 0)
+			{
+				int32 maxStack = id.maxStack;
+
+				for (FInstanceItemData iid : itemsFound)
+				{
+					// Check for self, as we can be in the same container 
+					if (itemToTransfer.amount > 0 && iid.ID != itemToTransfer.ID)
+					{
+						iid.TakeFrom(itemToTransfer, maxStack);
+
+						// Update each amount increase
+						GetGame()->AddUpdateData(iid);
+						OnItemUpdated.Broadcast(iid);
+					}
+				}
+
+				// If amount is 0, then remove us
+				if (itemToTransfer.amount == 0)
+				{
+					GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
+					other->OnItemRemoved.Broadcast(itemToTransfer);
+				}
+				// If there's still some left, try and add the remainder to the next empty slot
+				else
+				{
+					MoveItemToEmptySlot(other, itemToTransfer, oldData);
+				}
+			}
+			// If there are no existing items, just get the next valid slot
+			else
+			{
+				MoveItemToEmptySlot(other, itemToTransfer, oldData);
+			}
+		}
+	}
+}
+
 /**
  * 
  */
@@ -137,8 +289,8 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 	FInstanceItemData oldData = itemToTransfer;
 	FItemData id = GetGame()->GetItemData(itemToTransfer.itemID);
 
-	if (CheckForArmourInventory(itemToTransfer)) {
-
+	if (CheckForArmourInventory(itemToTransfer))
+	{
 		// Get the item, if any, at the slot we've dropped the item onto
 		FInstanceItemData existingItem = GetInstanceItemAtSlot(droppedSlot);
 		EGearType type = GetGame()->GetGearTypeForItem(itemToTransfer.itemID);
@@ -146,144 +298,16 @@ FInstanceItemData UItemContainer::TransferItem(UItemContainer* other, FInstanceI
 		// If the ID isn't -1, then we have an item in the slot
 		if (existingItem.ID != UItemStructs::InvalidInt)
 		{
-			EGearType existingIType = GetGame()->GetGearTypeForItem(existingItem.itemID);
-			bool canSwitchPlaces = IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingIType);
-
-			// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
-			if (canSwitchPlaces)
-			{
-				// Are we dropping something that can stack more than once and the item we're dropping onto is the same
-				if (id.maxStack > 1 && itemToTransfer.itemID == existingItem.itemID)
-				{
-					// Does the existing item have space?
-					// If so, we're trying to add an item to another
-					if(existingItem.HasSpace(id.maxStack))
-					{
-						existingItem.TakeFrom(itemToTransfer, id.maxStack);			
-					}
-					// Otherwise we're just swapping the items, as existingItem.amount is at max.
-					// This would be like swapping a half stack for a full stack
-					else
-					{
-						itemToTransfer.TakeFrom(existingItem, id.maxStack);
-					}
-
-					// Update each amount increase
-					GetGame()->AddUpdateData(existingItem);
-					OnItemUpdated.Broadcast(existingItem);
-
-					// If amount is 0, then remove us
-					if (itemToTransfer.amount == 0)
-					{
-						GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
-						other->OnItemRemoved.Broadcast(oldData);
-					}
-					else {
-						GetGame()->AddUpdateData(itemToTransfer);
-						other->OnItemUpdated.Broadcast(itemToTransfer);
-					}
-				}
-				else
-				{
-					// Switch the items in the containers
-					existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
-					existingItem.slot = itemToTransfer.slot;
-
-					itemToTransfer.slot = droppedSlot;
-
-					GetGame()->AddUpdateData(existingItem);
-					GetGame()->AddUpdateData(itemToTransfer);
-
-					other->OnItemAdded.Broadcast(existingItem);
-					other->OnItemRemoved.Broadcast(oldData);
-
-					OnItemRemoved.Broadcast(existingItem);
-					OnItemAdded.Broadcast(itemToTransfer);
-				}
-			}
-			else
-			{
-				// If the item has no space, then it's a whole stack and should go into the next valid slot, if any
-				// No point adding it to others if it's a whole stack, this also helps dealing with single item stacks of armour and weapons
-				if (!HasSpace(itemToTransfer))
-				{
-					itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
-				}
-				// We're not full so try and find existing items OR add it to the inventory as is
-				else
-				{
-					TArray<FInstanceItemData> itemsFound = GetExistingItemsWithSpace(itemToTransfer.itemID);
-
-					// If we found items, then try and add to them
-					if (itemsFound.Num() > 0)
-					{
-						int32 maxStack = id.maxStack;
-
-						for (FInstanceItemData iid : itemsFound)
-						{
-							// Check for self, as we can be in the same container 
-							if (itemToTransfer.amount > 0 && iid.ID != itemToTransfer.ID)
-							{
-								iid.TakeFrom(itemToTransfer, maxStack);
-
-								// Update each amount increase
-								GetGame()->AddUpdateData(iid);
-								OnItemUpdated.Broadcast(iid);
-							}
-						}
-
-						// If amount is 0, then remove us
-						if (itemToTransfer.amount == 0)
-						{
-							GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
-							other->OnItemRemoved.Broadcast(itemToTransfer);
-						}
-						// If there's still some left, try and add the remainder to the next empty slot
-						else
-						{
-							itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
-						}
-					}
-					// If there are no existing items, just get the next valid slot
-					else
-					{
-						itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
-					}
-				}
-			}
+			DropOnExistingItem(other, itemToTransfer, droppedSlot, oldData, id, existingItem, type);
 		}
-		// If the ID is -1, then we don't have an item in the slot
+		// If the ID is -1, then we don't have an existing item in the slot
 		else if (IsValidForSlot(droppedSlot, type))
 		{
-			itemToTransfer.slot = droppedSlot;
-
-			// Set the containerInstanceID to this container, this will move the item to belong to us
-			itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
-
-			// Update the itemToTransfer in the database
-			GetGame()->AddUpdateData(itemToTransfer);
-
-			// Tell our listeners that we've made changes, so things like UI can be updated
-			other->OnItemRemoved.Broadcast(oldData);
-			OnItemAdded.Broadcast(itemToTransfer);
+			MoveItemToSlot(other, itemToTransfer, droppedSlot, oldData);
 		}
 		else
 		{
-			itemToTransfer.slot = GetNextEmptySlotForItem(itemToTransfer.itemID);
-
-			// If we found a valid slot then transfer the item
-			if (itemToTransfer.slot != UItemStructs::InvalidInt && itemToTransfer.amount > 0)
-			{
-				// Set the containerInstanceID to this container, this will move the item to belong to us
-				itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
-
-				// Update the itemToTransfer in the database
-				GetGame()->AddUpdateData(itemToTransfer);
-
-				// Tell our listeners that we've made changes, so things like UI can be updated
-				other->OnItemRemoved.Broadcast(oldData);
-				OnItemAdded.Broadcast(itemToTransfer);
-			}
+			MoveItemToEmptySlot(other, itemToTransfer, oldData);
 		}
 	}
 
@@ -471,8 +495,9 @@ bool UItemContainer::IsValidForSlot(int32 slot, EGearType inType)
 			return true;
 		}
 
-		if(slots->validGear.Contains(inType)) {
-				return true;
+		if (slots->validGear.Contains(inType))
+		{
+			return true;
 		}
 
 		// Either there were no slots defined for that gear type or no valid slots were found for the gear type at all

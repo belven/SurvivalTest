@@ -717,7 +717,6 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 		DrainStat(currentStats.water, currentStats.waterLossRate, 0.5f, DeltaSeconds);
 		DrainStat(currentStats.rest, currentStats.restLossRate, 0.25f, DeltaSeconds);
 		DrainStat(currentStats.hunger, currentStats.hungerLossRate, 0.1f, DeltaSeconds);
-
 		CalculateSprint(DeltaSeconds);
 	}
 }

@@ -55,6 +55,10 @@ public:
 	int32 GetNextEmptySlotForItem(int32 itemID);
 	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
 	bool CheckForArmourInventory(FInstanceItemData itemToTransfer);
+	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData& existingItem);
+	void MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData);
+	void MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData);
+	void DropOnExistingItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData existingItem, EGearType type);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
 	void RemoveFilledSlots(TArray<int32>& slots);
