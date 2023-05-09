@@ -181,6 +181,19 @@ FString UTableManager::GetContainerInstanceName(int32 containerID)
 	return GetInstancedContainers().FindChecked(containerID).name;
 }
 
+FItemData UTableManager::GetItemDataByName(const FString& inString)
+{
+	TArray<FItemData> itemData = GetItemDataTable()->GetData();
+	for (const FItemData id : itemData)
+	{
+		if (id.name.Equals(inString))
+		{
+			return id;
+		}
+	}
+	return {};
+}
+
 
 FArmourData UTableManager::GetArmourData(int32 armourID)
 {

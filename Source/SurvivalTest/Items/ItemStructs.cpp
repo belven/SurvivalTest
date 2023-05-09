@@ -71,6 +71,10 @@ EItemType UItemStructs::GetItemType(FString typeName)
 	{
 		return EItemType::Armour;
 	}
+	else	if (typeName.Equals("Ammo"))
+	{
+		return EItemType::Ammo;
+	}
 	else	if (typeName.Equals("Resource"))
 	{
 		return EItemType::Resource;

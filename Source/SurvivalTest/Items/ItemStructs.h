@@ -19,6 +19,7 @@ enum class EItemType : uint8
 	Consumable,
 	Armour,
 	Resource,
+	Ammo,
 	End
 };
 

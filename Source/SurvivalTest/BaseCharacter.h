@@ -23,6 +23,7 @@ class UWeapon;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponEquipped, UWeapon*, oldWeapon);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
 
 USTRUCT(BlueprintType)
 struct FCharacterStats
@@ -91,6 +92,7 @@ public:
 	UStaticMesh* GetItemMesh(FItemData data);
 
 	FWeaponEquipped OnWeaponEquipped;
+	FCharacterDied OnCharacterDied;
 
 	virtual EFaction GetFaction() override { return faction; }
 	void SetFaction(EFaction inFaction) { faction = inFaction; }

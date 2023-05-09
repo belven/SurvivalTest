@@ -138,6 +138,7 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 
 	currentStats.health = ld.health;
 	maxStats.health = ld.health;
+	CreateNewItemForInventory(GetGame()->GetItemDataByName("Knife").ID);
 	CreateNewItemForInventory(ld.weaponID);
 	CreateNewItemForInventory(ld.headArmourID);
 	CreateNewItemForInventory(ld.chestArmourID);
@@ -232,7 +233,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
 
-					for (int i = 0; i < 2; ++i)
+					for (int i = 0; i < 1; ++i)
 					{
 						iid.amount = ammoData.maxStack;
 						iid.itemID = pwd.ammoID;
@@ -241,7 +242,8 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 						GetInventory()->AddItem(iid, ids);
 					}
 				}
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), ids[0]));
+				
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), ids.IsEmpty() ? UItemStructs::InvalidInt : ids[0]));
 			}
 		}
 	}
@@ -604,14 +606,6 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 		GetOverlapsOnSpawn();
 
 		SetupLoadout("Player");
-	}
-	else
-	{
-		//GetCharacterMovement()->bUseRVOAvoidance = true;
-		//GetCharacterMovement()->AvoidanceConsiderationRadius = 300.0f;
-		//GetCharacterMovement()->AvoidanceWeight = 0.5f;
-		//GetCharacterMovement()->SetAvoidanceEnabled(true);
-		interactionSphere->DestroyComponent();
 	}
 }
 

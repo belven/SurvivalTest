@@ -14,6 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/ProjectileWeapon.h"
 #include "Items/Weapon.h"
+#include "Items/WeaponCreator.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Missions/PatrolPath.h"
 #include "Navigation/CrowdFollowingComponent.h"
@@ -45,7 +46,7 @@ void ABaseAIController::LookAt(FVector lookAtLocation)
 	FRotator lookAt = UKismetMathLibrary::FindLookAtRotation(mActorLocation, lookAtLocation);
 	lookAt.Pitch = mActorRotation.Pitch;
 	lookAt.Roll = mActorRotation.Roll;
-	GetCharacter()->SetActorRotation(lookAt);
+	GetCharacter()->FaceRotation(lookAt);
 }
 
 void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result)
@@ -59,6 +60,26 @@ void ABaseAIController::OutOfAmmo()
 	{
 		Reload();
 	}
+	else
+	{
+		GetAmmo();
+	}
+}
+
+bool ABaseAIController::HasAmmo(ABaseCharacter* other)
+{
+	UBaseGameInstance* game = GetBaseCharacter()->GetGame();
+	int32 containerID = other->GetInventory()->GetInstanceContainerData().ID;
+
+	for (auto iid : game->GetInstancedItemsForContainer(containerID))
+	{
+		FItemData id = game->GetItemData(iid.itemID);
+		if (id.type == EItemType::Ammo)
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 void ABaseAIController::ReloadComplete()
@@ -67,7 +88,7 @@ void ABaseAIController::ReloadComplete()
 
 void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
 {
-	if(oldWeapon && oldWeapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (oldWeapon && oldWeapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
 		pw->OnOutOfAmmo.RemoveAll(this);
@@ -148,7 +169,7 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 		}
 	}
 	// If we don't have a target, then check if this is a new viable target
-	else if (target == NULL)
+	else
 	{
 		// Get the Actors team, if it has one, and check if we're enemies
 		ITeam* otherTeam = Cast<ITeam>(Actor);
@@ -156,13 +177,17 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 		if (otherTeam != NULL)
 		{
 			// Are we enemies with the perceived actor?
-			if (AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Enemy)
+			if (target == NULL && AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Enemy)
 			{
 				// Update our target and set that we can see them, we can assume that, if the actor is a team, it's also damagable
 				target = Cast<IDamagable>(Actor);
 				canSee = true;
 
 				//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "I see you!");
+			}
+			else if (!alliesSeen.Contains(Actor))
+			{
+				alliesSeen.Add(Cast<ABaseCharacter>(Actor));
 			}
 		}
 	}
@@ -199,6 +224,10 @@ void ABaseAIController::Tick(float DeltaTime)
 		{
 			target = NULL;
 			FindNewTarget();
+		}
+		else if (!HasAmmoForWeapon())
+		{
+			GetAmmo();
 		}
 		else
 		{
@@ -300,7 +329,7 @@ void ABaseAIController::CalculateCombat()
 		}
 	}
 	// We can't see the target, make sure we're not already trying to move to the target
-	else if (!GetCharacter()->GetCharacterMovement()->IsMovementInProgress())
+	else if (finishedMove)
 	{
 		// Move to the last known location
 		LookAt(lastKnowLocation);
@@ -315,18 +344,15 @@ bool ABaseAIController::HasAmmoForWeapon()
 {
 	UWeapon* weapon = mCurrentWeapon();
 
-	if (weapon)
+	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
-		if (weapon->GetWeaponData().type == EWeaponType::Projectile)
-		{
-			UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-			int32 ammoID = pw->GetProjectileWeaponData().ammoID;
-			int32 ammoQuantity = GetBaseCharacter()->GetInventory()->GetItemAmount(ammoID);
-			return ammoQuantity > 0;
-		}
-		return true;
+		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
+		int32 ammoID = pw->GetProjectileWeaponData().ammoID;
+		int32 ammoQuantity = GetBaseCharacter()->GetInventory()->GetItemAmount(ammoID);
+		return ammoQuantity > 0;
 	}
-	return false;
+
+	return true;
 }
 
 void ABaseAIController::Reload()
@@ -363,7 +389,79 @@ FVector ABaseAIController::GetPredictedLocation(AActor* actor)
 
 void ABaseAIController::MoveToCombatLocation()
 {
+	finishedMove = false;
 	FindViableCombatLocationRequest.Execute(EEnvQueryRunMode::SingleResult, this, &ABaseAIController::WeaponLocationQueryFinished);
+}
+
+void ABaseAIController::GetNearbyAmmo()
+{
+	for (IInteractable* inter : GetBaseCharacter()->GetOverlappingInteractables())
+	{
+		ABaseCharacter* other = Cast<ABaseCharacter>(inter);
+		if (other && other->IsDead())
+		{
+			UBaseGameInstance* game = GetBaseCharacter()->GetGame();
+			int32 containerID = other->GetInventory()->GetInstanceContainerData().ID;
+
+			for (auto iid : game->GetInstancedItemsForContainer(containerID))
+			{
+				FItemData id = game->GetItemData(iid.itemID);
+				if (id.type == EItemType::Ammo)
+				{
+					GetBaseCharacter()->GetInventory()->TransferItem(other->GetInventory(), iid, GetBaseCharacter()->GetInventory()->GetNextEmptySlotForItem(id.ID));
+					needsAmmo = false;
+				}
+			}
+		}
+	}
+}
+
+bool ABaseAIController::FindAllyWithAmmo()
+{
+	for (auto ally : alliesSeen)
+	{
+		if (ally->IsDead() && HasAmmo(ally))
+		{
+			finishedMove = false;
+			MoveToActor(ally);
+			return true;
+		}
+	}
+	return false;
+}
+
+void ABaseAIController::EquipKnife()
+{
+	UBaseGameInstance* game = GetBaseCharacter()->GetGame();
+	int32 containerID = GetBaseCharacter()->GetInventory()->GetInstanceContainerData().ID;
+
+	for (auto iid : game->GetInstancedItemsForContainer(containerID))
+	{
+		FItemData id = game->GetItemData(iid.itemID);
+		if (id.name.Equals("Knife"))
+		{
+			GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID));
+			break;
+		}
+	}
+}
+
+void ABaseAIController::GetAmmo()
+{
+	if (finishedMove)
+	{
+		needsAmmo = true;
+
+		GetNearbyAmmo();
+
+		if (needsAmmo)
+		{
+			if (!FindAllyWithAmmo())
+			{
+				EquipKnife();
+			}
+		}
+	}
 }
 
 void ABaseAIController::AttackWithWeapon(FRotator FireDirection)

@@ -33,6 +33,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FItemData GetItemData(int32 itemID) { return mTable()->GetItemData(itemID); }
+	FItemData GetItemDataByName(FString itemName) { return mTable()->GetItemDataByName(itemName); }
 
 	void AddUpdateData(const FInstanceArmourData& inData) { mTable()->AddUpdateData(inData); }
 	void AddUpdateData(const FInstanceWeaponData& inData) { mTable()->AddUpdateData(inData); }

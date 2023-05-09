@@ -27,15 +27,14 @@ public:
 
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-
-	/*explicit ABaseAIController(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get())
-	{
-		Super(ObjectInitializer.SetDefaultSubobjectClass<UCrowdFollowingComponent>(TEXT("PathFollowingComponent")));
-	}*/
-
+	
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 	void MoveToCombatLocation();
+	void GetNearbyAmmo();
+	bool FindAllyWithAmmo();
+	void EquipKnife();
 
+	void GetAmmo();
 	virtual void Tick(float DeltaTime) override;
 	void Patrol();
 	void KillAI();
@@ -51,6 +50,7 @@ public:
 
 	UFUNCTION()
 	void OutOfAmmo();
+	bool HasAmmo(ABaseCharacter* other);
 
 	UFUNCTION()
 	void ReloadComplete();
@@ -74,6 +74,9 @@ private:
 	FVector lastKnowLocation;
 	bool canSee = false;
 	bool finishedMove = true;
+	bool needsAmmo = false;
+
+	TArray<ABaseCharacter*> alliesSeen;
 
 	UPROPERTY()
 	UAISenseConfig_Sight* sightConfig;

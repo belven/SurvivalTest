@@ -72,6 +72,8 @@ public:
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
+	FItemData GetItemDataByName(const FString& inString);
+
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
