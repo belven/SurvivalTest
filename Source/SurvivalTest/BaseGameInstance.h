@@ -11,6 +11,7 @@
 
 #define GameInstance(world) Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(world))
 #define mGameInstance() Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))
+#define mTable() GetTableManager()
 
 class UTableManager;
 class UFactionManager;
@@ -29,32 +30,31 @@ class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
-
-
+	
 	UFUNCTION(BlueprintCallable)
-	FItemData GetItemData(int32 itemID);
+	FItemData GetItemData(int32 itemID) { return mTable()->GetItemData(itemID); }
 
-	void AddUpdateData(const FInstanceArmourData& inData);
-	void AddUpdateData(const FInstanceWeaponData& inData);
-	void AddUpdateData(const FInstanceItemData& inData);
-	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
-	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);
+	void AddUpdateData(const FInstanceArmourData& inData) { mTable()->AddUpdateData(inData); }
+	void AddUpdateData(const FInstanceWeaponData& inData) { mTable()->AddUpdateData(inData); }
+	void AddUpdateData(const FInstanceItemData& inData) { mTable()->AddUpdateData(inData); }
+	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID) { return mTable()->GetInstancedItemsForContainer(instanceContainerID); }
+	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID) { return  mTable()->GetInstanceArmourDataByInstanceItemID(InstanceItemID); }
 
-	FWeaponData GetWeaponData(int32 itemID);
-	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
-	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
-	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
-	FArmourData GetArmourData(int32 armourID);
-	FContainerData GetContainerDataName(FString containerName);
-	FContainerData GetContainerDataByID(int32 containerID);
-	FArmourData GetArmourDataByItemID(int32 itemID);
-	FLoadoutData GetLoadoutData(FString loadoutName);
-	FConsumableData GetConsumableData(int32 itemID);
-	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID);
+	FWeaponData GetWeaponData(int32 itemID) { return mTable()->GetWeaponData(itemID); }
+	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID) { return mTable()->GetMeleeWeaponData(weaponID); }
+	FRangedWeaponData GetRangedWeaponData(int32 weaponID) { return mTable()->GetRangedWeaponData(weaponID); }
+	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID) { return mTable()->GetProjectileWeaponData(rangedWeaponID); }
+	FArmourData GetArmourData(int32 armourID) { return mTable()->GetArmourData(armourID); }
+	FContainerData GetContainerDataName(FString containerName) { return mTable()->GetContainerDataName(containerName); }
+	FContainerData GetContainerDataByID(int32 containerID) { return mTable()->GetContainerDataByID(containerID); }
+	FArmourData GetArmourDataByItemID(int32 itemID) { return mTable()->GetArmourDataByItemID(itemID); }
+	FLoadoutData GetLoadoutData(FString loadoutName) { return mTable()->GetLoadoutData(loadoutName); }
+	FConsumableData GetConsumableData(int32 itemID) { return mTable()->GetConsumableData(itemID); }
+	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID) { return mTable()->GetInstanceWeaponDataByInstanceItemID(instanceItemID); }
+	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID) { return mTable()->GetInstancedArmourByContainerID(inContainerInstanceID); }
+	FString GetContainerInstanceName(int32 containerID) { return mTable()->GetContainerInstanceName(containerID); }
 
-	EGearType GetGearTypeForItem(int32 itemID);
-	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
-	FString GetContainerInstanceName(int32 containerID);
+	EGearType GetGearTypeForItem(int32 itemID) { return mTable()->GetGearTypeForItem(itemID); }
 
 	int32 GetNextInstanceItemDataID();
 	int32 GetNextBoxID();
@@ -63,10 +63,10 @@ public:
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
 
-	TMap<int32, FInstanceItemData>& GetInstancedItems() { return tableManager->GetInstanceItemDataTable()->GetData(); }
-	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
-	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
-	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
+	TMap<int32, FInstanceItemData>& GetInstancedItems() { return mTable()->GetInstanceItemDataTable()->GetData(); }
+	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return mTable()->GetInstancedContainers(); }
+	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return mTable()->GetInstancedArmour(); }
+	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return mTable()->GetInstancedBoxes(); }
 	void SetMainLight(AMainLight* inMainLight) { mainLight = inMainLight; }
 
 	AMainLight* GetMainLight() const { return mainLight; }
@@ -82,10 +82,6 @@ public:
 	UMissionManager* GetMissionManager();
 
 private:
-	// TODO Make these use data tables!
-	TMap<int32, FInstanceContainerData> instancedContainers;
-	TMap<int32, FInstanceArmourData> armourInstances;
-	TMap<int32, FInstanceBoxData> boxContainers;
 
 	UPROPERTY()
 	UMissionManager* missionManager;

@@ -65,7 +65,6 @@ ABaseCharacter::ABaseCharacter()
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
 	navInvoker->SetGenerationRadii(4000, 5000);
-	//navInvoker->AddToRoot();
 
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
@@ -77,9 +76,8 @@ ABaseCharacter::ABaseCharacter()
 	weaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
 	weaponMeshComp->SetupAttachment(GetMesh(), FName(TEXT("GripPoint")));
 	weaponMeshComp->SetRelativeRotation(FRotator(180));
-	//weaponMeshComp->SetWorldRotation(FRotator(180));
 	GetMesh()->SetCustomDepthStencilValue(2);
-
+	
 	ResetStats();
 }
 

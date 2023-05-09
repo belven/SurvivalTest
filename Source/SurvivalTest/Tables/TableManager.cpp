@@ -60,6 +60,240 @@ void UTableManager::LoadTableFromFile(UCSVTable* table)
 	}
 }
 
+FInstanceWeaponData UTableManager::GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID)
+{
+	int32 instanceContainerDataID = 0;
+	TMap<int32, FInstanceWeaponData> instancedWeapons = GetWeaponInstanceTable()->GetData();
+
+	for (auto& iwd : instancedWeapons)
+	{
+		if (iwd.Value.instanceItemID == instanceItemID)
+		{
+			return iwd.Value;
+		}
+	}
+
+	return {};
+}
+
+
+TArray<FInstanceItemData> UTableManager::GetInstancedItemsForContainer(int32 instanceContainerID)
+{
+	TArray<FInstanceItemData> data;
+	for (auto& iid : GetInstanceItemDataTable()->GetData())
+	{
+		if (iid.Value.containerInstanceID == instanceContainerID)
+		{
+			data.Add(iid.Value);
+		}
+	}
+	return data;
+}
+
+FItemData UTableManager::GetItemData(int32 itemID)
+{
+	TArray<FItemData> itemData = GetItemDataTable()->GetData();
+	for (const FItemData id : itemData)
+	{
+		if (id.ID == itemID)
+		{
+			return id;
+		}
+	}
+	return {};
+}
+
+FWeaponData UTableManager::GetWeaponData(int32 itemID)
+{
+	TArray<FWeaponData> weaponData = GetWeaponDataTable()->GetData();
+	for (const FWeaponData wd : weaponData)
+	{
+		if (wd.itemID == itemID)
+		{
+			return wd;
+		}
+	}
+	return {};
+}
+
+FConsumableData UTableManager::GetConsumableData(int32 itemID)
+{
+	for (const auto& cd : GetConsumableData()->GetData())
+	{
+		if (cd.Value.itemID == itemID)
+		{
+			return cd.Value;
+		}
+	}
+	return {};
+}
+
+FMeleeWeaponData UTableManager::GetMeleeWeaponData(int32 weaponID)
+{
+	for (const FMeleeWeaponData wd : GetMeleeWeaponData()->GetData())
+	{
+		if (wd.weaponID == weaponID)
+		{
+			return wd;
+		}
+	}
+	return {};
+}
+
+FRangedWeaponData UTableManager::GetRangedWeaponData(int32 weaponID)
+{
+	for (const FRangedWeaponData wd : GetRangedWeaponData()->GetData())
+	{
+		if (wd.weaponID == weaponID)
+		{
+			return wd;
+		}
+	}
+	return {};
+}
+
+FProjectileWeaponData UTableManager::GetProjectileWeaponData(int32 rangedWeaponID)
+{
+	for (const FProjectileWeaponData wd : GetProjectileWeaponData()->GetData())
+	{
+		if (wd.rangedWeaponID == rangedWeaponID)
+		{
+			return wd;
+		}
+	}
+	return {};
+}
+
+FInstanceArmourData UTableManager::GetInstancedArmourByContainerID(int32 inContainerInstanceID)
+{
+	for (auto& ad : GetInstancedArmour())
+	{
+		if (ad.Value.containerInstanceID == inContainerInstanceID)
+		{
+			return ad.Value;
+		}
+	}
+	return {};
+}
+
+FString UTableManager::GetContainerInstanceName(int32 containerID)
+{
+	return GetInstancedContainers().FindChecked(containerID).name;
+}
+
+
+FArmourData UTableManager::GetArmourData(int32 armourID)
+{
+	for (const FArmourData ad : GetArmourDataTable()->GetData())
+	{
+		if (ad.ID == armourID)
+		{
+			return ad;
+		}
+	}
+	return {};
+}
+
+FContainerData UTableManager::GetContainerDataName(FString containerName)
+{
+	for (auto& cd : GetContainerData()->GetData())
+	{
+		if (cd.Value.name.Equals(containerName))
+			return cd.Value;
+	}
+	return {};
+}
+
+FContainerData UTableManager::GetContainerDataByID(int32 containerID)
+{
+	return GetContainerData()->GetData().FindChecked(containerID);
+}
+
+FArmourData UTableManager::GetArmourDataByItemID(int32 itemID)
+{
+	for (const FArmourData ad : GetArmourDataTable()->GetData())
+	{
+		if (ad.itemID == itemID)
+		{
+			return ad;
+		}
+	}
+	return {};
+}
+
+FLoadoutData UTableManager::GetLoadoutData(FString loadoutName)
+{
+	for (const FLoadoutData ld : GetLoadoutTableData()->GetData())
+	{
+		if (ld.name.Equals(loadoutName))
+		{
+			return ld;
+		}
+	}
+	return {};
+}
+
+EGearType UTableManager::GetGearTypeForItem(int32 itemID)
+{
+	FItemData id = GetItemData(itemID);
+	if (id.type == EItemType::Armour)
+	{
+		FArmourData ad = GetArmourDataByItemID(itemID);
+		return ad.slot;
+	}
+	else if (id.type == EItemType::Weapon)
+	{
+		FWeaponData wd = GetWeaponData(itemID);
+		return wd.gearType;
+	}
+
+	return EGearType::End;
+}
+
+/**
+ * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
+ *
+ * @param inData The data we're adding or updating, it will match on ID of the data
+ *
+ */
+void UTableManager::AddUpdateData(const FInstanceItemData& inData)
+{
+	GetInstanceItemDataTable()->GetData().Add(inData.ID, inData);
+}
+
+FInstanceArmourData UTableManager::GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID)
+{
+	for (auto& iad : GetInstancedArmour())
+	{
+		if (iad.Value.instancedItemDataID == InstanceItemID)
+			return iad.Value;
+	}
+	return {};
+}
+
+/**
+ * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
+ *
+ * @param inData The data we're adding or updating, it will match on ID of the data
+ *
+ */
+void UTableManager::AddUpdateData(const FInstanceArmourData& inData)
+{
+	GetInstancedArmour().Add(inData.ID, inData);
+}
+
+/**
+ * Due to the data being structs, the only way to actually update information in the Map of data, is by adding the copy of the struct back in the array, as if it was new
+ *
+ * @param inData The data we're adding or updating, it will match on ID of the data
+ *
+ */
+void UTableManager::AddUpdateData(const FInstanceWeaponData& inData)
+{
+	GetWeaponInstanceTable()->GetData().Add(inData.ID, inData);
+}
+
+
 void UTableManager::SaveTableToFile(UCSVTable* table)
 {
 	FFileHelper::SaveStringArrayToFile(table->GetDataStrings(), *table->GetPath());

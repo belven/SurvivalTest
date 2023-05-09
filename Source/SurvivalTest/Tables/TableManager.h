@@ -47,7 +47,36 @@ public:
 
 	TArray<int32> GetItemsForMissionType(EMissionType type);
 
+	void AddUpdateData(const FInstanceArmourData& inData);
+	void AddUpdateData(const FInstanceWeaponData& inData);
+	void AddUpdateData(const FInstanceItemData& inData);
+	TArray<FInstanceItemData> GetInstancedItemsForContainer(int32 instanceContainerID);
+	FInstanceArmourData GetInstanceArmourDataByInstanceItemID(int32 InstanceItemID);
+
+	FItemData GetItemData(int32 itemID);
+	FWeaponData GetWeaponData(int32 itemID);
+	FMeleeWeaponData GetMeleeWeaponData(int32 weaponID);
+	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
+	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
+	FArmourData GetArmourData(int32 armourID);
+	FContainerData GetContainerDataName(FString containerName);
+	FContainerData GetContainerDataByID(int32 containerID);
+	FArmourData GetArmourDataByItemID(int32 itemID);
+	FLoadoutData GetLoadoutData(FString loadoutName);
+	EGearType GetGearTypeForItem(int32 itemID);
+	FConsumableData GetConsumableData(int32 itemID);
+	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID);
+	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
+	FString GetContainerInstanceName(int32 containerID);
+
+	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
+	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
+	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
 private:
+	TMap<int32, FInstanceContainerData> instancedContainers;
+	TMap<int32, FInstanceArmourData> armourInstances;
+	TMap<int32, FInstanceBoxData> boxContainers;
+
 	UPROPERTY()
 	UItemDataTable* ItemData;
 

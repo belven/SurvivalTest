@@ -2,6 +2,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "SurvivalTest/BaseCharacter.h"
+#include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/BaseProjectile.h"
 
 #define mSetReloadTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, GetProjectileWeaponData().reloadSpeed)
@@ -59,6 +60,9 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 	{
 		firstShot = false;
 	}
+
+	GetCharacterOwner()->AddControllerPitchInput(rot.Pitch);
+	GetCharacterOwner()->AddControllerYawInput(rot.Yaw);
 	
 	ABaseProjectile* proj = UWeapon::SpawnProjectile(gunLocation, rot, ABaseProjectile::StaticClass());
 	FVector velocity = FVector(1.f, 0.f, 0.f).GetSafeNormal() * GetProjectileWeaponData().bulletVelocity;
