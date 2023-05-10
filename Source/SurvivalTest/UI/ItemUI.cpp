@@ -19,7 +19,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 {
 	if (InMouseEvent.GetPressedButtons().Contains(EKeys::RightMouseButton))
 	{
-		if (itemData.type == EItemType::Consumable && instanceItemData.amount > 0)
+		if (itemData.type == EItemType::Consumable && GetInstanceItemData().amount > 0)
 		{
 			UBaseGameInstance* baseGameInstance = itemContainer->GetGame();
 			FConsumableData cd = baseGameInstance->GetConsumableData(itemData.ID);
@@ -28,15 +28,15 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 			basePlayerController->GetBaseCharacter()->Consume(cd.consumableType, cd.value);
 			instanceItemData.amount--;
 
-			if (instanceItemData.amount > 0)
+			if (GetInstanceItemData().amount > 0)
 			{
-				baseGameInstance->AddUpdateData(instanceItemData);
-				itemContainer->OnItemRemoved.Broadcast(instanceItemData);
+				baseGameInstance->AddUpdateData(GetInstanceItemData());
+				itemContainer->OnItemRemoved.Broadcast(GetInstanceItemData());
 			}
 			else
 			{
-				baseGameInstance->GetInstancedItems().Remove(instanceItemData.ID);
-				itemContainer->OnItemRemoved.Broadcast(instanceItemData);
+				baseGameInstance->GetInstancedItems().Remove(GetInstanceItemData().ID);
+				itemContainer->OnItemRemoved.Broadcast(GetInstanceItemData());
 			}
 		}
 	}
@@ -49,12 +49,12 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 
 			if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
 			{
-				playerInventory->TransferItem(GetItemContainer(), instanceItemData, UItemStructs::InvalidInt);
+				playerInventory->TransferItem(GetItemContainer(), GetInstanceItemData(), UItemStructs::InvalidInt);
 			}
 		}
 		else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())
 		{
-			GetItemContainer()->SplitItem(instanceItemData);			
+			GetItemContainer()->SplitItem(GetInstanceItemData());
 		}
 		else
 		{
@@ -66,7 +66,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 
 FString UItemUI::GetItemAmount()
 {
-	return instanceItemData.amount == 1 ? "" : FString::FromInt(instanceItemData.amount);
+	return GetInstanceItemData().amount == 1 ? "" : FString::FromInt(GetInstanceItemData().amount);
 }
 
 UTexture2D* UItemUI::GetItemIcon()

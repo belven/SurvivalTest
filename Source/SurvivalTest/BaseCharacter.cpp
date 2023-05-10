@@ -281,9 +281,9 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
 
-					for (int i = 0; i < 100; ++i)
+					for (int i = 0; i < 1; ++i)
 					{
-						iid.amount = ammoData.maxStack;
+						iid.amount = ammoData.maxStack * 3;
 						iid.itemID = pwd.ammoID;
 
 						ids.Empty();

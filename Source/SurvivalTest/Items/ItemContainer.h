@@ -55,23 +55,23 @@ public:
 	int32 GetNextEmptySlotForItem(int32 itemID);
 	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
 	bool CheckForArmourInventory(FInstanceItemData& itemToTransfer);
-	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData& existingItem);
-	void MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 slot, FInstanceItemData oldData);
-	void MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData);
-	void FillExistingItems(FInstanceItemData& itemToTransfer, FItemData id);
-	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, const FInstanceItemData& oldData, FItemData id, FInstanceItemData& existingItem, EGearType type);
+	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, const FItemData id, FInstanceItemData& existingItem);
+	void MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 slot, const FInstanceItemData& oldData);
+	void MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData);
+	void FillExistingItems(FInstanceItemData& itemToTransfer, const FItemData id);
+	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, const FItemData id, FInstanceItemData& existingItem, EGearType type);
 	void AddUpdateItemData(FInstanceItemData& existingItem);
 	void UpdateItemData(UItemContainer* container, FInstanceItemData& existingItem, const FInstanceItemData& oldData);
 	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData);
-	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData, FItemData id);
+	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData, const FItemData id);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
-	bool IsValidForSlot(int32 slot, EGearType inType);
+	bool IsValidForSlot(const int32 slot, const EGearType inType);
 	int32 FindNextEmptyValidSlot(EGearType inType);
 	void UpdateDebugItemsList();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	FInstanceItemData& TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot);
+	FInstanceItemData& TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, const int32 droppedSlot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	TArray<FInstanceItemData> GetItems() { return game->GetInstancedItemsForContainer(instanceContainerData.ID); }
@@ -108,7 +108,7 @@ public:
 	int32 GetNextEmptySlot();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void SplitItem(FInstanceItemData& inInstanceItemData);
+	void SplitItem(const FInstanceItemData inInstanceItemData);
 
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 	FItemRemoved OnItemRemoved;
@@ -137,7 +137,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 		UBaseGameInstance* GetGame();
 
-	void AddValidSlot(EGearType type, int32 slot);
+	void AddValidSlot(EGearType type, const int32 slot);
 private:
 	UPROPERTY()
 	TMap<int32, FValidSlots> validSlots;

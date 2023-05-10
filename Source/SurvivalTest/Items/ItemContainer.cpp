@@ -129,7 +129,7 @@ bool UItemContainer::CheckForArmourInventory(FInstanceItemData& itemToTransfer)
 	return true;
 }
 
-void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, FInstanceItemData oldData, FItemData id, FInstanceItemData& existingItem)
+void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, const FItemData id, FInstanceItemData& existingItem)
 {
 	// Are we dropping something that can stack more than once and the item we're dropping onto is the same
 	if (id.maxStack > 1 && itemToTransfer.itemID == existingItem.itemID)
@@ -144,6 +144,7 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 			if (existingItem.amount < itemToTransfer.amount)
 			{
 				existingItem.TakeFrom(itemToTransfer, id.maxStack);
+				UpdateItemData(this, existingItem, oldExistingItem);
 			}
 			// Otherwise we're just swapping the items, as existingItem.amount is at max.
 			// This would be like swapping a half stack for a full stack
@@ -155,11 +156,9 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 		// Neither item is full, so simply add the dropped item amount onto the existing item
 		else
 		{
-			existingItem.TakeFrom(itemToTransfer, id.maxStack);
+			existingItem.TakeFrom(itemToTransfer, id.maxStack);			
+			UpdateItemData(this, existingItem, oldExistingItem);
 		}
-
-		// Update each amount increase
-		UpdateItemData(this, existingItem, oldExistingItem);
 
 		if (itemToTransfer.amount == 0)
 		{
@@ -170,6 +169,7 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 			UpdateItemData(other, itemToTransfer, oldData);
 		}
 	}
+	// We have an item that only stacks once, so check if the item is in this container
 	else if (other == this)
 	{
 		FInstanceItemData oldExistingItem = existingItem;
@@ -194,16 +194,20 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 
 		existingItem.slot = itemToTransfer.slot;
 		itemToTransfer.slot = droppedSlot;
+		
+		AddUpdateItemData(existingItem);
+		AddUpdateItemData(itemToTransfer);
 
-		// The oldExistingItem has been changed to be itemToTransfer
-		UpdateItemData(this, itemToTransfer, oldExistingItem);
+		// Tell our listeners that we've made changes, so things like UI can be updated
+		other->OnItemRemoved.Broadcast(oldData);
+		OnItemRemoved.Broadcast(oldExistingItem);
 
-		// The old itemToTransfer has been changed to be the new existingItem
-		UpdateItemData(other, existingItem, oldData);
+		other->OnItemAdded.Broadcast(existingItem);
+		OnItemAdded.Broadcast(itemToTransfer);
 	}
 }
 
-void UItemContainer::MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 slot, FInstanceItemData oldData)
+void UItemContainer::MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 slot, const FInstanceItemData& oldData)
 {
 	if (slot != UItemStructs::InvalidInt)
 	{
@@ -228,12 +232,12 @@ void UItemContainer::MoveItemToSlot(UItemContainer* other, FInstanceItemData& it
 	}
 }
 
-void UItemContainer::MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData)
+void UItemContainer::MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData)
 {
 	MoveItemToSlot(other, itemToTransfer, GetNextEmptySlotForItem(itemToTransfer.itemID), oldData);
 }
 
-void UItemContainer::FillExistingItems(FInstanceItemData& itemToTransfer, FItemData id)
+void UItemContainer::FillExistingItems(FInstanceItemData& itemToTransfer, const FItemData id)
 {
 	TArray<FInstanceItemData> itemsFound = GetExistingItemsWithSpace(itemToTransfer.itemID);
 
@@ -261,7 +265,7 @@ void UItemContainer::FillExistingItems(FInstanceItemData& itemToTransfer, FItemD
 	}
 }
 
-void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, int32 droppedSlot, const FInstanceItemData& oldData, FItemData id, FInstanceItemData& existingItem, EGearType type)
+void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, const FItemData id, FInstanceItemData& existingItem, EGearType type)
 {
 	EGearType existingType = GetGame()->GetGearTypeForItem(existingItem.itemID);
 	bool canSwitchPlaces = IsValidForSlot(droppedSlot, type) && other->IsValidForSlot(itemToTransfer.slot, existingType);
@@ -301,7 +305,7 @@ void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData
 	other->OnItemRemoved.Broadcast(oldData);
 }
 
-void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, FInstanceItemData oldData, FItemData id)
+void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData, const FItemData id)
 {
 	// Does the item stack more than once?
 	if (id.maxStack > 1)
@@ -330,7 +334,7 @@ void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FIn
 /**
  *
  */
-FInstanceItemData& UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, int32 droppedSlot)
+FInstanceItemData& UItemContainer::TransferItem(UItemContainer* other, FInstanceItemData itemToTransfer, const int32 droppedSlot)
 {
 	// Store a copy of the data so we can use it to update the UI
 	FInstanceItemData oldData = itemToTransfer;
@@ -470,7 +474,7 @@ TArray<int32> UItemContainer::GetEmptySlots()
 
 	for (int32 i = 0; i < GetMaxItemCount(); i++)
 	{
-		if(!slotsFilled.Contains(i))
+		if (!slotsFilled.Contains(i))
 			emptySlots.Add(i);
 	}
 
@@ -500,15 +504,15 @@ int32 UItemContainer::GetNextEmptySlot()
 	return UItemStructs::InvalidInt;
 }
 
-void UItemContainer::SplitItem(FInstanceItemData& inInstanceItemData)
+void UItemContainer::SplitItem(const FInstanceItemData inInstanceItemData)
 {
 	if (HasSpace() && inInstanceItemData.amount > 1 && GetItemStackSize(inInstanceItemData.itemID) > 1)
 	{
 		int32 emptySlot = GetNextEmptySlotForItem(inInstanceItemData.itemID);
-
+		
 		if (emptySlot != UItemStructs::InvalidInt)
 		{
-			int32 nextID = GetNextInstanceItemDataID();
+			const int32 nextID = GetNextInstanceItemDataID();
 			FInstanceItemData iid = inInstanceItemData;
 
 			const int32 total = iid.amount;
@@ -519,10 +523,9 @@ void UItemContainer::SplitItem(FInstanceItemData& inInstanceItemData)
 			UpdateItemData(this, iid, inInstanceItemData);
 
 			int32 newAmount = total - halfAmountInt;
-
-
+			
 			// Create a new item
-			FInstanceItemData newItem = iid.CopyItem(nextID, instanceContainerData.ID, emptySlot, newAmount);
+			FInstanceItemData newItem = iid.CopyItem(nextID, GetInstanceContainerData().ID, emptySlot, newAmount);
 
 			AddUpdateItemData(newItem);
 			OnItemAdded.Broadcast(newItem);
@@ -537,7 +540,7 @@ UBaseGameInstance* UItemContainer::GetGame()
 	return game;
 }
 
-void UItemContainer::AddValidSlot(EGearType type, int32 slot)
+void UItemContainer::AddValidSlot(EGearType type, const int32 slot)
 {
 	validSlots.FindOrAdd(slot).validGear.Add(type);
 }
@@ -551,7 +554,7 @@ void UItemContainer::AddValidSlot(EGearType type, int32 slot)
  *
  *@return True if the slot chosen can support the type of gear
  */
-bool UItemContainer::IsValidForSlot(int32 slot, EGearType inType)
+bool UItemContainer::IsValidForSlot(const int32 slot, const EGearType inType)
 {
 	// Do we have any valid slots set?
 	if (validSlots.Num() > 0)
