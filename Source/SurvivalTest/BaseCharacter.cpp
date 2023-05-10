@@ -81,7 +81,7 @@ ABaseCharacter::ABaseCharacter()
 	weaponMeshComp->SetupAttachment(GetMesh(), FName(TEXT("GripPoint")));
 	weaponMeshComp->SetRelativeRotation(FRotator(180));
 	GetMesh()->SetCustomDepthStencilValue(2);
-	
+
 	ResetStats();
 }
 
@@ -92,7 +92,8 @@ void ABaseCharacter::StopSprinting()
 
 void ABaseCharacter::StartSprinting()
 {
-	if (GetCurrentStats().stamina > 0) {
+	if (GetCurrentStats().stamina > 0)
+	{
 		isRequestingSprint = true;
 	}
 }
@@ -119,7 +120,7 @@ void ABaseCharacter::SetMovementSpeed(EMovementState state)
 
 void ABaseCharacter::SetMovementState(EMovementState inState)
 {
-	if(currentMovementState != inState)
+	if (currentMovementState != inState)
 	{
 		currentMovementState = inState;
 		SetMovementSpeed(inState);
@@ -128,12 +129,10 @@ void ABaseCharacter::SetMovementState(EMovementState inState)
 
 void ABaseCharacter::Interact(ABasePlayerController* instigator)
 {
-
 }
 
 void ABaseCharacter::Highlight(bool activate)
 {
-
 }
 
 void ABaseCharacter::BeginPlay()
@@ -283,7 +282,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 					FRangedWeaponData rwd = GetGame()->GetRangedWeaponData(wd.ID);
 					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
-					
+
 					for (int i = 0; i < 1; ++i)
 					{
 						iid.amount = ammoData.maxStack;
@@ -310,7 +309,8 @@ void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
 	UWeapon* oldWeapon = equippedWeapon;
 	equippedWeapon = weapon;
 
-	if (equippedWeapon) {
+	if (equippedWeapon)
+	{
 		equippedWeapon->SetOwner(this);
 	}
 
@@ -501,12 +501,24 @@ void ABaseCharacter::ItemUpdated(FInstanceItemData inItem, FInstanceItemData old
 
 	if (id.type == EItemType::Weapon)
 	{
-		// Have we updated an equipped weapon?
-		if (GetEquippedWeapon() && GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID
-			// Has the weapon moved out of an equipped slot?
-			&& !GetSlotForGear(GetEquippedWeapon()->GetWeaponData().gearType).Contains(inItem.slot))
+		bool movedSlot = inItem.slot != oldItem.slot && inItem.containerInstanceID == oldItem.containerInstanceID;
+		bool isWeaponSlot = GetSlotForGear(EGearType::Weapon).Contains(inItem.slot) || GetSlotForGear(EGearType::Sidearm).Contains(inItem.slot);
+
+		if (GetEquippedWeapon())
 		{
-			SetEquippedWeapon(nullptr);
+			// Have we updated an equipped weapon?
+			if (GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID)
+			{
+				// Has the weapon moved out of an equipped slot?
+				if (movedSlot && !isWeaponSlot)
+				{
+					SetEquippedWeapon(nullptr);
+				}
+			}
+		}
+		else if (isWeaponSlot)
+		{
+			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));
 		}
 	}
 	else if (id.type == EItemType::Armour)
@@ -664,7 +676,7 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 {
 	// Check if we're moving more than a low speed
-	if(!GetVelocity().IsNearlyZero())
+	if (!GetVelocity().IsNearlyZero())
 	{
 		timeMoved += DeltaSeconds;
 	}
@@ -675,23 +687,23 @@ void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 	}
 
 	// If we're sprinting and we've been moving for more than a third of a second, start sprinting speed
-	if(isRequestingSprint && timeMoved > 0.33)
+	if (isRequestingSprint && timeMoved > 0.33)
 	{
 		// Consume Stamina
 		DrainStat(currentStats.stamina, currentStats.staminaLossRate, 0.0f, DeltaSeconds);
 
 		// Stop sprinting if we have no stamina
-		if(currentStats.stamina <= 0)
+		if (currentStats.stamina <= 0)
 		{
 			StopSprinting();
 			SetMovementState(EMovementState::Base);
 		}
-		else 
+		else
 		{
 			SetMovementState(EMovementState::Sprinting);
 		}
 	}
-	else if(currentStats.stamina <= maxStats.stamina)
+	else if (currentStats.stamina <= maxStats.stamina)
 	{
 		currentStats.stamina += currentStats.staminaRecoverRate * DeltaSeconds;
 

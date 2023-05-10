@@ -50,7 +50,7 @@ public:
 	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame);
 
 	FString GetItemName(int32 itemID);
-	int32 GetNextItemID();
+	int32 GetNextInstanceItemDataID();
 	int32 GetItemStackSize(int32 itemID);
 	int32 GetNextEmptySlotForItem(int32 itemID);
 	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
@@ -106,6 +106,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetNextEmptySlot();
+
+	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	void SplitItem(FInstanceItemData& inInstanceItemData);
 
 	UPROPERTY(BlueprintCallable, Category = "Item Container")

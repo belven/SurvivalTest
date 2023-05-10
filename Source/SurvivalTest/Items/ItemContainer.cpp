@@ -19,7 +19,7 @@ FString UItemContainer::GetItemName(int32 itemID)
 	return GetGame()->GetItemData(itemID).name;
 }
 
-int32 UItemContainer::GetNextItemID()
+int32 UItemContainer::GetNextInstanceItemDataID()
 {
 	return GetGame()->GetNextInstanceItemDataID();
 }
@@ -168,15 +168,22 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 	}
 	else if (other == this)
 	{
+		FInstanceItemData oldExistingItem = existingItem;
+
 		existingItem.slot = itemToTransfer.slot;
 		itemToTransfer.slot = droppedSlot;
 
-		UpdateItemData(this, existingItem, oldData);
-		UpdateItemData(other, itemToTransfer, oldData);
+		// The oldExistingItem has been changed to be itemToTransfer
+		UpdateItemData(this, itemToTransfer, oldExistingItem);
+
+		// The old itemToTransfer has been changed to be the new existingItem
+		UpdateItemData(other, existingItem, oldData);
 	}
 	// We have an item that either has only 1 stack size or the item we dropped onto isn't the same item as the dropped one
 	else
 	{
+		FInstanceItemData oldExistingItem = existingItem;
+
 		// Switch the items in the containers
 		existingItem.containerInstanceID = itemToTransfer.containerInstanceID;
 		itemToTransfer.containerInstanceID = GetInstanceContainerData().ID;
@@ -184,14 +191,11 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 		existingItem.slot = itemToTransfer.slot;
 		itemToTransfer.slot = droppedSlot;
 
-		UpdateItemData(existingItem);
-		UpdateItemData(itemToTransfer);
+		// The oldExistingItem has been changed to be itemToTransfer
+		UpdateItemData(this, itemToTransfer, oldExistingItem);
 
-		other->OnItemRemoved.Broadcast(oldData);
-		other->OnItemAdded.Broadcast(existingItem);
-
-		OnItemRemoved.Broadcast(existingItem);
-		OnItemAdded.Broadcast(itemToTransfer);
+		// The old itemToTransfer has been changed to be the new existingItem
+		UpdateItemData(other, existingItem, oldData);
 	}
 }
 
@@ -418,7 +422,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 		{
 			if (emptySlot != UItemStructs::InvalidInt)
 			{
-				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
+				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextInstanceItemDataID(), instanceContainerData.ID);
 				newItem.amount = itemToAdd.amount;
 				UpdateItemData(newItem);
 				OnItemAdded.Broadcast(newItem);
@@ -451,7 +455,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 				if (emptySlot != UItemStructs::InvalidInt)
 				{
 					// Make a new item
-					FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
+					FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextInstanceItemDataID(), instanceContainerData.ID);
 					newItem.amount = 0;
 					newItem.TakeFrom(itemToAdd, stackSize);
 
@@ -488,7 +492,7 @@ TArray<int32> UItemContainer::GetEmptySlots()
 
 bool UItemContainer::HasSpace()
 {
-	return GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID).Num() < containerData.slots;
+	return GetItems().Num() < containerData.slots;
 }
 
 /**
@@ -528,13 +532,15 @@ void UItemContainer::SplitItem(FInstanceItemData& inInstanceItemData)
 			FInstanceItemData newData;
 			newData.itemID = iid.itemID;
 			newData.amount = total - halfAmountInt;
-			
+
 			UpdateItemData(this, iid, inInstanceItemData);
 
-			FInstanceItemData newItem = newData.CopyItem(emptySlot, GetNextItemID(), instanceContainerData.ID);
+			int32 nextID = GetNextInstanceItemDataID();
+
+			FInstanceItemData newItem = newData.CopyItem(emptySlot, nextID, instanceContainerData.ID);
 			newItem.amount = newData.amount;
 			UpdateItemData(newItem);
-			OnItemAdded.Broadcast(newItem);	
+			OnItemAdded.Broadcast(newItem);
 		}
 	}
 }
