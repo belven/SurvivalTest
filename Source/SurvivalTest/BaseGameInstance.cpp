@@ -24,9 +24,10 @@ int32 UBaseGameInstance::GetNextInstanceItemDataID()
 {
 	int32 instanceItemDataID = 0;
 	TMap<int32, FInstanceItemData> items = GetInstancedItems();
+	
 	if (items.Num() > 0)
 	{
-		instanceItemDataID = items.FindChecked(items.Num() - 1).ID + 1;
+		instanceItemDataID = items[items.Num() - 1].ID + 1;
 	}
 	return instanceItemDataID;
 }
@@ -37,7 +38,7 @@ int32 UBaseGameInstance::GetNextBoxID()
 	TMap<int32, FInstanceBoxData> boxes = GetInstancedBoxes();
 	if (boxes.Num() > 0)
 	{
-		boxID = boxes.FindChecked(boxes.Num() - 1).boxID + 1;
+		boxID = boxes[boxes.Num() - 1].boxID + 1;
 	}
 	return boxID;
 }
@@ -48,7 +49,7 @@ int32 UBaseGameInstance::GetNextInstanceBoxDataID()
 	TMap<int32, FInstanceBoxData> boxes = GetInstancedBoxes();
 	if (boxes.Num() > 0)
 	{
-		instanceBoxDataID = boxes.FindChecked(boxes.Num() - 1).ID + 1;
+		instanceBoxDataID = boxes[boxes.Num() - 1].ID + 1;
 	}
 	return instanceBoxDataID;
 }
@@ -59,7 +60,7 @@ int32 UBaseGameInstance::GetNextInstanceArmourDataID()
 	TMap<int32, FInstanceArmourData> armour = GetInstancedArmour();
 	if (armour.Num() > 0)
 	{
-		instanceArmourDataID = armour.FindChecked(armour.Num() - 1).ID + 1;
+		instanceArmourDataID = armour[armour.Num() - 1].ID + 1;
 	}
 	return instanceArmourDataID;
 }
@@ -70,7 +71,7 @@ int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 	TMap<int32, FInstanceContainerData> containers = GetInstancedContainers();
 	if (containers.Num() > 0)
 	{
-		instanceContainerDataID = containers.FindChecked(containers.Num() - 1).ID + 1;
+		instanceContainerDataID = containers[containers.Num() - 1].ID + 1;
 	}
 	return instanceContainerDataID;
 }
@@ -83,7 +84,7 @@ int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
 
 	if (instancedWeapons.Num() > 0)
 	{
-		instanceWeaponDataID = instancedWeapons.FindChecked(instancedWeapons.Num() - 1).ID + 1;
+		instanceWeaponDataID = instancedWeapons[instancedWeapons.Num() - 1].ID + 1;
 	}
 	return instanceWeaponDataID;
 }

@@ -26,17 +26,17 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 			ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
 
 			basePlayerController->GetBaseCharacter()->Consume(cd.consumableType, cd.value);
+
+			FInstanceItemData oldData = GetInstanceItemData();
 			instanceItemData.amount--;
 
 			if (GetInstanceItemData().amount > 0)
 			{
-				baseGameInstance->AddUpdateData(GetInstanceItemData());
-				itemContainer->OnItemRemoved.Broadcast(GetInstanceItemData());
+				GetItemContainer()->UpdateItemData(GetItemContainer(),instanceItemData, oldData);
 			}
 			else
 			{
-				baseGameInstance->GetInstancedItems().Remove(GetInstanceItemData().ID);
-				itemContainer->OnItemRemoved.Broadcast(GetInstanceItemData());
+				GetItemContainer()->RemoveInstanceItem(GetItemContainer(), instanceItemData, oldData);
 			}
 		}
 	}

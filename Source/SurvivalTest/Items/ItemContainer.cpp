@@ -144,7 +144,6 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 			if (existingItem.amount < itemToTransfer.amount)
 			{
 				existingItem.TakeFrom(itemToTransfer, id.maxStack);
-				UpdateItemData(this, existingItem, oldExistingItem);
 			}
 			// Otherwise we're just swapping the items, as existingItem.amount is at max.
 			// This would be like swapping a half stack for a full stack
@@ -157,8 +156,9 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 		else
 		{
 			existingItem.TakeFrom(itemToTransfer, id.maxStack);			
-			UpdateItemData(this, existingItem, oldExistingItem);
 		}
+
+		UpdateItemData(this, existingItem, oldExistingItem);
 
 		if (itemToTransfer.amount == 0)
 		{
@@ -430,7 +430,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 		}
 		else
 		{
-			FillExistingItems(itemToAdd, GetGame()->GetItemData(itemToAdd.ID));
+			FillExistingItems(itemToAdd, GetGame()->GetItemData(itemToAdd.itemID));
 
 			// Keep adding new items until we're either full or added all items
 			while (itemToAdd.amount > 0 && HasSpace())

@@ -129,10 +129,8 @@ FInstanceItemData ALootBox::CreateLoot(FItemData id)
 	FInstanceItemData iid;
 	if (id.ID != UItemStructs::InvalidInt)
 	{
-		int32 nextID = GetGame()->GetNextInstanceItemDataID();
 		int32 randomAmount = FMath::RandRange(1, id.maxStack);
-		int32 nextSlot = container->GetNextEmptySlot();
-		return FInstanceItemData(nextID, id.ID, icd.ID, randomAmount, nextSlot);
+		return FInstanceItemData(id.ID, randomAmount);
 	}
 	return {};
 }

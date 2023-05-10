@@ -6,6 +6,6 @@ UItemDragDrop* UItemDragDrop::CreateDragDrop(UItemUI* item)
 	UItemDragDrop* dragDrop = NewObject<UItemDragDrop>();
 	dragDrop->SetDraggedItem(item);
 	dragDrop->DefaultDragVisual = item->GetRootWidget();
-	//dragDrop->Payload = item->
+	dragDrop->DefaultDragVisual->SetRenderScale(FVector2D(0.8));
 	return dragDrop;
 }
