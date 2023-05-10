@@ -358,9 +358,21 @@ struct FInstanceItemData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
+	FInstanceItemData() {}
+	FInstanceItemData(int32 inItemID, int32 newAmount) : itemID(inItemID), amount(newAmount) {}
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
+
+	FInstanceItemData(int32 inID, int32 inItemID, int32 inContainerInstanceID, int32 inAmount, int32 inSlot)
+		: ID(inID),
+		  itemID(inItemID),
+		  containerInstanceID(inContainerInstanceID),
+		  amount(inAmount),
+		  slot(inSlot)
+	{
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 itemID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
@@ -392,16 +404,10 @@ public:
 		amount += amountToTake;
 		itemToAdd.amount -= amountToTake;
 	}
-	
-	FInstanceItemData CopyItem(int32 emptySlot, int32 nextID, int32 instanceContainerID)
+
+	FInstanceItemData CopyItem(int32 nextID,  int32 instanceContainerID, int32 emptySlot, int32 newAmount = 0)
 	{
-		FInstanceItemData newData;
-		newData.ID = nextID;
-		newData.itemID = itemID;
-		newData.containerInstanceID = instanceContainerID;
-		newData.amount = 0;
-		newData.slot = emptySlot;
-		return newData;
+		return FInstanceItemData(nextID, itemID, instanceContainerID, newAmount, emptySlot);
 	}
 
 	bool HasSpace(int32 maxStackSize)

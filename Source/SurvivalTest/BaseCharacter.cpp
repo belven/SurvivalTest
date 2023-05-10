@@ -261,9 +261,7 @@ void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
 	{
 		FItemData id = game->GetItemData(itemID);
 		TArray<int32> ids;
-		FInstanceItemData iid;
-		iid.itemID = itemID;
-		iid.amount = 1;
+		FInstanceItemData iid(itemID, 1);
 
 		if (inventory->AddItem(iid, ids).amount == 0)
 		{

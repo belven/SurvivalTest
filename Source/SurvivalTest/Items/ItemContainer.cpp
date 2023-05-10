@@ -422,7 +422,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 		{
 			if (emptySlot != UItemStructs::InvalidInt)
 			{
-				FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextInstanceItemDataID(), instanceContainerData.ID);
+				FInstanceItemData newItem = itemToAdd.CopyItem(GetNextInstanceItemDataID(), instanceContainerData.ID, emptySlot);
 				newItem.amount = itemToAdd.amount;
 				UpdateItemData(newItem);
 				OnItemAdded.Broadcast(newItem);
@@ -455,7 +455,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 				if (emptySlot != UItemStructs::InvalidInt)
 				{
 					// Make a new item
-					FInstanceItemData newItem = itemToAdd.CopyItem(emptySlot, GetNextInstanceItemDataID(), instanceContainerData.ID);
+					FInstanceItemData newItem = itemToAdd.CopyItem(GetNextInstanceItemDataID(), instanceContainerData.ID, emptySlot);
 					newItem.amount = 0;
 					newItem.TakeFrom(itemToAdd, stackSize);
 
@@ -492,7 +492,8 @@ TArray<int32> UItemContainer::GetEmptySlots()
 
 bool UItemContainer::HasSpace()
 {
-	return GetItems().Num() < containerData.slots;
+	int32 num = GetItems().Num();
+	return num < containerData.slots;
 }
 
 /**
@@ -529,16 +530,15 @@ void UItemContainer::SplitItem(FInstanceItemData& inInstanceItemData)
 			int32 halfAmountInt = FMath::RoundToInt32(halfAmountF);
 			iid.amount = halfAmountInt;
 
-			FInstanceItemData newData;
-			newData.itemID = iid.itemID;
-			newData.amount = total - halfAmountInt;
-
 			UpdateItemData(this, iid, inInstanceItemData);
+
+			int32 newAmount = total - halfAmountInt;
 
 			int32 nextID = GetNextInstanceItemDataID();
 
-			FInstanceItemData newItem = newData.CopyItem(emptySlot, nextID, instanceContainerData.ID);
-			newItem.amount = newData.amount;
+			// Create a new item
+			FInstanceItemData newItem = iid.CopyItem(GetNextInstanceItemDataID(), instanceContainerData.ID, emptySlot, newAmount);
+			
 			UpdateItemData(newItem);
 			OnItemAdded.Broadcast(newItem);
 		}
