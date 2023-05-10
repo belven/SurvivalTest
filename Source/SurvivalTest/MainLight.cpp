@@ -73,10 +73,7 @@ AMainLight::AMainLight(const FObjectInitializer& ObjectInitializer)
 		}
 	};
 	static FConstructorStatics ConstructorStatics;
-
-#if !WITH_EDITORONLY_DATA
-	UDirectionalLightComponent* DirectionalLightComponent;
-#endif
+	
 	DirectionalLightComponent = CastChecked<UDirectionalLightComponent>(GetLightComponent());
 	DirectionalLightComponent->Mobility = EComponentMobility::Stationary;
 	DirectionalLightComponent->SetRelativeRotation(FRotator(-46.0f, 0.0f, 0.0f));

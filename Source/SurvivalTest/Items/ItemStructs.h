@@ -405,6 +405,7 @@ struct FInstanceItemData
 		itemToAdd.amount -= amountToTake;
 	}
 
+	// Single method to get a copy of the item with new data, basically just copies itemID
 	FInstanceItemData CopyItem(int32 nextID,  int32 instanceContainerID, int32 emptySlot, int32 newAmount = 0)
 	{
 		return FInstanceItemData(nextID, itemID, instanceContainerID, newAmount, emptySlot);

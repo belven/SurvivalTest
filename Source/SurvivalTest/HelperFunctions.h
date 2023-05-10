@@ -20,11 +20,13 @@ UCLASS()
 class SURVIVALTEST_API UHelperFunctions : public UObject
 {
 	GENERATED_BODY()
+
 public:
 	UFUNCTION(BlueprintCallable)
 	static void ToggleUIVisibility(UUserWidget* widget)
 	{
-		if (widget) {
+		if (widget)
+		{
 			if (widget->GetVisibility() == ESlateVisibility::Visible)
 			{
 				widget->SetVisibility(ESlateVisibility::Collapsed);
@@ -36,7 +38,9 @@ public:
 		}
 	}
 
-		 template<class T> static T GetRandom(TArray<T> itemArray) {
-			 return itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
-		 }
+	template <class T>
+	static T GetRandom(TArray<T> itemArray)
+	{
+		return itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
+	}
 };
