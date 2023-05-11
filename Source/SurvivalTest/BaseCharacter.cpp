@@ -499,12 +499,12 @@ void ABaseCharacter::ItemUpdated(FInstanceItemData inItem, FInstanceItemData old
 
 	if (id.type == EItemType::Weapon)
 	{
-		bool movedSlot = inItem.slot != oldItem.slot && inItem.containerInstanceID == oldItem.containerInstanceID;
+		bool movedSlot = inItem.slot != oldItem.slot;
 		bool isWeaponSlot = GetSlotForGear(EGearType::Weapon).Contains(inItem.slot) || GetSlotForGear(EGearType::Sidearm).Contains(inItem.slot);
 
 		if (GetEquippedWeapon())
 		{
-			// Have we updated an equipped weapon?
+			// Have we updated our equipped weapon?
 			if (GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID)
 			{
 				// Has the weapon moved out of an equipped slot?
@@ -512,6 +512,12 @@ void ABaseCharacter::ItemUpdated(FInstanceItemData inItem, FInstanceItemData old
 				{
 					SetEquippedWeapon(nullptr);
 				}
+			}
+			// Is the new item in a valid weapon slot
+			// If so equip the new weapon
+			else if(isWeaponSlot)
+			{
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));				
 			}
 		}
 		else if (isWeaponSlot)

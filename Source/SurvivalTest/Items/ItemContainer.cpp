@@ -609,8 +609,8 @@ FInstanceItemData UItemContainer::RemoveItem(FInstanceItemData itemToRemove)
 			// So just reduce the value by the amount to remove, and zero the amount to remove
 			else
 			{
-				itemToRemove.amount = 0;
 				item.amount -= itemToRemove.amount;
+				itemToRemove.amount = 0;
 
 				UpdateItemData(this, item, oldData);
 			}

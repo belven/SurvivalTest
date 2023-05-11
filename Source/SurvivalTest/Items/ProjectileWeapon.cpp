@@ -37,10 +37,10 @@ void UProjectileWeapon::SetCanFireTimer()
 
 void UProjectileWeapon::ConsumeAmmo()
 {
-	GetInstanceWeaponData().ammo--;
-	GetCharacterOwner()->GetGame()->AddUpdateData(GetInstanceWeaponData());
+	instanceWeaponData.ammo--;
+	GetCharacterOwner()->GetGame()->AddUpdateData(instanceWeaponData);
 
-	if (GetInstanceWeaponData().ammo == 0)
+	if (instanceWeaponData.ammo == 0)
 	{
 		OnOutOfAmmo.Broadcast();
 	}
@@ -86,9 +86,7 @@ void UProjectileWeapon::ReloadExpired()
 
 	if (ammoLeft > 0)
 	{
-		FInstanceItemData iid;
-		iid.amount = ammoToTake;
-		iid.itemID = GetProjectileWeaponData().ammoID;
+		FInstanceItemData iid(GetProjectileWeaponData().ammoID, ammoToTake);
 		GetCharacterOwner()->GetInventory()->RemoveItem(iid);
 
 		GetInstanceWeaponData().ammo += ammoToTake;
