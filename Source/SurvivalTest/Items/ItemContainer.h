@@ -55,15 +55,15 @@ public:
 	int32 GetNextEmptySlotForItem(int32 itemID);
 	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
 	bool CheckForArmourInventory(FInstanceItemData& itemToTransfer);
-	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, const FItemData id, FInstanceItemData& existingItem);
+	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, int32 maxStackSize, FInstanceItemData& existingItem);
 	void MoveItemToSlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 slot, const FInstanceItemData& oldData);
 	void MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData);
-	void FillExistingItems(FInstanceItemData& itemToTransfer, const FItemData id);
-	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, const FItemData id, FInstanceItemData& existingItem, EGearType type);
+	void FillExistingItems(FInstanceItemData& itemToTransfer, int32 maxStackSize);
+	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& oldData, int32 maxStack, FInstanceItemData& existingItem, EGearType type);
 	void AddUpdateItemData(FInstanceItemData& existingItem);
 	void UpdateItemData(UItemContainer* container, FInstanceItemData& existingItem, const FInstanceItemData& oldData);
 	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData);
-	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData, const FItemData id);
+	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData, int32 maxStackSize);
 	TArray<int32> GetEmptySlots();
 	bool HasSpace();
 	bool IsValidForSlot(const int32 slot, const EGearType inType);
@@ -81,9 +81,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData GetInstanceItemAtSlot(int32 slot);
-
-	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	FInstanceItemData GetExistingItemWithSpace(FInstanceItemData inItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData& AddItem(FInstanceItemData& itemToAdd, TArray<int32>& ids);
@@ -106,9 +103,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetNextEmptySlot();
+	int32 GetContainerInstanceID();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void SplitItem(const FInstanceItemData inInstanceItemData);
+	void SplitItem(const FInstanceItemData itemToSplit);
 
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 	FItemRemoved OnItemRemoved;

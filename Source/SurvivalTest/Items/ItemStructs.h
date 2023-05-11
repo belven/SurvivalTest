@@ -391,7 +391,7 @@ struct FInstanceItemData
 	{
 		return !(lhs == rhs);
 	}
-
+	
 	bool isValid()
 	{
 		return ID != UItemStructs::InvalidInt;

@@ -38,6 +38,14 @@ public:
 		}
 	}
 
+	template <class A, class B>
+	static B GetLastMapItem(TMap<A, B> itemArray)
+	{
+		TArray<B> values;
+		itemArray.GenerateValueArray(values);
+		return values.Last();
+	}
+
 	template <class T>
 	static T GetRandom(TArray<T> itemArray)
 	{

@@ -1,4 +1,4 @@
-"0","Knife","Weapon","Texture2D'/Game/FirstPerson/Icons/Knife.Knife'","StaticMesh'/Game/FirstPerson/Weapons/Knife.Knife'","2"
+"0","Knife","Weapon","Texture2D'/Game/FirstPerson/Icons/Knife.Knife'","StaticMesh'/Game/FirstPerson/Weapons/Knife.Knife'","1"
 "1","Axe","Weapon","Texture2D'/Game/FirstPerson/Icons/Axe.Axe'","StaticMesh'/Game/FirstPerson/Weapons/Axe.Axe'","1"
 "2","SMG","Weapon","Texture2D'/Game/FirstPerson/Icons/SMG.SMG'","StaticMesh'/Game/FirstPerson/Weapons/SMG.SMG'","1"
 "3","AK","Weapon","Texture2D'/Game/FirstPerson/Icons/AK.AK'","StaticMesh'/Game/FirstPerson/Weapons/AK.AK'","1"

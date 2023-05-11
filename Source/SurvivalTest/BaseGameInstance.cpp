@@ -1,5 +1,6 @@
 #include "BaseGameInstance.h"
 #include "FactionManager.h"
+#include "HelperFunctions.h"
 #include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
 #include "Missions/MissionManager.h"
@@ -7,6 +8,7 @@
 #include "Tables/TableManager.h"
 #include "Tables/Items/WeaponInstanceTable.h"
 
+#define GetLastMapItem(type, values) UHelperFunctions::GetLastMapItem<int32, type>(values)
 
 void UBaseGameInstance::Init()
 {
@@ -27,7 +29,7 @@ int32 UBaseGameInstance::GetNextInstanceItemDataID()
 	
 	if (items.Num() > 0)
 	{
-		instanceItemDataID = items[items.Num() - 1].ID + 1;
+		instanceItemDataID = GetLastMapItem(FInstanceItemData, items).ID + 1;
 	}
 	return instanceItemDataID;
 }
@@ -38,7 +40,7 @@ int32 UBaseGameInstance::GetNextBoxID()
 	TMap<int32, FInstanceBoxData> boxes = GetInstancedBoxes();
 	if (boxes.Num() > 0)
 	{
-		boxID = boxes[boxes.Num() - 1].boxID + 1;
+		boxID = GetLastMapItem(FInstanceBoxData, boxes).boxID + 1;
 	}
 	return boxID;
 }
@@ -49,7 +51,7 @@ int32 UBaseGameInstance::GetNextInstanceBoxDataID()
 	TMap<int32, FInstanceBoxData> boxes = GetInstancedBoxes();
 	if (boxes.Num() > 0)
 	{
-		instanceBoxDataID = boxes[boxes.Num() - 1].ID + 1;
+		instanceBoxDataID = GetLastMapItem(FInstanceBoxData, boxes).ID + 1;
 	}
 	return instanceBoxDataID;
 }
@@ -60,7 +62,7 @@ int32 UBaseGameInstance::GetNextInstanceArmourDataID()
 	TMap<int32, FInstanceArmourData> armour = GetInstancedArmour();
 	if (armour.Num() > 0)
 	{
-		instanceArmourDataID = armour[armour.Num() - 1].ID + 1;
+		instanceArmourDataID = GetLastMapItem(FInstanceArmourData, armour).ID + 1;
 	}
 	return instanceArmourDataID;
 }
@@ -71,7 +73,7 @@ int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 	TMap<int32, FInstanceContainerData> containers = GetInstancedContainers();
 	if (containers.Num() > 0)
 	{
-		instanceContainerDataID = containers[containers.Num() - 1].ID + 1;
+		instanceContainerDataID = GetLastMapItem(FInstanceContainerData, containers).ID + 1;
 	}
 	return instanceContainerDataID;
 }
@@ -84,7 +86,7 @@ int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
 
 	if (instancedWeapons.Num() > 0)
 	{
-		instanceWeaponDataID = instancedWeapons[instancedWeapons.Num() - 1].ID + 1;
+		instanceWeaponDataID = GetLastMapItem(FInstanceWeaponData, instancedWeapons).ID + 1;
 	}
 	return instanceWeaponDataID;
 }
