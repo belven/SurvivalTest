@@ -369,10 +369,10 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 	{
 		if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius)
 			health_change.source->AddInteractable(this);
-		//SetActorHiddenInGame(true);
-		//SetActorEnableCollision(false);
 		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 	}
+
+	health_change.source->EnemyHit(this);
 
 	mEventTriggered(game, mCreateHealthChangeEvent(this, health_change, false));
 }
@@ -662,7 +662,6 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
  * If they are a player, we can setup the listeners for the Overlap of the interactionSphere.
  * Otherwise, we remove it entirely
  *
- * TODO find a better way to spawn the interactionSphere and set it up
  */
 void ABaseCharacter::PossessedBy(AController* NewController)
 {
@@ -717,6 +716,11 @@ void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 	FMath::Clamp(currentStats.stamina, 0, maxStats.stamina);
 }
 
+void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
+{
+	OnEnemyHit.Broadcast(inActor);
+}
+
 /**
  * Almost entirely used for passive stat draining like food and water.
  */
@@ -724,12 +728,12 @@ void ABaseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (game->grid)
-	{
-		AGridSection* gs = game->grid->GetGridSection(GetActorLocation());
-		if (gs)
-			gs->HighlightSection(DeltaSeconds);
-	}
+	//if (game->grid)
+	//{
+	//	AGridSection* gs = game->grid->GetGridSection(GetActorLocation());
+	//	if (gs)
+	//		gs->HighlightSection(DeltaSeconds);
+	//}
 
 	if (currentStats.health > 0)
 	{

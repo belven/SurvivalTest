@@ -3,6 +3,7 @@
 #include "Components/SphereComponent.h"
 #include "BaseCharacter.h"
 #include "BaseGameInstance.h"
+#include "BasePlayerController.h"
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
 #include "Items/Weapon.h"
@@ -64,12 +65,14 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 	}
 
 	FHitResult hit;
-	GetWorld()->LineTraceSingleByChannel(hit, GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 400), ECollisionChannel::ECC_Pawn);
-	DrawDebugLine(GetWorld(), GetActorLocation(), GetActorLocation() + (GetActorForwardVector() * 300), FColor::Red, false, 1);
+	FVector start = GetActorLocation() - (GetActorForwardVector() * 100);
+	FVector end = GetActorLocation() + (GetActorForwardVector() * 400);
+
+	GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Pawn);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1);
 	
 	if(hit.IsValidBlockingHit())
 	{
-
 		if (hit.GetActor()->Implements<UDamagable>() && Cast<IDamagable>(hit.GetActor())->IsAlive())
 		{
 			ITeam* hitTeam = Cast<ITeam>(hit.GetActor());
@@ -77,10 +80,9 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 			if (hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy) {
 				IDamagable* hitActor = Cast<IDamagable>(hit.GetActor());
 				healthChange.changeAmount = CalculateDamageFalloff();
-
-				FVector start = healthChange.source->GetActorLocation() + (healthChange.source->GetActorForwardVector() * 200);
+				/*FVector start = healthChange.source->GetActorLocation() + (healthChange.source->GetActorForwardVector() * 200);
 				start.Z += 20;
-				DrawDebugCrosshairs(GetWorld(), start, GetActorRotation(), 20, FColor::Blue, false, 3);
+				DrawDebugCrosshairs(GetWorld(), start, GetActorRotation(), 20, FColor::Blue, false, 3);*/
 
 				hitActor->ChangeHealth(healthChange);
 				Destroy();

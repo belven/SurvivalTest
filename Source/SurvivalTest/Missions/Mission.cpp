@@ -101,7 +101,7 @@ void AMission::SpawnBox(FVector location)
 
 	area->GetBox()->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMission::BeginOverlap);
 	area->GetBox()->OnComponentEndOverlap.AddUniqueDynamic(this, &AMission::EndOverlap);
-	DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
+	//DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
 }
 
 void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex)

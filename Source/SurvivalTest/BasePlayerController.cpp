@@ -76,6 +76,14 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 	}
 }
 
+void ABasePlayerController::EnemyHit(ABaseCharacter* enemy)
+{
+	if(mainHUD)
+	{
+		mainHUD->EnemyHit(enemy);
+	}
+}
+
 void ABasePlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
@@ -83,6 +91,7 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
 	baseCharacter->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
 	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
+	baseCharacter->OnEnemyHit.AddUniqueDynamic(this, &ABasePlayerController::EnemyHit);
 
 	if (baseCharacter->GetEquippedWeapon())
 	{

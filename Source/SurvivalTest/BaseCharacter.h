@@ -25,6 +25,7 @@ class UWeapon;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponEquipped, UWeapon*, oldWeapon);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyHit, ABaseCharacter*, enemy);
 
 UCLASS(config = Game)
 class ABaseCharacter : public ACharacter, public IDamagable, public ITeam, public IItemContainerInterface, public IInteractable
@@ -40,6 +41,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 	void CalculateSprint(float DeltaSeconds);
+	void EnemyHit(ABaseCharacter* inActor);
 
 	static const FVector cameraCenter;
 	static const FVector leftLean;
@@ -63,6 +65,7 @@ public:
 
 	FWeaponEquipped OnWeaponEquipped;
 	FCharacterDied OnCharacterDied;
+	FEnemyHit OnEnemyHit;
 
 	virtual EFaction GetFaction() override { return faction; }
 	void SetFaction(EFaction inFaction) { faction = inFaction; }
@@ -76,6 +79,7 @@ public:
 
 	bool IsSprinting() { return isRequestingSprint; }
 
+	UFUNCTION(BlueprintCallable)
 	virtual bool IsDead() override { return currentStats.health < 1; };
 
 	virtual float GetCurrentHealth() override { return currentStats.health; }

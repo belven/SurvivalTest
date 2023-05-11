@@ -18,6 +18,7 @@ public:
 	virtual void ChangeHealth(FHealthChange& health_change);
 	virtual float GetCurrentHealth();
 	virtual float GetMaxHealth();
+
 	bool IsAlive() { return !IsDead(); };
 	virtual bool IsDead();
 

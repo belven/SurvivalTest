@@ -99,9 +99,9 @@ void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
 
 	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-		pw->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
-		pw->OnReloadComplete.AddUniqueDynamic(this, &ABaseAIController::ReloadComplete);
+		projectileWeapon = Cast<UProjectileWeapon>(weapon);
+		projectileWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
+		projectileWeapon->OnReloadComplete.AddUniqueDynamic(this, &ABaseAIController::ReloadComplete);
 	}
 }
 
@@ -210,30 +210,22 @@ void ABaseAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
 	if (GetBaseCharacter() != NULL && GetBaseCharacter()->IsDead())
 	{
 		KillAI();
 	}
+	else if (target != NULL && target->IsAlive())
+	{
+		CalculateCombat();
+	}
+	else if (target != NULL && target->IsDead())
+	{
+		target = NULL;
+		FindNewTarget();
+	}
 	else
 	{
-		if (target != NULL && target->IsAlive())
-		{
-			CalculateCombat();
-		}
-		else if (target != NULL && target->IsDead())
-		{
-			target = NULL;
-			FindNewTarget();
-		}
-		else if (!HasAmmoForWeapon())
-		{
-			GetAmmo();
-		}
-		else
-		{
-			Patrol();
-		}
+		Patrol();
 	}
 }
 
@@ -324,7 +316,7 @@ void ABaseAIController::CalculateCombat()
 				StopMovement();
 				GetBaseCharacter()->StopSprinting();
 				FVector targetLoc = GetPredictedLocation(target->asActor());
-				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(mActorLocation, targetLoc);
+				FRotator rotation = UKismetMathLibrary::FindLookAtRotation(mActorLocation, IncreaseVectorHeight(targetLoc, 50));
 				AttackWithWeapon(rotation);
 			}
 			// Otherwise move towards the targets current location
@@ -348,18 +340,19 @@ void ABaseAIController::CalculateCombat()
 	}
 }
 
+FVector ABaseAIController::IncreaseVectorHeight(FVector location, int32 increase)
+{
+	return FVector(location.X, location.Y, location.Z + increase);
+}
+
 bool ABaseAIController::HasAmmoForWeapon()
 {
-	UWeapon* weapon = mCurrentWeapon();
-
-	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (projectileWeapon && !projectileWeapon->HasAmmo())
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-		int32 ammoID = pw->GetProjectileWeaponData().ammoID;
+		int32 ammoID = projectileWeapon->GetProjectileWeaponData().ammoID;
 		int32 ammoQuantity = GetBaseCharacter()->GetInventory()->GetItemAmount(ammoID);
 		return ammoQuantity > 0;
 	}
-
 	return true;
 }
 
@@ -466,25 +459,21 @@ void ABaseAIController::EquipKnife()
 
 void ABaseAIController::GetAmmo()
 {
-	// Have we finished moving?
-	if (finishedMoving)
+	// Set that we need ammo
+	// Either Tick has run HasAmmoForWeapon or OutOfAmmo has run HasAmmoForWeapon
+	needsAmmo = true;
+
+	// See if there's any allies with ammo nearby
+	GetNearbyAmmo();
+
+	// Do we still need ammo?
+	if (needsAmmo)
 	{
-		// Set that we need ammo
-		// Either Tick has run HasAmmoForWeapon or OutOfAmmo has run HasAmmoForWeapon
-		needsAmmo = true;
-
-		// See if there's any allies with ammo nearby
-		GetNearbyAmmo();
-
-		// Do we still need ammo?
-		if (needsAmmo)
+		// Find an ally we've seen, with ammo
+		if (!FindAllyWithAmmo())
 		{
-			// Find an ally we've seen, with ammo
-			if (!FindAllyWithAmmo())
-			{
-				// We didn't find a dead ally with ammo, so equip our knife
-				EquipKnife();
-			}
+			// We didn't find a dead ally with ammo, so equip our knife
+			EquipKnife();
 		}
 	}
 }
@@ -538,6 +527,8 @@ void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 			if (!hce->GetChange().heals && hce->GetEventOwner() == GetCharacter() && !hce->GetChange().source->IsDead())
 			{
 				target = hce->GetChange().source;
+				StopMovement();
+				LookAt(hce->GetChange().source->GetActorLocation());
 			}
 		}
 		// Check if the change is damage

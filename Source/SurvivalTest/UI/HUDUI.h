@@ -39,6 +39,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetPlayer(ABaseCharacter* inPlayer) { player = inPlayer; }
 
+	void EnemyHit(ABaseCharacter* inActor);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Combat")
+	void TriggerHitMarker(ABaseCharacter* inEnemy);
+
 private:
 	UPROPERTY()
 	ABaseCharacter* player;

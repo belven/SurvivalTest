@@ -14,6 +14,7 @@ class IDamagable;
 class UAISenseConfig_Sight;
 class UEnvQuery;
 class APatrolPath;
+class UProjectileWeapon;
 
 #define mAsBaseCharacter(character) Cast<ABaseCharacter>(character)
 
@@ -40,6 +41,7 @@ public:
 	void KillAI();
 	bool IsInWeaponsRange(float dist);
 	void CalculateCombat();
+	FVector IncreaseVectorHeight(FVector location, int32 increase);
 	bool HasAmmoForWeapon();
 	void Reload();
 	FVector GetPredictedLocation(AActor* actor);
@@ -77,6 +79,9 @@ private:
 	bool needsAmmo = false;
 
 	TArray<ABaseCharacter*> alliesSeen;
+
+	UPROPERTY()
+	UProjectileWeapon* projectileWeapon;
 
 	UPROPERTY()
 	UAISenseConfig_Sight* sightConfig;

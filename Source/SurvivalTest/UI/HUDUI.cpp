@@ -57,3 +57,8 @@ float UHUDUI::GetStaminaProgress()
 {
 	return (GetPlayer()->GetCurrentStats().stamina / GetPlayer()->GetMaxStats().stamina);
 }
+
+void UHUDUI::EnemyHit(ABaseCharacter* inActor)
+{
+	TriggerHitMarker(inActor);
+}

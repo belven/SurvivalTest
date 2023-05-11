@@ -31,6 +31,9 @@ public:
 	UFUNCTION()
 		void ContainersUpdated();
 
+	UFUNCTION()
+		void EnemyHit(ABaseCharacter* enemy);
+
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
 
