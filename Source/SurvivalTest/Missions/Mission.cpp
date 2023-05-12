@@ -5,6 +5,7 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include <NavigationSystem.h>
 #include "MissionManager.h"
+#include "SurvivalTest/BaseAIController.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Items/LootBox.h"
 #include "SurvivalTest/BaseGameInstance.h"
@@ -21,7 +22,6 @@ AMission::AMission()
 	AIClass = PlayerPawnClassFinder.Class;
 
 	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
-	navInvoker->SetGenerationRadii(boxSize, boxSize * 1.2);
 }
 
 FContainerData AMission::GetRandomContainerData()
@@ -68,7 +68,8 @@ void AMission::SetUpLootBoxes()
 void AMission::BeginPlay()
 {
 	Super::BeginPlay();
-	navInvoker->SetGenerationRadii(boxSize, boxSize * 1.2);
+	navInvoker->SetGenerationRadii(boxSize, boxSize);
+	navInvoker->Activate();
 	navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 
 	game = mGameInstance();
@@ -142,7 +143,7 @@ void AMission::MissionComplete()
 	SetUpLootBoxes();
 }
 
-void AMission::SpawnMission()
+void AMission::SpawnMission_Internal()
 {
 	if (!HasPlayers() && spawnMission)
 	{
@@ -154,7 +155,7 @@ void AMission::SpawnMission()
 		FActorSpawnParameters params;
 		params.Owner = this;
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		
+
 		for (auto& mld : mlt->GetData())
 		{
 			FLoadoutData ld = game->GetTableManager()->GetLoadoutTableData()->GetLoadoutDataByID(mld.loadoutID);
@@ -170,10 +171,31 @@ void AMission::SpawnMission()
 				aiSpawned.Add(character);
 			}
 		}
+
+		for (ABaseCharacter* character : aiSpawned)
+		{
+			ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
+			con->alliesSeen = aiSpawned;
+			con->alliesSeen.Remove(character);
+		}
+	}
+}
+
+void AMission::NavDone(ANavigationData* inNavData)
+{
+	SpawnMission_Internal();
+}
+
+void AMission::SpawnMission()
+{
+	UNavigationSystemV1* navigationSystemV1 = UNavigationSystemV1::GetCurrent(GetWorld());
+
+	if (navigationSystemV1->IsNavigationBuildInProgress()) {
+		navigationSystemV1->OnNavigationGenerationFinishedDelegate.AddUniqueDynamic(this, &AMission::NavDone);
 	}
 	else
 	{
-		SetUpLootBoxes();
+		SpawnMission_Internal();
 	}
 }
 

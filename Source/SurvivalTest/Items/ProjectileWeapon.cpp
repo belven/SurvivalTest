@@ -92,6 +92,7 @@ void UProjectileWeapon::ReloadExpired()
 		GetInstanceWeaponData().ammo += ammoToTake;
 		GetCharacterOwner()->GetGame()->AddUpdateData(GetInstanceWeaponData());
 		canAttack = true;
+		OnWeaponReady.Broadcast();
 		OnReloadComplete.Broadcast();
 	}
 }

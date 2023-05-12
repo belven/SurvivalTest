@@ -26,6 +26,7 @@ void UWeapon::SetOwner(ABaseCharacter* val)
 void UWeapon::AttackComplete()
 {
 	canAttack = true;
+	OnWeaponReady.Broadcast();
 }
 
 ABaseProjectile* UWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) {

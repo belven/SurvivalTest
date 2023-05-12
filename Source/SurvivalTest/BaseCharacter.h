@@ -46,6 +46,7 @@ public:
 	static const FVector cameraCenter;
 	static const FVector leftLean;
 	static const FVector rightLean;
+	static float interactionRadius;
 
 	float baseWalkSpeed;
 	EMovementState currentMovementState;
@@ -142,7 +143,6 @@ public:
 #pragma endregion Inventory
 
 protected:
-	static float interactionRadius;
 	float timeMoved;
 	bool inCombat;
 	bool isRequestingSprint;

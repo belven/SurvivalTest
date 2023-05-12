@@ -28,18 +28,30 @@ public:
 
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-	
+
+	FVector GetLastKnowLocation() { return lastKnowLocation; }
+	IDamagable* GetTarget() { return target; }
+	ABaseCharacter* GetBaseCharacter() { return AICharacter; }
+
+	TArray<ABaseCharacter*> alliesSeen;
+	bool isInactive;
+
+protected:
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
+	void DetermineNextAction();
 	void MoveToCombatLocation();
 	void GetNearbyAmmo();
 	bool FindAllyWithAmmo();
 	void EquipKnife();
 
 	void GetAmmo();
+	void Inactive();
 	virtual void Tick(float DeltaTime) override;
+	void GetPatrolPath();
 	void Patrol();
 	void KillAI();
 	bool IsInWeaponsRange(float dist);
+	void AttackWithWeapon();
 	void CalculateCombat();
 	FVector IncreaseVectorHeight(FVector location, int32 increase);
 	bool HasAmmoForWeapon();
@@ -47,11 +59,15 @@ public:
 	FVector GetPredictedLocation(AActor* actor);
 	void AttackWithWeapon(FRotator FireDirection);
 	void LookAt(FVector lookAtLocation);
-	
+	virtual void BeginPlay() override;
 	void MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result);
 
 	UFUNCTION()
 	void OutOfAmmo();
+
+	UFUNCTION()
+	void WeaponReady();
+
 	bool HasAmmo(ABaseCharacter* other);
 
 	UFUNCTION()
@@ -61,24 +77,21 @@ public:
 	void WeaponEquipped(UWeapon* oldWeapon);
 
 	UFUNCTION()
+	void NavDone(ANavigationData* inNavData);
+	UFUNCTION()
 	virtual void OnPossess(APawn* aPawn) override;
 	void FindNewTarget();
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
 
-	FVector GetLastKnowLocation() { return lastKnowLocation; }
-
-	IDamagable* GetTarget() { return target; }
-
-	ABaseCharacter* GetBaseCharacter() { return AICharacter; }
 
 private:
 	IDamagable* target;
 	FVector lastKnowLocation;
 	bool canSee = false;
-	bool finishedMoving = true;
 	bool needsAmmo = false;
+	FTimerHandle TimerHandle_Inactive;
+	FTimerHandle TimerHandle_DetemineAction;
 
-	TArray<ABaseCharacter*> alliesSeen;
 
 	UPROPERTY()
 	UProjectileWeapon* projectileWeapon;

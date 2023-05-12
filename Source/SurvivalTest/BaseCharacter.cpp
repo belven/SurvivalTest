@@ -67,8 +67,8 @@ ABaseCharacter::ABaseCharacter()
 	baseCameraComponent->SetRelativeLocation(FVector(50.0f, 0.0f, 80.0f)); // Position the camera
 	baseCameraComponent->bUsePawnControlRotation = true;
 
-	navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
-	navInvoker->SetGenerationRadii(4000, 5000);
+	//navInvoker = CreateDefaultSubobject<UNavigationInvokerComponent>(TEXT("navInvoker"));
+	//navInvoker->SetGenerationRadii(4000, 5000);
 
 	interactionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	interactionSphere->InitSphereRadius(interactionRadius);
@@ -139,7 +139,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
+	//navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 	game = mGameInstance();
 	GetOverlapsOnSpawn();
 }
@@ -369,7 +369,7 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 	{
 		if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius)
 			health_change.source->AddInteractable(this);
-		UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
+		//UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 	}
 
 	health_change.source->EnemyHit(this);

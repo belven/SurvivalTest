@@ -8,6 +8,7 @@
 #define mSetTimer(handle, method, delay) mSetTimerWorld(GetWorld(), handle, method, delay)
 #define mTimeRemaining(handle) GetWorld()->GetTimerManager().GetTimerRemaining(handle)
 #define mIsTimerActive(handle) GetWorld()->GetTimerManager().IsTimerActive(handle)
+#define mClearTimerWorld(world, handle, method, delay) world->GetTimerManager().SetTimer(handle, this, method, delay)
 
 #define mActorLocation GetCharacter()->GetActorLocation()
 #define mActorRotation GetCharacter()->GetActorRotation()

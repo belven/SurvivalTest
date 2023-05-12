@@ -312,7 +312,6 @@ void ABaseAIController::Patrol()
 
 void ABaseAIController::KillAI()
 {
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	StopMovement();
 	SetActorTickEnabled(false);
 }
@@ -455,7 +454,7 @@ bool ABaseAIController::FindAllyWithAmmo()
 {
 	for (auto ally : alliesSeen)
 	{
-		if (ally->IsDead() && HasAmmo(ally) && FVector::Dist(mActorLocation, ally->GetActorLocation()) < 10000)
+		if (ally->IsDead() && HasAmmo(ally))
 		{
 			MoveToLocation(ally->GetActorLocation(), ABaseCharacter::interactionRadius * 0.7);
 			return true;

@@ -3,6 +3,7 @@
 #include "Engine/TargetPoint.h"
 #include "SurvivalTest/Items/ItemStructs.h"
 #include "MissionStructs.h"
+#include "NavigationData.h"
 #include "NavigationInvokerComponent.h"
 #include "SurvivalTest/Events/EventListener.h"
 #include "Mission.generated.h"
@@ -19,9 +20,12 @@ class SURVIVALTEST_API AMission : public ATargetPoint, public IEventListener
 public:
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
 	void MissionComplete();
+	void SpawnMission_Internal();
 	bool ShouldSpawnMission() const { return spawnMission; }
 	bool MissionSpawned() const { return missionSpawned; }
 	void SetSpawnMission(bool inSpawnMission) { spawnMission = inSpawnMission; }
+	UFUNCTION()
+	void NavDone(ANavigationData* inNavData);
 	void SpawnMission();
 	EMissionType GetMissionType() const { return missionType; }
 	void SetMissionType(EMissionType inMissionType) { missionType = inMissionType; }

@@ -8,6 +8,9 @@
 
 #define mSpawnProjectile(projectileClass) GetCharacterOwner()->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponReady);
+
 class ABaseCharacter;
 class ABaseProjectile;
 
@@ -19,6 +22,8 @@ class SURVIVALTEST_API UWeapon : public UItem
 public:
 	UWeapon();
 	UStaticMesh* GetItemMesh();
+
+	FWeaponReady OnWeaponReady;
 
 	FInstanceWeaponData& GetInstanceWeaponData() { return instanceWeaponData; }
 	void SetInstanceWeaponData(FInstanceWeaponData inInstanceWeaponData) { instanceWeaponData = inInstanceWeaponData; }
