@@ -150,7 +150,8 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	// Set up our EQS query 
 	FindViableCombatLocationRequest = FEnvQueryRequest(FindWeaponLocationQuery, this);
 
-	if (!UNavigationSystemV1::GetCurrent(GetWorld())->IsNavigationBuildInProgress()) {
+	if (!UNavigationSystemV1::GetCurrent(GetWorld())->IsNavigationBuildInProgress())
+	{
 		UNavigationSystemV1::GetCurrent(GetWorld())->OnNavigationGenerationFinishedDelegate.AddUniqueDynamic(this, &ABaseAIController::NavDone);
 	}
 	else
@@ -226,25 +227,27 @@ void ABaseAIController::DetermineNextAction()
 	if (GetBaseCharacter() && GetBaseCharacter()->IsAlive())
 	{
 		isInactive = false;
-		if(needsAmmo)
+		if (needsAmmo)
 		{
 			GetAmmo();
 		}
-		else {
-			if (target != NULL && target->IsAlive())
-			{
-				CalculateCombat();
-			}
-			else if (target != NULL && target->IsDead())
-			{
-				target = NULL;
-				FindNewTarget();
-			}
-			else if (target == nullptr)
-			{
-				Patrol();
-			}
+		else if (target != NULL && target->IsAlive())
+		{
+			CalculateCombat();
 		}
+		else if (target != NULL && target->IsDead())
+		{
+			target = NULL;
+			FindNewTarget();
+		}
+		else if (target == nullptr)
+		{
+			Patrol();
+		}
+	}
+	else
+	{
+		isInactive = false;
 	}
 
 	mSetTimer(TimerHandle_Inactive, &ABaseAIController::Inactive, 10.0f);
@@ -315,6 +318,9 @@ void ABaseAIController::KillAI()
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
 	StopMovement();
 	SetActorTickEnabled(false);
+	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
+	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
+	UnPossess();	
 }
 
 bool ABaseAIController::IsInWeaponsRange(float dist)
@@ -424,11 +430,7 @@ FVector ABaseAIController::GetPredictedLocation(AActor* actor)
 void ABaseAIController::MoveToCombatLocation()
 {
 	FindViableCombatLocationRequest.Execute(EEnvQueryRunMode::SingleResult, this, &ABaseAIController::WeaponLocationQueryFinished);
-
-	if (!GetBaseCharacter()->IsSprinting())
-	{
-		GetBaseCharacter()->StartSprinting();
-	}
+	StartSprinting();
 }
 
 void ABaseAIController::GetNearbyAmmo()
@@ -451,6 +453,14 @@ void ABaseAIController::GetNearbyAmmo()
 	}
 }
 
+void ABaseAIController::StartSprinting()
+{
+	if (!GetBaseCharacter()->IsSprinting())
+	{
+		GetBaseCharacter()->StartSprinting();
+	}
+}
+
 bool ABaseAIController::FindAllyWithAmmo()
 {
 	for (auto ally : alliesSeen)
@@ -458,6 +468,7 @@ bool ABaseAIController::FindAllyWithAmmo()
 		if (ally->IsDead() && HasAmmo(ally) && FVector::Dist(mActorLocation, ally->GetActorLocation()) < 10000)
 		{
 			MoveToLocation(ally->GetActorLocation(), ABaseCharacter::interactionRadius * 0.7);
+			StartSprinting();
 			return true;
 		}
 	}
@@ -522,7 +533,7 @@ void ABaseAIController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (isInactive)
+	if (isInactive && GetBaseCharacter() && GetBaseCharacter()->IsAlive())
 	{
 		DetermineNextAction();
 	}
@@ -557,6 +568,7 @@ void ABaseAIController::FindNewTarget()
 				target = damagable;
 				lastKnowLocation = PerceptionComponent.Get()->GetActorInfo(*actor)->GetLastStimulusLocation();
 				MoveToLocation(lastKnowLocation);
+				StartSprinting();
 				return;
 			}
 		}

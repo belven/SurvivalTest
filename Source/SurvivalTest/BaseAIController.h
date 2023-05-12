@@ -41,6 +41,7 @@ protected:
 	void DetermineNextAction();
 	void MoveToCombatLocation();
 	void GetNearbyAmmo();
+	void StartSprinting();
 	bool FindAllyWithAmmo();
 	void EquipKnife();
 
