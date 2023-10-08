@@ -1,5 +1,4 @@
 #include "BasePlayerController.h"
-
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -9,7 +8,6 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "Components/TimelineComponent.h"
-#include "GameFramework/PawnMovementComponent.h"
 #include "Items/ProjectileWeapon.h"
 #include "UI/HUDUI.h"
 
@@ -89,7 +87,7 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
-	baseCharacter->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
+	baseCharacter->GetInventory()->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
 	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
 	baseCharacter->OnEnemyHit.AddUniqueDynamic(this, &ABasePlayerController::EnemyHit);
 
@@ -168,17 +166,17 @@ void ABasePlayerController::OnPrimaryActionReleased()
 
 void ABasePlayerController::OnPrimaryWeapon()
 {
-	EquipWeaponAtSlot(GetBaseCharacter()->GetPrimaryWeaponSlot(), EGearType::Weapon);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetInventory()->GetPrimaryWeaponSlot(), EGearType::Weapon);
 }
 
 void ABasePlayerController::OnSecondaryWeapon()
 {
-	EquipWeaponAtSlot(GetBaseCharacter()->GetSecondaryWeaponSlot(), EGearType::Weapon);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetInventory()->GetSecondaryWeaponSlot(), EGearType::Weapon);
 }
 
 void ABasePlayerController::OnSidearm()
 {
-	EquipWeaponAtSlot(GetBaseCharacter()->GetSidearmWeaponSlot(), EGearType::Sidearm);
+	EquipWeaponAtSlot(GetBaseCharacter()->GetInventory()->GetSidearmWeaponSlot(), EGearType::Sidearm);
 }
 
 void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
@@ -189,7 +187,7 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 	
 	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
 	{
-		GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID));
+		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID));
 	}
 }
 
@@ -318,6 +316,13 @@ void ABasePlayerController::OpenInventory()
 	{
 		inventoryWidget->SetVisibility(ESlateVisibility::Visible);
 		inventoryWidget->GenerateInventory();
+
+		for(IInteractable* i : GetBaseCharacter()->GetOverlappingInteractables())
+		{
+			// TODO make the interaction based on inventories only
+			i->Interact(this);
+		}
+
 		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, inventoryWidget);
 		bShowMouseCursor = true;
 	}

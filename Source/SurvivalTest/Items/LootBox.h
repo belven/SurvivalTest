@@ -28,14 +28,11 @@ public:
 	void SetContainerData(FContainerData inContainerData) { containerData = inContainerData; }
 
 	UFUNCTION()
-	void ItemAdded(FInstanceItemData inItem);
+	void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
 
 	UFUNCTION()
 	void RemoveLootBox();
-
-	UFUNCTION()
-	void ItemRemoved(FInstanceItemData inItem);
-
+	
 	UFUNCTION()
 	void SpawnLoot();
 	void ClearData();

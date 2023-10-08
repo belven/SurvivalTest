@@ -8,20 +8,11 @@
 #include "Events/RPGEventManager.h"
 #include "GameFramework/InputSettings.h"
 #include "Items/Armour.h"
-#include "Items/ArmourCreator.h"
-#include "Items/WeaponCreator.h"
 #include "Perception/AIPerceptionSystem.h"
-// ReSharper disable once CppUnusedIncludeDirective
-#include "BaseGameInstance.h"
-#include "Items/Weapon.h"
 #include "BasePlayerController.h"
-#include "NavigationInvokerComponent.h"
 #include "NavigationSystem.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Items/ItemContainer.h"
-#include "Missions/GridSectionData.h"
-#include "Missions/MainGrid.h"
 
 float ABaseCharacter::interactionRadius = 500;
 const FVector ABaseCharacter::cameraCenter = FVector(50.0f, 0.0f, 80.0f);
@@ -133,6 +124,7 @@ void ABaseCharacter::Interact(ABasePlayerController* instigator)
 
 void ABaseCharacter::Highlight(bool activate)
 {
+
 }
 
 void ABaseCharacter::BeginPlay()
@@ -162,157 +154,13 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 	icd.type = EContainerType::Player;
 	icd.name = cd.name;
 	game->GetInstancedContainers().Add(icd.ID, icd);
-	inventory = UItemContainer::CreateItemContainer(cd, icd, game);
-
-	TArray<EGearType> gearTypes;
-	gearTypes.AddUnique(EGearType::Head);
-	gearTypes.AddUnique(EGearType::Legs);
-	gearTypes.AddUnique(EGearType::Chest);
-	gearTypes.AddUnique(EGearType::Weapon);
-	gearTypes.AddUnique(EGearType::Bag);
-	gearTypes.AddUnique(EGearType::Sidearm);
-	gearTypes.AddUnique(EGearType::Vest);
-
-	for (EGearType type : gearTypes)
-	{
-		for (int32 slot : GetSlotForGear(type))
-		{
-			if (slot != UItemStructs::InvalidInt)
-				inventory->AddValidSlot(type, slot);
-		}
-	}
+	inventory = UInventory::CreateInventory(cd, icd, game, this);
 
 	currentStats.health = ld.health;
 	maxStats.health = ld.health;
-	CreateNewItemForInventory(GetGame()->GetItemDataByName("Knife").ID);
-	CreateNewItemForInventory(ld.weaponID);
-	CreateNewItemForInventory(ld.headArmourID);
-	CreateNewItemForInventory(ld.chestArmourID);
-	CreateNewItemForInventory(ld.vestArmourID);
-	CreateNewItemForInventory(ld.legsArmourID);
-
 	baseWalkSpeed = ld.moveSpeed;
 
-	inventory->OnItemAdded.AddUniqueDynamic(this, &ABaseCharacter::ItemAdded);
-	inventory->OnItemUpdated.AddUniqueDynamic(this, &ABaseCharacter::ItemUpdated);
-	inventory->OnItemRemoved.AddUniqueDynamic(this, &ABaseCharacter::ItemRemoved);
-}
-
-/**
- *Helper method defining the slots that are valid for specific types of gear
- *
- *This needs to be change to use validSlots in UItemContainer
- *
- *@param type The type of gear to get the slot for
- */
-TArray<int32> ABaseCharacter::GetSlotForGear(EGearType type)
-{
-	TArray<int32> validSlots;
-	switch (type)
-	{
-	case EGearType::Head: validSlots.Add(0);
-		break;
-	case EGearType::Chest: validSlots.Add(1);
-		break;
-	case EGearType::Vest: validSlots.Add(2);
-		break;
-	case EGearType::Legs: validSlots.Add(3);
-		break;
-	case EGearType::Weapon:
-		validSlots.Add(4);
-		validSlots.Add(5);
-		break;
-	case EGearType::Sidearm: validSlots.Add(6);
-		break;
-	case EGearType::Bag: validSlots.Add(7);
-		break;
-	default:
-		break;
-	}
-	return validSlots;
-}
-
-int32 ABaseCharacter::GetPrimaryWeaponSlot()
-{
-	return GetSlotForGear(EGearType::Weapon)[0];
-}
-
-int32 ABaseCharacter::GetSecondaryWeaponSlot()
-{
-	return GetSlotForGear(EGearType::Weapon)[1];
-}
-
-int32 ABaseCharacter::GetSidearmWeaponSlot()
-{
-	return GetSlotForGear(EGearType::Sidearm)[0];
-}
-
-/**
- * Currently used as a helper method, to add gear spawned from the loadouts.
- *
- * This needs to be changed so that gear equipped on a player, is added to an additional data table,
- * that stores the players inventory, so on reload, they get the same gear back
- *
- * @param itemID the ID of the armour to add
- */
-void ABaseCharacter::CreateNewItemForInventory(int32 itemID)
-{
-	if (itemID != UItemStructs::InvalidInt)
-	{
-		FItemData id = game->GetItemData(itemID);
-		TArray<int32> ids;
-		FInstanceItemData iid(itemID, 1);
-
-		if (inventory->AddItem(iid, ids).amount == 0)
-		{
-			int32 weaponInstanceItemID = ids.IsEmpty() ? UItemStructs::InvalidInt : ids[0];
-
-			if (id.type == EItemType::Armour)
-			{
-				EquipArmour(UArmourCreator::CreateArmour(itemID, GetWorld(), ids[0]));
-			}
-			else if (id.type == EItemType::Weapon)
-			{
-				FWeaponData wd = GetGame()->GetWeaponData(id.ID);
-
-				if (wd.type == EWeaponType::Projectile)
-				{
-					FRangedWeaponData rwd = GetGame()->GetRangedWeaponData(wd.ID);
-					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
-					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
-
-					for (int i = 0; i < 1; ++i)
-					{
-						iid.amount = ammoData.maxStack * 3;
-						iid.itemID = pwd.ammoID;
-
-						ids.Empty();
-						GetInventory()->AddItem(iid, ids);
-					}
-				}
-
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, GetWorld(), weaponInstanceItemID));
-			}
-		}
-	}
-}
-
-/**
- * Equips a weapon the character, setting the owner as well
- *
- *@param weapon The weapon to equip
- */
-void ABaseCharacter::SetEquippedWeapon(UWeapon* weapon)
-{
-	UWeapon* oldWeapon = equippedWeapon;
-	equippedWeapon = weapon;
-
-	if (equippedWeapon)
-	{
-		equippedWeapon->SetOwner(this);
-	}
-
-	OnWeaponEquipped.Broadcast(oldWeapon);
+	inventory->SetupLoadout(ld);
 }
 
 UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)
@@ -323,16 +171,6 @@ UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)
 	return LoadObject<UStaticMesh>(this, *data.mesh);
 }
 
-/**
- *Equips the given armour to the character. Adds it the slot that is viable for the armour
- *
- *@param armour The armour to equip
- *
- */
-void ABaseCharacter::EquipArmour(UArmour* armour)
-{
-	equippedArmour.FindOrAdd(armour->GetData().slot, armour);
-}
 
 /**
  * This is used to change the characters health, taking into account the type of change and possibly armour for damage reduction
@@ -401,13 +239,10 @@ float ABaseCharacter::GetDamageAfterResistance(float damage)
 int32 ABaseCharacter::GetDamageResistance()
 {
 	int32 total = 0;
-
-	TArray<UArmour*> armour;
-	equippedArmour.GenerateValueArray(armour);
-
-	for (const UArmour* a : armour)
+	
+	for (auto a : GetInventory()->GetEquippedArmour())
 	{
-		total += a->GetData().resistance;
+		total += a.Value->GetData().resistance;
 	}
 
 	return total;
@@ -447,7 +282,7 @@ void ABaseCharacter::AddInteractable(IInteractable* inter)
 	{
 		inter->Highlight(true);
 		overlappingInteractables.AddUnique(inter);
-		OnContainersUpdated.Broadcast();
+		GetInventory()->OnContainersUpdated.Broadcast();
 	}
 }
 
@@ -461,7 +296,7 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
 	inter->Highlight(false);
 	overlappingInteractables.Remove(inter);
-	OnContainersUpdated.Broadcast();
+	GetInventory()->OnContainersUpdated.Broadcast();
 }
 
 void ABaseCharacter::Consume(EConsumableType type, int32 value)
@@ -493,126 +328,7 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	}
 }
 
-void ABaseCharacter::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
-{
-	FItemData id = game->GetItemData(inItem.itemID);
 
-	if (id.type == EItemType::Weapon)
-	{
-		bool movedSlot = inItem.slot != oldItem.slot;
-		bool isWeaponSlot = GetSlotForGear(EGearType::Weapon).Contains(inItem.slot) || GetSlotForGear(EGearType::Sidearm).Contains(inItem.slot);
-
-		if (GetEquippedWeapon())
-		{
-			// Have we updated our equipped weapon?
-			if (GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID)
-			{
-				// Has the weapon moved out of an equipped slot?
-				if (movedSlot && !isWeaponSlot)
-				{
-					SetEquippedWeapon(nullptr);
-				}
-			}
-			// Is the new item in a valid weapon slot
-			// If so equip the new weapon
-			else if(isWeaponSlot)
-			{
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));				
-			}
-		}
-		else if (isWeaponSlot)
-		{
-			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));
-		}
-	}
-	else if (id.type == EItemType::Armour)
-	{
-		UArmour* armourFound = nullptr;
-
-		for (auto& a : equippedArmour)
-		{
-			if (a.Value->GetInstanceArmourData().instancedItemDataID == inItem.ID
-				// Has the armour moved out of an equipped slot?
-				&& !GetSlotForGear(a.Value->GetData().slot).Contains(inItem.slot))
-			{
-				armourFound = a.Value;
-				break;
-			}
-		}
-
-		if (armourFound)
-		{
-			equippedArmour.Remove(armourFound->GetData().slot);
-		}
-	}
-	OnContainersUpdated.Broadcast();
-}
-
-/**
- * An event listener for the players inventory that responds to items being added
- *
- *@param inItem The item added to the inventory
- *
- */
-void ABaseCharacter::ItemAdded(FInstanceItemData inItem)
-{
-	FItemData id = game->GetItemData(inItem.itemID);
-
-	// If we added armour, then update the Equipped armour
-	if (id.type == EItemType::Armour)
-	{
-		FInstanceArmourData iad = game->GetInstanceArmourDataByInstanceItemID(inItem.ID);
-		EquipArmour(UArmour::CreateArmour(inItem.itemID, game, inItem.ID));
-	}
-	// If we added a weapon and don't have one equipped, then equip it
-	else if (id.type == EItemType::Weapon)
-	{
-		FWeaponData wd = game->GetWeaponData(id.ID);
-		if (!GetEquippedWeapon() && GetSlotForGear(wd.gearType).Contains(inItem.slot))
-		{
-			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, GetWorld(), inItem.ID));
-		}
-	}
-	OnContainersUpdated.Broadcast();
-}
-
-/**
- * An event listener for the players inventory that responds to items being removed
- *
- *@param inItem The item removed from the inventory
- *
- */
-void ABaseCharacter::ItemRemoved(FInstanceItemData inItem)
-{
-	FItemData id = game->GetItemData(inItem.itemID);
-
-	if (id.type == EItemType::Weapon)
-	{
-		if (GetEquippedWeapon() && GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID)
-		{
-			SetEquippedWeapon(nullptr);
-		}
-	}
-	else if (id.type == EItemType::Armour)
-	{
-		UArmour* armourFound = nullptr;
-
-		for (auto& a : equippedArmour)
-		{
-			if (a.Value->GetInstanceArmourData().instancedItemDataID == inItem.ID)
-			{
-				armourFound = a.Value;
-				break;
-			}
-		}
-
-		if (armourFound)
-		{
-			equippedArmour.Remove(armourFound->GetData().slot);
-		}
-	}
-	OnContainersUpdated.Broadcast();
-}
 
 /**
  * This is typically triggered by the BeginOverlap of the interactionSphere.
@@ -727,13 +443,6 @@ void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
 void ABaseCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	//if (game->grid)
-	//{
-	//	AGridSection* gs = game->grid->GetGridSection(GetActorLocation());
-	//	if (gs)
-	//		gs->HighlightSection(DeltaSeconds);
-	//}
 
 	if (currentStats.health > 0)
 	{

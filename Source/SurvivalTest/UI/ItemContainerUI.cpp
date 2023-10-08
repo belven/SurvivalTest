@@ -34,8 +34,6 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 
 	if (container != NULL) {
 		// Set up add and remove listeners for our new container, so we can update our UI as things are added and removed
-		container->OnItemRemoved.AddUniqueDynamic(this, &UItemContainerUI::ItemRemoved);
-		container->OnItemAdded.AddUniqueDynamic(this, &UItemContainerUI::ItemAdded);
 		container->OnItemUpdated.AddUniqueDynamic(this, &UItemContainerUI::ItemUpdated);
 	}
 }
@@ -93,15 +91,15 @@ UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widget
 	return nullptr;
 }
 
-void UItemContainerUI::ItemAdded(FInstanceItemData inItem)
-{
-	AddItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
-}
-
-void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
-{
-	RemoveItem(inItem);
-}
+//void UItemContainerUI::ItemAdded(FInstanceItemData inItem)
+//{
+//	AddItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
+//}
+//
+//void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
+//{
+//	RemoveItem(inItem);
+//}
 
 void UItemContainerUI::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
 {

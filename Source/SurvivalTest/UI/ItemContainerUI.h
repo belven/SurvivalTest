@@ -76,13 +76,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UItemUI* GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widgets);
-
-	UFUNCTION()
-		void ItemAdded(FInstanceItemData inItem);
-
-	UFUNCTION()
-		void ItemRemoved(FInstanceItemData inItem);
-
+	
 private:
 	UPROPERTY()
 		UInventoryUI* inventory;

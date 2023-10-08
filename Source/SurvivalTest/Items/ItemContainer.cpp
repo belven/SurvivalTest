@@ -172,8 +172,8 @@ void UItemContainer::MoveItemToSlot(UItemContainer* other, FInstanceItemData& it
 			itemToTransfer.containerInstanceID = GetContainerInstanceID();
 			
 			AddUpdateItemData(itemToTransfer);
-			other->OnItemRemoved.Broadcast(oldData);
-			OnItemAdded.Broadcast(itemToTransfer);
+			other->OnItemUpdated.Broadcast(itemToTransfer, oldData);
+			OnItemUpdated.Broadcast(itemToTransfer, oldData);
 		}
 		else
 		{
@@ -253,7 +253,7 @@ void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData
 void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData)
 {
 	GetGame()->GetInstancedItems().Remove(itemToTransfer.ID);
-	other->OnItemRemoved.Broadcast(oldData);
+	other->OnItemUpdated.Broadcast(FInstanceItemData(), oldData);
 }
 
 void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& oldData, int32 maxStackSize)
@@ -373,7 +373,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 				FInstanceItemData newItem = itemToAdd.CopyItem(GetNextInstanceItemDataID(), instanceContainerData.ID, emptySlot);
 				newItem.amount = itemToAdd.amount;
 				AddUpdateItemData(newItem);
-				OnItemAdded.Broadcast(newItem);
+				OnItemUpdated.Broadcast(newItem, FInstanceItemData());
 
 				ids.Add(newItem.ID);
 				itemToAdd.amount = 0;
@@ -398,7 +398,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 					// Add the new item
 					ids.Add(newItem.ID);
 					AddUpdateItemData(newItem);
-					OnItemAdded.Broadcast(newItem);
+					OnItemUpdated.Broadcast(newItem, FInstanceItemData());
 				}
 				// We found no more valid slots for the item
 				else
@@ -484,7 +484,7 @@ void UItemContainer::SplitItem(const FInstanceItemData itemToSplit)
 			FInstanceItemData newItem = iid.CopyItem(nextID, GetContainerInstanceID(), emptySlot, newAmount);
 
 			AddUpdateItemData(newItem);
-			OnItemAdded.Broadcast(newItem);
+			OnItemUpdated.Broadcast(newItem, FInstanceItemData());
 
 			UpdateDebugItemsList();
 		}

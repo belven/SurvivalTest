@@ -60,7 +60,7 @@ void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowin
 {
 	if (result.IsSuccess())
 	{
-		mSetTimer(TimerHandle_DetemineAction, &ABaseAIController::DetermineNextAction, 1.0f);
+		mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
 	}
 }
 
@@ -226,7 +226,10 @@ void ABaseAIController::DetermineNextAction()
 {
 	if (GetBaseCharacter() && GetBaseCharacter()->IsAlive())
 	{
+		inactiveTimerDuration = 3.0f;
+
 		isInactive = false;
+
 		if (needsAmmo)
 		{
 			GetAmmo();
@@ -250,7 +253,7 @@ void ABaseAIController::DetermineNextAction()
 		isInactive = false;
 	}
 
-	mSetTimer(TimerHandle_Inactive, &ABaseAIController::Inactive, 10.0f);
+	mSetTimer(TimerHandle_Inactive, &ABaseAIController::Inactive, inactiveTimerDuration);
 }
 
 void ABaseAIController::WeaponReady()
@@ -316,7 +319,7 @@ void ABaseAIController::Patrol()
 void ABaseAIController::KillAI()
 {
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	StopMovement();
+	GetBaseCharacter()->GetMovementComponent()->StopMovementImmediately();
 	SetActorTickEnabled(false);
 	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
 	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
@@ -490,7 +493,7 @@ void ABaseAIController::EquipKnife()
 		// Find the knife, all AI should have one by default
 		if (id.name.Equals("Knife"))
 		{
-			GetBaseCharacter()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID));
+			GetBaseCharacter()->GetInventory()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID));
 			knifeEquipped = true;
 			DetermineNextAction();
 			break;
@@ -499,7 +502,7 @@ void ABaseAIController::EquipKnife()
 
 	if (!knifeEquipped)
 	{
-		GetBaseCharacter()->SetEquippedWeapon(nullptr);
+		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(nullptr);
 	}
 }
 
@@ -527,16 +530,7 @@ void ABaseAIController::GetAmmo()
 void ABaseAIController::Inactive()
 {
 	isInactive = true;
-}
-
-void ABaseAIController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	if (isInactive && GetBaseCharacter() && GetBaseCharacter()->IsAlive())
-	{
-		DetermineNextAction();
-	}
+	DetermineNextAction();
 }
 
 void ABaseAIController::AttackWithWeapon(FRotator FireDirection)
@@ -615,4 +609,15 @@ void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 			FindNewTarget();
 		}
 	}
+}
+
+FPathFollowingRequestResult ABaseAIController::MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath)
+{
+	//FPathFollowingRequestResult res = Super::MoveTo(MoveRequest, OutPath);
+	//inactiveTimerDuration = OutPath->Get()->GetLength() / (GetBaseCharacter()->GetMovementComponent()->GetMaxSpeed() * 1.2);
+	//return res;
+
+	// TODO figure out inactive timer based on travel time
+	inactiveTimerDuration = 15.0f;
+	return Super::MoveTo(MoveRequest, OutPath);
 }

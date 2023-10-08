@@ -60,6 +60,68 @@ void UTableManager::LoadTableFromFile(UCSVTable* table)
 	}
 }
 
+void UTableManager::RemoveContainerData(int32 containerInstanceID)
+{
+	TArray<FInstanceItemData> items = GetInstancedItemsForContainer(containerInstanceID);
+	FInstanceContainerData icd = GetInstanceContainerData(containerInstanceID);
+
+	if(icd.type == EContainerType::Box)
+	{
+		int32 boxID = GetInstanceBoxDataByContainerInstance(containerInstanceID).ID;
+		GetInstancedBoxes().FindAndRemoveChecked(boxID);
+
+		// TODO make box container CSVTable
+	}
+	else if(icd.type == EContainerType::Player)
+	{
+		int32 playerID = 0;
+		// TODO make player container data
+	}
+	else if (icd.type == EContainerType::Armour)
+	{
+		int32 armourID = 0;
+
+	}
+
+	for(FInstanceItemData iid : items)
+	{
+		GetInstanceItemDataTable()->GetData().FindAndRemoveChecked(iid.ID);
+	}
+
+	instancedContainers.FindAndRemoveChecked(icd.ID);
+}
+
+FInstanceBoxData UTableManager::GetInstanceBoxDataByContainerInstance(int32 containerInstanceID)
+{
+	TArray<FInstanceBoxData> instancedBoxsFound;
+	boxContainers.GenerateValueArray(instancedBoxsFound);
+
+	for (const FInstanceBoxData ibd : instancedBoxsFound)
+	{
+		if (ibd.containerInstanceID == containerInstanceID)
+		{
+			return ibd;
+		}
+	}
+	return {};
+}
+
+
+FInstanceContainerData UTableManager::GetInstanceContainerData(int32 containerInstanceID)
+	{
+	TArray<FInstanceContainerData> instancedContainersFound;
+	instancedContainers.GenerateValueArray(instancedContainersFound);
+
+		for (const FInstanceContainerData icd : instancedContainersFound)
+		{
+			if (icd.ID == containerInstanceID)
+			{
+				return icd;
+			}
+		}
+		return {};
+	}
+
 FInstanceWeaponData UTableManager::GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID)
 {
 	int32 instanceContainerDataID = 0;
@@ -89,6 +151,8 @@ TArray<FInstanceItemData> UTableManager::GetInstancedItemsForContainer(int32 ins
 	}
 	return data;
 }
+
+
 
 FItemData UTableManager::GetItemData(int32 itemID)
 {

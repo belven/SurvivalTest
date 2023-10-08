@@ -42,6 +42,9 @@ public:
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
+	void RemoveContainerData(int32 containerInstanceID);
+	FInstanceBoxData GetInstanceBoxDataByContainerInstance(int32 BoxInstanceID);
+	FInstanceContainerData GetInstanceContainerData(int32 containerInstanceID);
 	void SaveTableToFile(UCSVTable* table);
 	TArray<FString> CleanData(TArray<FString> strings);
 

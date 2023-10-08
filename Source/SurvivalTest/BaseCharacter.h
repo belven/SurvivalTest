@@ -6,23 +6,16 @@
 #include "GameFramework/Character.h"
 #include "Interfaces/Interactable.h"
 #include "Interfaces/ItemContainerInterface.h"
-#include "Items/ItemStructs.h"
 #include "CharacterStructs.h"
+#include "Items/Inventory.h"
 #include "BaseCharacter.generated.h"
 
-class UInputComponent;
-class USkeletalMeshComponent;
-class USceneComponent;
 class UCameraComponent;
-class UAnimMontage;
-class USoundBase;
 class UBaseGameInstance;
-class UArmour;
 class USphereComponent;
-class UItemContainer;
+class UInventory;
 class UWeapon;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponEquipped, UWeapon*, oldWeapon);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyHit, ABaseCharacter*, enemy);
@@ -57,10 +50,7 @@ public:
 	UCameraComponent* GetBaseCameraComponent() const { return baseCameraComponent; }
 
 #pragma region Combat
-	UStaticMeshComponent* GetWeaponMeshComp() const { return weaponMeshComp; }
-	FORCEINLINE UWeapon* GetEquippedWeapon() { return equippedWeapon; }
-	void SetEquippedWeapon(UWeapon* weapon);
-	void EquipArmour(UArmour* armour);
+	FORCEINLINE UWeapon* GetEquippedWeapon() { return GetInventory() ? GetInventory()->GetEquippedWeapon() : nullptr; }
 
 	UStaticMesh* GetItemMesh(FItemData data);
 
@@ -113,34 +103,22 @@ public:
 #pragma endregion Interactables
 
 #pragma region Inventory
-	FOnContainersUpdated OnContainersUpdated;
-
 	virtual UItemContainer* GetItemContainer() override { return inventory; }
-	UItemContainer* GetInventory() const { return inventory; }
 
-	void SetInventory(UItemContainer* inInventory) { inventory = inInventory; }
+	UInventory* GetInventory() const { return inventory; }
+	void SetInventory(UInventory* inInventory) { inventory = inInventory; }
+
+	void SetupLoadout(FString loadoutName);
+
+	UStaticMeshComponent* GetWeaponMeshComp() const
+	{
+		return weaponMeshComp;
+	}
+
+#pragma endregion Inventory
 
 	UBaseGameInstance* GetGame() const { return game; }
 	void SetGame(UBaseGameInstance* inGame) { game = inGame; }
-
-	UFUNCTION()
-	void ItemAdded(FInstanceItemData inItem);
-
-	UFUNCTION()
-	void ItemRemoved(FInstanceItemData inItem);
-	UFUNCTION()
-	void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
-
-	TArray<int32> GetSlotForGear(EGearType type);
-	int32 GetPrimaryWeaponSlot();
-	int32 GetSecondaryWeaponSlot();
-	int32 GetSidearmWeaponSlot();
-
-	UFUNCTION()
-	void SetupLoadout(FString loadoutName);
-
-
-#pragma endregion Inventory
 
 protected:
 	float timeMoved;
@@ -149,9 +127,6 @@ protected:
 
 	void ResetStats();
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void CreateNewItemForInventory(int32 itemID);
 	void DrainStat(float& stat, float drainRate, float healthDamage, float deltaSeconds);
 
 	UPROPERTY()
@@ -165,12 +140,6 @@ protected:
 	UPROPERTY()
 	UBaseGameInstance* game;
 
-	UPROPERTY()
-	UWeapon* equippedWeapon;
-
-	UPROPERTY()
-	TMap<EGearType, UArmour*> equippedArmour;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Factions, meta = (AllowPrivateAccess = "true"))
 	EFaction faction;
 
@@ -181,7 +150,7 @@ protected:
 	FCharacterStats currentStats;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
-	UItemContainer* inventory;
+	UInventory* inventory;
 
 	UPROPERTY()
 	FCharacterStats maxStats;

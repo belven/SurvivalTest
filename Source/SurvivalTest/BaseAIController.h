@@ -47,7 +47,6 @@ protected:
 
 	void GetAmmo();
 	void Inactive();
-	virtual void Tick(float DeltaTime) override;
 	void GetPatrolPath();
 	void Patrol();
 	void KillAI();
@@ -84,6 +83,8 @@ protected:
 	void FindNewTarget();
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
 
+public:
+	virtual FPathFollowingRequestResult MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath) override;
 
 private:
 	IDamagable* target;
@@ -91,8 +92,8 @@ private:
 	bool canSee = false;
 	bool needsAmmo = false;
 	FTimerHandle TimerHandle_Inactive;
-	FTimerHandle TimerHandle_DetemineAction;
-
+	FTimerHandle TimerHandle_DetermineAction;
+	float inactiveTimerDuration;
 
 	UPROPERTY()
 	UProjectileWeapon* projectileWeapon;

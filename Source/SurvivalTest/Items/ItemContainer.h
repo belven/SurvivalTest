@@ -5,9 +5,7 @@
 #include "../BaseGameInstance.h"
 #include "ItemContainer.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemRemoved, FInstanceItemData, item);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemUpdated, FInstanceItemData, item, FInstanceItemData, oldItem);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FItemAdded, FInstanceItemData, item);
 
 USTRUCT(BlueprintType)
 struct FValidSlots
@@ -107,16 +105,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	void SplitItem(const FInstanceItemData itemToSplit);
-
-	UPROPERTY(BlueprintCallable, Category = "Item Container")
-	FItemRemoved OnItemRemoved;
-
+	
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 		FItemUpdated OnItemUpdated;
-
-	UPROPERTY(BlueprintCallable, Category = "Item Container")
-	FItemAdded OnItemAdded;
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetOwnerID() const { return containerData.ID; }
 
@@ -136,7 +128,7 @@ public:
 		UBaseGameInstance* GetGame();
 
 	void AddValidSlot(EGearType type, const int32 slot);
-private:
+protected:
 	UPROPERTY()
 	TMap<int32, FValidSlots> validSlots;
 

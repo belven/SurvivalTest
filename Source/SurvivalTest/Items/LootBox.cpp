@@ -120,8 +120,7 @@ void ALootBox::CreateLootboxData()
 	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
 
 	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerData.ID), icd, gameIn);
-	container->OnItemRemoved.AddUniqueDynamic(this, &ALootBox::ItemRemoved);
-	container->OnItemAdded.AddUniqueDynamic(this, &ALootBox::ItemAdded);
+	container->OnItemUpdated.AddUniqueDynamic(this, &ALootBox::ItemUpdated);
 }
 
 FInstanceItemData ALootBox::CreateLoot(FItemData id)
@@ -135,9 +134,6 @@ FInstanceItemData ALootBox::CreateLoot(FItemData id)
 	return {};
 }
 
-void ALootBox::ItemAdded(FInstanceItemData inItem)
-{
-}
 
 void ALootBox::RemoveLootBox()
 {
@@ -145,7 +141,7 @@ void ALootBox::RemoveLootBox()
 	//Destroy();
 }
 
-void ALootBox::ItemRemoved(FInstanceItemData inItem)
+void ALootBox::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
 {
 	if (!mIsTimerActive(TimerHandle_LootboxClear))
 		mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, 60.0f);
