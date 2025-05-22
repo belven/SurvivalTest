@@ -18,14 +18,8 @@ public:
 		void GenerateInventory();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		void UpdateItem(FInstanceItemData instanceItemData, FItemData itemData);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		void RemoveItem(FInstanceItemData instanceItemData);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		void AddItem(FInstanceItemData instanceItemData, FItemData itemData);
-
+		void UpdateItem(FInstanceItemData newItemData, FInstanceItemData oldItemData, FItemData itemData);
+		
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		int32 GetColumn();
 
@@ -54,7 +48,7 @@ public:
 		UItemContainer* GetItemContainer() const { return container; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
+	void ItemUpdated(FInstanceItemData newItem, FInstanceItemData oldItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		void SetItemContainer(UItemContainer* inContainer);

@@ -91,22 +91,7 @@ UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widget
 	return nullptr;
 }
 
-//void UItemContainerUI::ItemAdded(FInstanceItemData inItem)
-//{
-//	AddItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
-//}
-//
-//void UItemContainerUI::ItemRemoved(FInstanceItemData inItem)
-//{
-//	RemoveItem(inItem);
-//}
-
-void UItemContainerUI::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
+void UItemContainerUI::ItemUpdated(FInstanceItemData newItem, FInstanceItemData oldItem)
 {
-	if(!GetItemContainer()->GetInstanceItemAtSlot(oldItem.slot).isValid())
-	{
-		RemoveItem(oldItem);
-	}
-
-	UpdateItem(inItem, GetBaseGameInstance()->GetItemData(inItem.itemID));
+	UpdateItem(newItem, oldItem, GetBaseGameInstance()->GetItemData(newItem.itemID));
 }

@@ -32,7 +32,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 
 			if (GetInstanceItemData().amount > 0)
 			{
-				GetItemContainer()->UpdateItemData(GetItemContainer(),instanceItemData, oldData);
+				GetItemContainer()->UpdateItemData(GetItemContainer(), instanceItemData, oldData);
 			}
 			else
 			{
@@ -95,4 +95,9 @@ void UItemUI::ClearItemData()
 	iid.slot = GetInstanceItemData().slot;
 	SetInstanceItemData(iid);
 	SetItemData(FItemData());
+}
+
+bool UItemUI::IsItemValid()
+{
+	return GetInstanceItemData().isValid();
 }

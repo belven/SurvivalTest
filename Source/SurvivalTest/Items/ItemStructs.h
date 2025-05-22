@@ -243,6 +243,10 @@ public:
 	static FString GetFireMode(EFireMode mode);
 	static bool GetBoolean(FString value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
+	static bool IsValidID(const int ID)
+	{
+		return ID != UItemStructs::InvalidInt;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -353,23 +357,26 @@ public:
 	int32 instancedItemDataID = UItemStructs::InvalidInt;
 };
 
+
+
 USTRUCT(BlueprintType)
 struct FInstanceItemData
 {
 	GENERATED_USTRUCT_BODY()
 
 	FInstanceItemData() {}
+	FInstanceItemData(int32 inSlot) : slot(inSlot) {}
 	FInstanceItemData(int32 inItemID, int32 newAmount) : itemID(inItemID), amount(newAmount) {}
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
 
 	FInstanceItemData(int32 inID, int32 inItemID, int32 inContainerInstanceID, int32 inAmount, int32 inSlot)
 		: ID(inID),
-		  itemID(inItemID),
-		  containerInstanceID(inContainerInstanceID),
-		  amount(inAmount),
-		  slot(inSlot)
+		itemID(inItemID),
+		containerInstanceID(inContainerInstanceID),
+		amount(inAmount),
+		slot(inSlot)
 	{
 	}
 
@@ -394,7 +401,7 @@ struct FInstanceItemData
 	
 	bool isValid()
 	{
-		return ID != UItemStructs::InvalidInt;
+		return UItemStructs::IsValidID(ID);
 	}
 
 	void TakeFrom(FInstanceItemData& itemToAdd, int32 stackSize)
@@ -406,7 +413,7 @@ struct FInstanceItemData
 	}
 
 	// Single method to get a copy of the item with new data, basically just copies itemID
-	FInstanceItemData CopyItem(int32 nextID,  int32 instanceContainerID, int32 emptySlot, int32 newAmount = 0)
+	FInstanceItemData CopyItem(int32 nextID, int32 instanceContainerID, int32 emptySlot, int32 newAmount = 0)
 	{
 		return FInstanceItemData(nextID, itemID, instanceContainerID, newAmount, emptySlot);
 	}

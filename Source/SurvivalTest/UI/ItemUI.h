@@ -24,10 +24,10 @@ public:
 	void UpdateItemDetails();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Item")
-		void ClearItem();
-	
+	void ClearItem();
+
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		FString GetItemAmount();
+	FString GetItemAmount();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	UTexture2D* GetItemIcon();
@@ -36,7 +36,7 @@ public:
 	void SetImage(UImage* image);
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		void ClearItemData();
+	void ClearItemData();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	FItemData GetItemData() const { return itemData; }
@@ -51,14 +51,16 @@ public:
 	void SetInstanceItemData(FInstanceItemData inInstanceItemData) { instanceItemData = inInstanceItemData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
-		UItemContainer* GetItemContainer() const { return itemContainer; }
+	UItemContainer* GetItemContainer() const { return itemContainer; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	void SetItemContainer(UItemContainer* inItemContainer) { itemContainer = inItemContainer; }
 
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	bool IsItemValid();
 private:
 	UPROPERTY()
-		UItemContainer* itemContainer;
+	UItemContainer* itemContainer;
 	FItemData itemData;
 	int32 imageSize = 100;
 	FInstanceItemData instanceItemData;
