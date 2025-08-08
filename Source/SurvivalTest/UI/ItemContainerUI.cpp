@@ -3,15 +3,17 @@
 #include "ItemUI.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 
+const int UItemContainerUI::itemsPerRow = 5;
+
 int32 UItemContainerUI::GetColumn()
 {
-	return index % 5;
+	return index % itemsPerRow;
 }
 
 int32 UItemContainerUI::GetNextRowIndex()
 {
 	int32 nextRow = GetRow() + 1;
-	return (nextRow * 5);
+	return (nextRow * itemsPerRow);
 }
 
 void UItemContainerUI::GetGridData(int32& row, int32& column)
@@ -22,7 +24,6 @@ void UItemContainerUI::GetGridData(int32& row, int32& column)
 
 int32 UItemContainerUI::GetRow()
 {
-	int32 itemsPerRow = 5;
 	int32 rowMod = index % itemsPerRow;
 	int32 nearestRow = index - rowMod;
 	return nearestRow / itemsPerRow;

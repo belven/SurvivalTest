@@ -154,7 +154,20 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 	// We have an item that only stacks once and the items are in the same container, so swap the items
 	else
 	{
-		MoveItemToSlot(this, itemToTransfer, droppedSlot, existingItem);
+		FInstanceItemData otherItem = itemToTransfer;
+		FInstanceItemData ourItem = existingItem;
+
+		int otherSlot = otherItem.slot;
+
+		otherItem.containerInstanceID = GetContainerInstanceID();
+		otherItem.slot = ourItem.slot;
+
+		UpdateItemData(this, otherItem, ourItem);
+
+		ourItem.containerInstanceID = other->GetContainerInstanceID();
+		ourItem.slot = otherSlot;
+
+		UpdateItemData(other, ourItem, itemToTransfer);
 	}
 }
 
@@ -233,10 +246,10 @@ void UItemContainer::AddUpdateItemData(FInstanceItemData& existingItem)
 	GetGame()->AddUpdateData(existingItem);
 }
 
-void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData& existingItem, const FInstanceItemData& originalItemData)
+void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem)
 {
-	AddUpdateItemData(existingItem);
-	container->OnItemUpdated.Broadcast(existingItem, originalItemData);
+	AddUpdateItemData(newItem);
+	container->OnItemUpdated.Broadcast(newItem, OldItem);
 }
 
 void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData)

@@ -188,6 +188,8 @@ public:
 	float reloadSpeed = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 bulletVelocity = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+	float gravity = 3;
 };
 
 USTRUCT(BlueprintType)

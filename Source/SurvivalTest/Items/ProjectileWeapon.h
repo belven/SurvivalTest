@@ -19,6 +19,7 @@ public:
 	void ConsumeAmmo();
 	void SpawnProjectile(const FRotator& FireRotation);
 	void Reload();
+	ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) override;
 
 	FOutOfAmmo OnOutOfAmmo;
 	FReloadComplete OnReloadComplete;

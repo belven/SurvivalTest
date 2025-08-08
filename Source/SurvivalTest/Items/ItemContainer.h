@@ -59,7 +59,7 @@ public:
 	void FillExistingItems(FInstanceItemData& itemToTransfer, int32 maxStackSize);
 	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& originalItemData, int32 maxStack, FInstanceItemData& existingItem, EGearType type);
 	void AddUpdateItemData(FInstanceItemData& existingItem);
-	void UpdateItemData(UItemContainer* container, FInstanceItemData& existingItem, const FInstanceItemData& originalItemData);
+	void UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem);
 	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData);
 	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData, int32 maxStackSize);
 	TArray<int32> GetEmptySlots();

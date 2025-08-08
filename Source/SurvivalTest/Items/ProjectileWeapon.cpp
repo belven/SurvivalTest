@@ -24,6 +24,18 @@ void UProjectileWeapon::UseWeapon(const FRotator& LookAtRotation)
 	}
 }
 
+ABaseProjectile* UProjectileWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) {
+	ABaseProjectile* projectile = mSpawnProjectile(projectileClass);
+	FHealthChange hc;
+	hc.changeAmount = weaponData.healthChange;
+	hc.source = GetCharacterOwner();
+	hc.heals = weaponData.heals;
+	projectile->SetHealthChange(hc);
+	projectile->SetWeaponUsed(this);
+	projectile->GetProjectileMovement()->ProjectileGravityScale = GetProjectileWeaponData().gravity;
+	return projectile;
+}
+
 bool UProjectileWeapon::HasAmmo()
 {
 	return GetInstanceWeaponData().ammo > 0;
@@ -63,8 +75,8 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 
 	GetCharacterOwner()->AddControllerPitchInput(rot.Pitch);
 	GetCharacterOwner()->AddControllerYawInput(rot.Yaw);
-	
-	ABaseProjectile* proj = UWeapon::SpawnProjectile(gunLocation, rot, ABaseProjectile::StaticClass());
+
+	ABaseProjectile* proj = SpawnProjectile(gunLocation, rot, ABaseProjectile::StaticClass());
 	FVector velocity = FVector(1.f, 0.f, 0.f).GetSafeNormal() * GetProjectileWeaponData().bulletVelocity;
 	proj->GetProjectileMovement()->SetVelocityInLocalSpace(velocity);
 

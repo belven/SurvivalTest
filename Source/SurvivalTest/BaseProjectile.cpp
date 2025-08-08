@@ -17,37 +17,43 @@ ABaseProjectile::ABaseProjectile()
 
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(10.0f);
-	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionComp->SetCollisionProfileName("Projectile");
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
-
 	RootComponent = CollisionComp;
 
+	// Only visual
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> ProjectileMeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Cone.Cone'"));
-
 	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ProjectileMesh0"));
 	ProjectileMesh->SetStaticMesh(ProjectileMeshAsset.Object);
 	ProjectileMesh->SetupAttachment(RootComponent);
 	ProjectileMesh->CastShadow = false;
 	ProjectileMesh->SetWorldScale3D(FVector(0.05));
-	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision); // purely visual
 	ProjectileMesh->SetRelativeRotation(FRotator(-90, 0, 0));
+
+	// Overlap handling
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);
+
+	// Movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	ProjectileMovement->InitialSpeed = Default_Initial_Speed;
 	ProjectileMovement->MaxSpeed = 60000;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
-	ProjectileMovement->ProjectileGravityScale = 0.f;
+	ProjectileMovement->ProjectileGravityScale = 3.0f;
+
 	InitialLifeSpan = Default_Initial_Lifespan;
 }
 
 float ABaseProjectile::CalculateDamageFalloff()
 {
 	float damage = healthChange.changeAmount;
-	float dist = FVector::Dist(GetActorLocation(), startLoc);	
+	float dist = FVector::Dist(GetActorLocation(), startLoc);
 	int32 range = GetWeaponUsed()->GetWeaponData().range;
-	if(dist > range)
+	if (dist > range)
 	{
 		damage *= 1 - ((dist - range) / range);
 	}
@@ -55,36 +61,22 @@ float ABaseProjectile::CalculateDamageFalloff()
 	return FMath::Max(damage, 1);
 }
 
-void ABaseProjectile::Tick(float DeltaSeconds)
+void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaSeconds);
-
-	if(startLoc == FVector::ZeroVector)
+	if (OtherActor && OtherActor != this && OtherComp && healthChange.source)
 	{
-		startLoc = GetActorLocation();
-	}
-
-	FHitResult hit;
-	FVector start = GetActorLocation() - (GetActorForwardVector() * 100);
-	FVector end = GetActorLocation() + (GetActorForwardVector() * 400);
-
-	GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Pawn);
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 1);
-	
-	if(hit.IsValidBlockingHit())
-	{
-		if (hit.GetActor()->Implements<UDamagable>() && Cast<IDamagable>(hit.GetActor())->IsAlive())
+		if (OtherActor->Implements<UDamagable>())
 		{
-			ITeam* hitTeam = Cast<ITeam>(hit.GetActor());
+			ITeam* hitTeam = Cast<ITeam>(OtherActor);
+			if (hitTeam && hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy)
+			{
+				IDamagable* hitTarget = Cast<IDamagable>(OtherActor);
 
-			if (hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy) {
-				IDamagable* hitActor = Cast<IDamagable>(hit.GetActor());
-				healthChange.changeAmount = CalculateDamageFalloff();
-				/*FVector start = healthChange.source->GetActorLocation() + (healthChange.source->GetActorForwardVector() * 200);
-				start.Z += 20;
-				DrawDebugCrosshairs(GetWorld(), start, GetActorRotation(), 20, FColor::Blue, false, 3);*/
-
-				hitActor->ChangeHealth(healthChange);
+				if (hitTarget->IsAlive()) {
+					healthChange.changeAmount = CalculateDamageFalloff();
+					hitTarget->ChangeHealth(healthChange);
+				}
 				Destroy();
 			}
 		}
@@ -93,6 +85,21 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 			Destroy();
 		}
 	}
+}
+
+void ABaseProjectile::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	if (startLoc == FVector::ZeroVector)
+	{
+		startLoc = GetActorLocation();
+	}
+
+	FVector start = GetActorLocation() - (GetActorForwardVector() * 100);
+	FVector end = GetActorLocation() + (GetActorForwardVector() * 100);
+
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5);
 }
 
 void ABaseProjectile::SetHealthChange(FHealthChange inHealthChange)

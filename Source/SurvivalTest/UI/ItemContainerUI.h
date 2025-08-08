@@ -14,6 +14,8 @@ class SURVIVALTEST_API UItemContainerUI : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	static const int itemsPerRow;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
 		void GenerateInventory();
 

@@ -56,14 +56,6 @@ void ABaseAIController::BeginPlay()
 	DetermineNextAction();
 }
 
-void ABaseAIController::MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result)
-{
-	if (result.IsSuccess())
-	{
-		mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
-	}
-}
-
 void ABaseAIController::OutOfAmmo()
 {
 	if (HasAmmoForWeapon())
@@ -129,8 +121,7 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 13000;
-
-	GetPathFollowingComponent()->OnRequestFinished.AddUObject(this, &ABaseAIController::MoveComplete);
+	
 
 	// Set up sight config for AI perception
 	sightConfig->SightRadius = range * 0.9;
@@ -206,6 +197,18 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 				alliesSeen.Add(Cast<ABaseCharacter>(Actor));
 			}
 		}
+	}
+}
+
+void ABaseAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
+{
+	if (Result.IsSuccess())
+	{
+		mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
+	}
+	else
+	{
+		mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);		
 	}
 }
 
@@ -323,7 +326,7 @@ void ABaseAIController::KillAI()
 	SetActorTickEnabled(false);
 	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
 	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
-	UnPossess();	
+	UnPossess();
 }
 
 bool ABaseAIController::IsInWeaponsRange(float dist)
@@ -333,8 +336,8 @@ bool ABaseAIController::IsInWeaponsRange(float dist)
 
 void ABaseAIController::AttackWithWeapon()
 {
-	const FVector targetLocation = target->asActor()->GetActorLocation() + FVector(0, 0, 50);
-	const UWeapon* weapon = mCurrentWeapon();
+	const FVector targetLocation = IncreaseVectorHeight(target->asActor()->GetActorLocation(),50);
+	UWeapon* weapon = mCurrentWeapon();
 
 	LookAt(targetLocation);
 
@@ -346,8 +349,17 @@ void ABaseAIController::AttackWithWeapon()
 		{
 			StopMovement();
 			GetBaseCharacter()->StopSprinting();
-			FVector targetLoc = GetPredictedLocation(target->asActor());
-			FRotator rotation = UKismetMathLibrary::FindLookAtRotation(mActorLocation, IncreaseVectorHeight(targetLoc, 50));
+			FVector targetLoc = IncreaseVectorHeight(GetPredictedLocation(target->asActor()), 70);
+
+			FRotator rotation = GetBaseCharacter()->GetActorRotation();
+
+			if (weapon->GetWeaponData().type == EWeaponType::Projectile)
+			{
+				FProjectileWeaponData pw = Cast<UProjectileWeapon>(weapon)->GetProjectileWeaponData();
+				float gravity = pw.gravity * GetWorld()->GetGravityZ();
+				SolveBallisticArc(mActorLocation, targetLoc, pw.bulletVelocity, gravity, rotation);
+			}
+
 			AttackWithWeapon(rotation);
 		}
 		// Otherwise move towards the targets current location
@@ -364,6 +376,34 @@ void ABaseAIController::AttackWithWeapon()
 		EquipKnife();
 		CalculateCombat();
 	}
+}
+
+bool ABaseAIController::SolveBallisticArc(const FVector& StartLocation, const FVector& TargetLocation, float LaunchSpeed, float GravityZ, FRotator& OutRotation) {
+	FVector Delta = TargetLocation - StartLocation;
+	FVector DeltaXZ = FVector(Delta.X, Delta.Y, 0.f);
+	float DeltaZ = Delta.Z;
+	float DeltaXY = DeltaXZ.Size();
+
+	float SpeedSq = LaunchSpeed * LaunchSpeed;
+	float Gravity = FMath::Abs(GravityZ); // Ensure gravity is positive
+	float Root = SpeedSq * SpeedSq - Gravity * (Gravity * DeltaXY * DeltaXY + 2 * DeltaZ * SpeedSq);
+
+	if (Root < 0)
+	{
+		// No solution
+		return false;
+	}
+
+	float RootSqrt = FMath::Sqrt(Root);
+
+	// Low angle solution
+	float Angle = FMath::Atan((SpeedSq - RootSqrt) / (Gravity * DeltaXY));
+
+	FVector DirectionXY = DeltaXZ.GetSafeNormal();
+	FVector LaunchVelocity = LaunchSpeed * (DirectionXY * FMath::Cos(Angle) + FVector::UpVector * FMath::Sin(Angle));
+
+	OutRotation = LaunchVelocity.Rotation();
+	return true;
 }
 
 void ABaseAIController::CalculateCombat()

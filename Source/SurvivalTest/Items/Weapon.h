@@ -50,5 +50,5 @@ protected:
 	UPROPERTY()
 	UStaticMeshComponent* weaponMeshComp;
 
-	ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass);
+	virtual ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) { return NULL;  };
 };

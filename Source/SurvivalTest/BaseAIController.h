@@ -25,10 +25,11 @@ class SURVIVALTEST_API ABaseAIController : public AAIController, public IEventLi
 
 public:
 	ABaseAIController();
+	bool SolveBallisticArc(const FVector& StartLocation, const FVector& TargetLocation, float LaunchSpeed, float GravityZ, FRotator& OutRotation);
 
 	UFUNCTION()
 	void TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 	FVector GetLastKnowLocation() { return lastKnowLocation; }
 	IDamagable* GetTarget() { return target; }
 	ABaseCharacter* GetBaseCharacter() { return AICharacter; }
@@ -60,7 +61,6 @@ protected:
 	void AttackWithWeapon(FRotator FireDirection);
 	void LookAt(FVector lookAtLocation);
 	virtual void BeginPlay() override;
-	void MoveComplete(FAIRequestID RequestID, const FPathFollowingResult& result);
 
 	UFUNCTION()
 	void OutOfAmmo();

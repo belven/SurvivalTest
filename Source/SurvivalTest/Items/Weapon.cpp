@@ -1,5 +1,6 @@
 #include "Weapon.h"
 #include "../BaseProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/CharacterStructs.h"
 
@@ -29,16 +30,7 @@ void UWeapon::AttackComplete()
 	OnWeaponReady.Broadcast();
 }
 
-ABaseProjectile* UWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) {
-	ABaseProjectile* projectile = mSpawnProjectile(projectileClass);
-	FHealthChange hc;
-	hc.changeAmount = weaponData.healthChange;
-	hc.source = GetCharacterOwner();
-	hc.heals = weaponData.heals;
-	projectile->SetHealthChange(hc);
-	projectile->SetWeaponUsed(this);
-	return projectile;
-}
+
 
 void UWeapon::UseWeapon(const FRotator& LookAtRotation)
 {
