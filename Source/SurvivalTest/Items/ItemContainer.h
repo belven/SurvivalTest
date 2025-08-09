@@ -60,9 +60,9 @@ public:
 	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& originalItemData, int32 maxStack, FInstanceItemData& existingItem, EGearType type);
 	void AddUpdateItemData(FInstanceItemData& existingItem);
 	void UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem);
-	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData);
+	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToDelete);
 	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData, int32 maxStackSize);
-	TArray<int32> GetEmptySlots();
+	TArray<int32> GetEmptySlots(bool first = false);
 	bool HasSpace();
 	bool IsValidForSlot(const int32 slot, const EGearType inType);
 	int32 FindNextEmptyValidSlot(EGearType inType);
@@ -104,7 +104,7 @@ public:
 	int32 GetContainerInstanceID();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	void SplitItem(const FInstanceItemData itemToSplit);
+	bool SplitItem(FInstanceItemData& itemToSplit);
 	
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
 		FItemUpdated OnItemUpdated;
@@ -136,7 +136,7 @@ protected:
 	FContainerData containerData;
 
 	UPROPERTY()
-	UBaseGameInstance* game;
+	UBaseGameInstance* game = NULL;
 
 	UPROPERTY()
 	FInstanceContainerData instanceContainerData;

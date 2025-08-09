@@ -31,8 +31,9 @@ void UInventory::CreateNewItemForInventory(int32 itemID)
 		FItemData id = game->GetItemData(itemID);
 		TArray<int32> ids;
 		FInstanceItemData iid(itemID, 1);
+		FInstanceItemData& newItem = AddItem(iid, ids);
 
-		if (AddItem(iid, ids).amount == 0)
+		if (newItem.amount == 0)
 		{
 			int32 weaponInstanceItemID = ids.IsEmpty() ? UItemStructs::InvalidInt : ids[0];
 
@@ -50,14 +51,14 @@ void UInventory::CreateNewItemForInventory(int32 itemID)
 					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
 
-					for (int i = 0; i < 1; ++i)
-					{
-						iid.amount = ammoData.maxStack * 3;
-						iid.itemID = pwd.ammoID;
+					/*for (int i = 0; i < 1; ++i)
+					{*/
+					iid.amount = ammoData.maxStack * 3;
+					iid.itemID = pwd.ammoID;
 
-						ids.Empty();
-						AddItem(iid, ids);
-					}
+					ids.Empty();
+					AddItem(iid, ids);
+					//}
 				}
 
 				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, characterOwner->GetWorld(), weaponInstanceItemID));
@@ -176,7 +177,7 @@ void UInventory::SetupLoadout(FLoadoutData ld)
 	CreateNewItemForInventory(ld.chestArmourID);
 	CreateNewItemForInventory(ld.vestArmourID);
 	CreateNewItemForInventory(ld.legsArmourID);
-	
+
 	OnItemUpdated.AddUniqueDynamic(this, &UInventory::ItemUpdated);
 }
 

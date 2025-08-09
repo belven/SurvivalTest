@@ -105,7 +105,7 @@ void ABaseCharacter::SetMovementSpeed(EMovementState state)
 	case EMovementState::Slow:
 		GetCharacterMovement()->MaxWalkSpeed = baseWalkSpeed * 0.5;
 		break;
-	default: ;
+	default:;
 	}
 }
 
@@ -239,7 +239,7 @@ float ABaseCharacter::GetDamageAfterResistance(float damage)
 int32 ABaseCharacter::GetDamageResistance()
 {
 	int32 total = 0;
-	
+
 	for (auto a : GetInventory()->GetEquippedArmour())
 	{
 		total += a.Value->GetData().resistance;
@@ -277,8 +277,23 @@ void ABaseCharacter::GetOverlapsOnSpawn()
  */
 void ABaseCharacter::AddInteractable(IInteractable* inter)
 {
+	bool shouldAdd = false;
+
 	ABaseCharacter* other = Cast<ABaseCharacter>(inter);
-	if (!other || (other != this && other->IsDead()))
+
+	// If the other is not a Character, then it's a regular container, so add it regardless.
+	// TODO - This is where we should check for loot permissions in teams
+	if (other == NULL)
+	{
+		shouldAdd = true;
+	}
+	// Otherwise, only show inventories of dead characters nearby
+	else if (other != this && other->IsDead())
+	{
+		shouldAdd = true;
+	}
+
+	if (shouldAdd)
 	{
 		inter->Highlight(true);
 		overlappingInteractables.AddUnique(inter);
@@ -312,7 +327,7 @@ void ABaseCharacter::Consume(EConsumableType type, int32 value)
 	case EConsumableType::Medical:
 		currentStats.health += value;
 		break;
-	default: ;
+	default:;
 	}
 }
 
@@ -327,8 +342,6 @@ void ABaseCharacter::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		AddInteractable(Cast<IInteractable>(OtherActor));
 	}
 }
-
-
 
 /**
  * This is typically triggered by the BeginOverlap of the interactionSphere.

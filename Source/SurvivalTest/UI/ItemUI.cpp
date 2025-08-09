@@ -36,7 +36,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 			}
 			else
 			{
-				GetItemContainer()->RemoveInstanceItem(GetItemContainer(), instanceItemData, oldData);
+				GetItemContainer()->RemoveInstanceItem(GetItemContainer(), instanceItemData);
 			}
 		}
 	}
@@ -54,7 +54,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 		}
 		else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())
 		{
-			GetItemContainer()->SplitItem(GetInstanceItemData());
+			GetItemContainer()->SplitItem(instanceItemData);
 		}
 		else
 		{
