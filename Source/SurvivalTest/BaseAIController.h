@@ -34,6 +34,7 @@ public:
 	IDamagable* GetTarget() { return target; }
 	ABaseCharacter* GetBaseCharacter() { return AICharacter; }
 
+	UPROPERTY()
 	TArray<ABaseCharacter*> alliesSeen;
 	bool isInactive;
 
@@ -54,12 +55,12 @@ protected:
 	bool IsInWeaponsRange(float dist);
 	void AttackWithWeapon();
 	void CalculateCombat();
-	FVector IncreaseVectorHeight(FVector location, int32 increase);
+	FVector IncreaseVectorHeight(const FVector& location, int32 increase);
 	bool HasAmmoForWeapon();
 	void Reload();
 	FVector GetPredictedLocation(AActor* actor);
-	void AttackWithWeapon(FRotator FireDirection);
-	void LookAt(FVector lookAtLocation);
+	void AttackWithWeapon(const FRotator& FireDirection);
+	void LookAt(const FVector& lookAtLocation);
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
@@ -81,6 +82,8 @@ protected:
 	UFUNCTION()
 	virtual void OnPossess(APawn* aPawn) override;
 	void FindNewTarget();
+
+	UFUNCTION()
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
 
 public:
@@ -114,4 +117,5 @@ private:
 	APatrolPath* currentPath;
 
 	int32 currentPathPoint;
+	int acceptanceRadius = 400;
 };

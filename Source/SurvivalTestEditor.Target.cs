@@ -10,5 +10,9 @@ public class SurvivalTestEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("SurvivalTest");
-	}
+        bLegacyParentIncludePaths = true;
+        CppStandard = CppStandardVersion.Default;
+        WindowsPlatform.bStrictConformanceMode = true;
+        bValidateFormatStrings = true;
+    }
 }

@@ -42,7 +42,7 @@ ABaseAIController::ABaseAIController() : Super()
 	currentPathPoint = 0;
 }
 
-void ABaseAIController::LookAt(FVector lookAtLocation)
+void ABaseAIController::LookAt(const FVector& lookAtLocation)
 {
 	FRotator lookAt = UKismetMathLibrary::FindLookAtRotation(mActorLocation, lookAtLocation);
 	lookAt.Pitch = mActorRotation.Pitch;
@@ -151,6 +151,7 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	}
 }
 
+// ReSharper disable once CppPassValueParameterByConstReference
 void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
 {
 	// Is the actor our current target?
@@ -202,16 +203,15 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 
 void ABaseAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
-	if (Result.IsSuccess())
+	if (!Result.IsSuccess() && (Result.Code == EPathFollowingResult::Invalid || Result.Code == EPathFollowingResult::Blocked))
 	{
-		mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
+		UE_LOG(LogTemp, Log, TEXT("OnMoveCompleted Failed"));
 	}
-	else
-	{
-		mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);		
-	}
+
+	mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
 }
 
+// ReSharper disable once CppPassValueParameterByConstReference
 void ABaseAIController::WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result)
 {
 	// Did we find a new location to move to?
@@ -221,7 +221,7 @@ void ABaseAIController::WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> 
 		const FVector loc = Result->GetItemAsLocation(0);
 
 		// Move to the location found
-		MoveToLocation(loc);
+		MoveToLocation(loc, acceptanceRadius);
 	}
 }
 
@@ -311,7 +311,7 @@ void ABaseAIController::Patrol()
 			const FVector loc = spline->GetWorldLocationAtSplinePoint(currentPathPoint);
 
 			// Move to the spline point
-			MoveToLocation(loc, 400);
+			MoveToLocation(loc, acceptanceRadius);
 
 			// Increment the path point, to move onto the next one
 			currentPathPoint++;
@@ -425,7 +425,7 @@ void ABaseAIController::CalculateCombat()
 	}
 }
 
-FVector ABaseAIController::IncreaseVectorHeight(FVector location, int32 increase)
+FVector ABaseAIController::IncreaseVectorHeight(const FVector& location, int32 increase)
 {
 	return FVector(location.X, location.Y, location.Z + increase);
 }
@@ -573,7 +573,7 @@ void ABaseAIController::Inactive()
 	DetermineNextAction();
 }
 
-void ABaseAIController::AttackWithWeapon(FRotator FireDirection)
+void ABaseAIController::AttackWithWeapon(const FRotator& FireDirection)
 {
 	mCurrentWeapon()->UseWeapon(FireDirection);
 }
@@ -601,7 +601,7 @@ void ABaseAIController::FindNewTarget()
 				// This means the AI will move to the targets exact location, rather than just their last location
 				target = damagable;
 				lastKnowLocation = PerceptionComponent.Get()->GetActorInfo(*actor)->GetLastStimulusLocation();
-				MoveToLocation(lastKnowLocation);
+				MoveToLocation(lastKnowLocation, acceptanceRadius);
 				StartSprinting();
 				return;
 			}

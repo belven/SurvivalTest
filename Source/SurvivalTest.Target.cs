@@ -10,5 +10,9 @@ public class SurvivalTestTarget : TargetRules
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.V2;
 		ExtraModuleNames.Add("SurvivalTest");
-	}
+        bLegacyParentIncludePaths= true;
+		CppStandard = CppStandardVersion.Default;
+		WindowsPlatform.bStrictConformanceMode = true;
+		bValidateFormatStrings = true;
+    }
 }

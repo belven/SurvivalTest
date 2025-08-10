@@ -8,13 +8,13 @@ void UCharacterTask::PerformTask(AController* inController)
 
 void UCharacterTask::PerformNextAction()
 {
-	currentAction = actions.Pop();
+	 actions.Dequeue(currentAction);
 	currentAction->StartAction();
 }
 
 void UCharacterTask::AddAction(UTaskAction* action)
 {
-	actions.Add(action);
+	actions.Enqueue(action);
 	action->OnActionComplete.AddUniqueDynamic(this, &UCharacterTask::ActionComplete);
 }
 
@@ -36,10 +36,11 @@ void UCharacterTask::ActionComplete(FStatusData actionStatus)
 
 bool UCharacterTask::CancelAction(bool force)
 {
+	bool result = false;
 	if (currentAction->CanBeInterrupted() || force)
 	{
 		currentAction->Cancel();
-		return true;
+		result = true;
 	}
-	return false;
+	return result;
 }

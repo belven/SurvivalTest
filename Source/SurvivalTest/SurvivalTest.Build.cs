@@ -7,7 +7,7 @@ public class SurvivalTest : ModuleRules
 	public SurvivalTest(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "Slate", "SlateCore", "NavigationSystem", "AIModule" });
+        bLegacyParentIncludePaths = true;
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG", "Slate", "SlateCore", "NavigationSystem", "AIModule" });
 	}
 }
