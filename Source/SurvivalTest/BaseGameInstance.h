@@ -30,7 +30,7 @@ class SURVIVALTEST_API UBaseGameInstance : public UGameInstance
 public:
 	virtual void Init() override;
 	virtual void Shutdown() override;
-	
+
 	UFUNCTION(BlueprintCallable)
 	FItemData GetItemData(int32 itemID) { return mTable()->GetItemData(itemID); }
 	FItemData GetItemDataByName(FString itemName) { return mTable()->GetItemDataByName(itemName); }
@@ -83,6 +83,8 @@ public:
 	UMissionManager* GetMissionManager();
 
 private:
+	FCriticalSection InstanceItemIDLock;
+	int32 LastInstanceItemID = -1;
 
 	UPROPERTY()
 	UMissionManager* missionManager;

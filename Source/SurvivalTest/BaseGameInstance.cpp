@@ -24,16 +24,26 @@ void UBaseGameInstance::Shutdown()
 
 int32 UBaseGameInstance::GetNextInstanceItemDataID()
 {
-	int32 instanceItemDataID = 0;
-	TMap<int32, FInstanceItemData> items = GetInstancedItems();
-	
-	if (items.Num() > 0)
-	{
-		instanceItemDataID = GetLastMapItem(FInstanceItemData, items).ID + 1;
-	}
-	return instanceItemDataID;
-}
+	FScopeLock Lock(&InstanceItemIDLock); // Thread-safe guard
 
+	const TMap<int32, FInstanceItemData>& items = GetInstancedItems();
+
+	// If LastInstanceItemID is not up to date (e.g. on load), recompute from current items
+	if (LastInstanceItemID < 0 || LastInstanceItemID < items.Num() - 1)
+	{
+		LastInstanceItemID = -1;
+		for (const auto& Pair : items)
+		{
+			if (Pair.Value.ID > LastInstanceItemID)
+			{
+				LastInstanceItemID = Pair.Value.ID;
+			}
+		}
+	}
+
+	// Increment to get a guaranteed new ID
+	return ++LastInstanceItemID;
+}
 int32 UBaseGameInstance::GetNextBoxID()
 {
 	int32 boxID = 0;

@@ -192,18 +192,46 @@ void UItemContainer::MoveItemToSlot(UItemContainer* container, FInstanceItemData
 	if (slot != UItemStructs::InvalidInt)
 	{
 		// Set the containerInstanceID to this container, this will move the item to belong to us
-		itemToTransfer.containerInstanceID = GetContainerInstanceID();
+		itemToTransfer.containerInstanceID = container->GetContainerInstanceID();
 		itemToTransfer.slot = slot;
 
-		UpdateItemData(this, itemToTransfer, originalItemData);
+		UpdateItemData(container, itemToTransfer, originalItemData);
 	}
 }
 
-void UItemContainer::MoveItemToEmptySlot(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData)
+//void UItemContainer::MoveItemToEmptySlot(UItemContainer* otherContainer, FInstanceItemData& itemToTransfer)
+//{
+//	FInstanceItemData originalItemData = itemToTransfer;
+//
+//	FInstanceItemData blankData = FInstanceItemData(originalItemData.slot);
+//	int32 emptySlot = GetNextEmptySlotForItem(itemToTransfer.itemID);
+//
+//	MoveItemToSlot(this, itemToTransfer, emptySlot, originalItemData);
+//
+//	MoveItemToSlot(otherContainer, blankData, originalItemData.slot, itemToTransfer);
+//}
+
+void UItemContainer::MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemContainer* destContainer, FInstanceItemData& itemToTransfer)
 {
-	FInstanceItemData blankData;
-	MoveItemToSlot(other, itemToTransfer, GetNextEmptySlotForItem(itemToTransfer.itemID), originalItemData);
-	MoveItemToSlot(other, blankData, originalItemData.slot, itemToTransfer);
+	// Find destination empty slot
+	int32 emptySlot = destContainer->GetNextEmptySlotForItem(itemToTransfer.itemID);
+	if (!UItemStructs::IsValidID(emptySlot))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MoveItemToEmptySlot: No valid empty slot in destination container %d"), destContainer->GetContainerInstanceID());
+		return;
+	}
+
+	// Store the original copy for UI update purposes
+	FInstanceItemData originalItemData = itemToTransfer;
+
+	// Blank data for clearing the old slot in the source
+	FInstanceItemData blankData(originalItemData.slot);
+
+	// Move the item into destination
+	destContainer->MoveItemToSlot(destContainer, itemToTransfer, emptySlot, originalItemData);
+
+	// Clear the original slot in the source
+	sourceContainer->MoveItemToSlot(sourceContainer, blankData, originalItemData.slot, itemToTransfer);
 }
 
 void UItemContainer::FillExistingItems(FInstanceItemData& itemToTransfer, int32 maxStackSize)
@@ -247,7 +275,7 @@ void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData
 	else if (!HasSpace(itemToTransfer))
 	{
 		UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem MoveItemToEmptySlot"));
-		MoveItemToEmptySlot(other, itemToTransfer, originalItemData);
+		MoveItemToEmptySlot(other, this, itemToTransfer);
 	}
 	// We're not full so try and find existing items OR add it to the inventory as is
 	else
@@ -286,7 +314,7 @@ void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FIn
 			// Update the itemToTransfer in the database
 			UpdateItemData(other, itemToTransfer, originalItemData);
 
-			MoveItemToEmptySlot(other, itemToTransfer, originalItemData);
+			MoveItemToEmptySlot(other, this, itemToTransfer);
 		}
 		else
 		{
@@ -296,7 +324,7 @@ void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FIn
 	// We're dealing with a single stack item, so try and add it to the next empty slot
 	else if (maxStackSize == 1)
 	{
-		MoveItemToEmptySlot(other, itemToTransfer, originalItemData);
+		MoveItemToEmptySlot(other, this, itemToTransfer);
 	}
 }
 
@@ -334,7 +362,7 @@ FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory,
 			else if (IsValidForSlot(droppedSlot, type))
 			{
 				UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Empty Slot"));
-				MoveItemToSlot(sourceInventory, itemToTransfer, droppedSlot, existingItem);
+				MoveItemToSlot(this, itemToTransfer, droppedSlot, existingItem);
 
 				sourceInventory->OnItemUpdated.Broadcast(FInstanceItemData(originalItemData.slot), originalItemData);
 			}
@@ -519,8 +547,13 @@ bool UItemContainer::SplitItem(FInstanceItemData& itemToSplit)
 			itemToSplit.amount = halfAmount;
 			UpdateItemData(this, itemToSplit, originalCopy);
 
+			int32 newID = GetNextInstanceItemDataID();
+
 			// Create new item
-			FInstanceItemData newItem = itemToSplit.CopyItem(GetNextInstanceItemDataID(), GetContainerInstanceID(), emptySlot, remainingAmount);
+			FInstanceItemData newItem = itemToSplit.CopyItem(newID, GetContainerInstanceID(), emptySlot, remainingAmount);
+			UE_LOG(LogTemp, Log, TEXT("SplitItem: New ID=%d, EmptySlot=%d, Existing? %s"),
+				newItem.ID, emptySlot,
+				GetGame()->GetInstancedItems().Contains(newItem.ID) ? TEXT("YES") : TEXT("NO"));
 
 			UpdateItemData(this, newItem, FInstanceItemData(emptySlot));
 
