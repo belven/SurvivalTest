@@ -12,7 +12,8 @@ void UInstanceBoxDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		int index = 0;
 		FInstanceBoxData data;
 		data.ID = GetIntFromString(row[index++]);
-		data.boxID = GetIntFromString(row[index++]);
+		//data.boxID = TODO Why do we have boxID here?
+		GetIntFromString(row[index++]);
 		data.containerInstanceID = GetIntFromString(row[index++]);
 		instanceBoxData.Add(data);
 	}

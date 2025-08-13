@@ -108,16 +108,16 @@ void ALootBox::SpawnLoot()
 
 void ALootBox::CreateLootboxData()
 {
-	ibd.ID = GetGame()->GetNextInstanceBoxDataID();
-	ibd.containerInstanceID = icd.ID;
-	ibd.boxID = GetGame()->GetNextBoxID();
-	GetGame()->GetInstancedBoxes().Add(ibd.ID, ibd);
-
 	icd.ID = GetGame()->GetNextInstanceContainerDataID();
 	icd.containerID = containerData.ID;
 	icd.type = EContainerType::Box;
-	icd.name = "Loot Box " + FString::FromInt(ibd.boxID);
 	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
+
+	ibd.ID = GetGame()->GetNextInstanceBoxDataID();
+	ibd.containerInstanceID = icd.ID;
+	GetGame()->GetInstancedBoxes().Add(ibd.ID, ibd);
+
+	icd.name = "Loot Box " + FString::FromInt(ibd.ID);
 
 	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerData.ID), icd, gameIn);
 	container->OnItemUpdated.AddUniqueDynamic(this, &ALootBox::ItemUpdated);

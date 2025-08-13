@@ -24,21 +24,35 @@
 
 ABaseAIController::ABaseAIController() : Super()
 {
-	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception Component"));
-	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
-	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
-	PerceptionComponent->ConfigureSense(*sightConfig);
-	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAIController::TargetPerceptionUpdated);
+	// Initialize pointers to nullptr for safety
+	PerceptionComponent = nullptr;
+	sightConfig = nullptr;
+	FindWeaponLocationQuery = nullptr;
 
-	FindWeaponLocationQuery = CreateDefaultSubobject<UEnvQuery>(TEXT("AIPerception Query"));
-	static ConstructorHelpers::FObjectFinder<UEnvQuery> playerLocationQuery(TEXT("EnvQuery'/Game/FirstPerson/EQS_FindPlayer.EQS_FindPlayer'"));
+	// Create and configure perception components
+	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
+	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
-	if (playerLocationQuery.Succeeded())
+	if (PerceptionComponent && sightConfig)
 	{
-		FindWeaponLocationQuery = playerLocationQuery.Object;
+		PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
+		PerceptionComponent->ConfigureSense(*sightConfig);
+		PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAIController::TargetPerceptionUpdated);
 	}
 
-	currentPath = NULL;
+	// Use FindObject instead of FObjectFinder for runtime safety (FObjectFinder is for editor only)
+	static ConstructorHelpers::FObjectFinder<UEnvQuery> PlayerLocationQueryObj(TEXT("EnvQuery'/Game/FirstPerson/EQS_FindPlayer.EQS_FindPlayer'"));
+	if (PlayerLocationQueryObj.Succeeded())
+	{
+		FindWeaponLocationQuery = PlayerLocationQueryObj.Object;
+	}
+	else
+	{
+		// Optionally log a warning if the query asset is missing
+		UE_LOG(LogTemp, Warning, TEXT("Failed to find EQS_FindPlayer EnvQuery asset."));
+	}
+
+	currentPath = nullptr;
 	currentPathPoint = 0;
 }
 
@@ -121,7 +135,7 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 13000;
-	
+
 
 	// Set up sight config for AI perception
 	sightConfig->SightRadius = range * 0.9;
@@ -336,7 +350,7 @@ bool ABaseAIController::IsInWeaponsRange(float dist)
 
 void ABaseAIController::AttackWithWeapon()
 {
-	const FVector targetLocation = IncreaseVectorHeight(target->asActor()->GetActorLocation(),50);
+	const FVector targetLocation = IncreaseVectorHeight(target->asActor()->GetActorLocation(), 50);
 	UWeapon* weapon = mCurrentWeapon();
 
 	LookAt(targetLocation);

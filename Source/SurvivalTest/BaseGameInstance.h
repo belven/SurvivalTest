@@ -64,6 +64,28 @@ public:
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
 
+	TFunction<bool(FInstanceItemData, int32)> instanceItemFilter = [](FInstanceItemData item, int32 id) { return item.ID == id; };
+
+	template<class T>
+	T GetDataByID(TArray<T> items, TFunction<bool(T, int32)> itemFilter, int32 idToFind)
+	{
+		T itemFound = NULL;
+
+		for (T item : items)
+		{
+			if (itemFilter(item, idToFind))
+			{
+				itemFound = item;
+				break;
+			}
+		}
+
+		return itemFound;
+	}
+
+
+	template<class T> T* GetSingletonObject(T*& object);
+
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return mTable()->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return mTable()->GetInstancedContainers(); }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return mTable()->GetInstancedArmour(); }
@@ -86,6 +108,21 @@ private:
 	FCriticalSection InstanceItemIDLock;
 	int32 LastInstanceItemID = -1;
 
+	FCriticalSection InstanceContainerDataLock;
+	int32 LastInstanceContainerDataID = -1;
+
+	FCriticalSection InstanceWeaponDataLock;
+	int32 LastInstanceWeaponDataID = -1;
+
+	FCriticalSection InstanceArmourDataLock;
+	int32 LastInstanceArmourDataID = -1;
+
+	FCriticalSection BoxIDLock;
+	int32 LastBoxID = -1;
+
+	FCriticalSection BoxDataIDLock;
+	int32 LastBoxDataID = -1;
+
 	UPROPERTY()
 	UMissionManager* missionManager;
 
@@ -101,3 +138,4 @@ private:
 	UPROPERTY()
 	UTableManager* tableManager;
 };
+

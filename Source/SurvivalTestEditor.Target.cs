@@ -8,10 +8,10 @@ public class SurvivalTestEditorTarget : TargetRules
 	public SurvivalTestEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.V2;
-		ExtraModuleNames.Add("SurvivalTest");
+        DefaultBuildSettings = BuildSettingsVersion.V5;
+        IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_5;
+        ExtraModuleNames.Add("SurvivalTest");
         bLegacyParentIncludePaths = true;
-        CppStandard = CppStandardVersion.Default;
         WindowsPlatform.bStrictConformanceMode = true;
         bValidateFormatStrings = true;
     }

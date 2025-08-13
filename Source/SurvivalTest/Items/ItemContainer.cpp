@@ -199,18 +199,6 @@ void UItemContainer::MoveItemToSlot(UItemContainer* container, FInstanceItemData
 	}
 }
 
-//void UItemContainer::MoveItemToEmptySlot(UItemContainer* otherContainer, FInstanceItemData& itemToTransfer)
-//{
-//	FInstanceItemData originalItemData = itemToTransfer;
-//
-//	FInstanceItemData blankData = FInstanceItemData(originalItemData.slot);
-//	int32 emptySlot = GetNextEmptySlotForItem(itemToTransfer.itemID);
-//
-//	MoveItemToSlot(this, itemToTransfer, emptySlot, originalItemData);
-//
-//	MoveItemToSlot(otherContainer, blankData, originalItemData.slot, itemToTransfer);
-//}
-
 void UItemContainer::MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemContainer* destContainer, FInstanceItemData& itemToTransfer)
 {
 	// Find destination empty slot

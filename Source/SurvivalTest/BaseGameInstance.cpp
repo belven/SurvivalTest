@@ -28,83 +28,149 @@ int32 UBaseGameInstance::GetNextInstanceItemDataID()
 
 	const TMap<int32, FInstanceItemData>& items = GetInstancedItems();
 
-	// If LastInstanceItemID is not up to date (e.g. on load), recompute from current items
-	if (LastInstanceItemID < 0 || LastInstanceItemID < items.Num() - 1)
+	int32& id = LastInstanceItemID;
+
+	if (id < 0 || id < items.Num() - 1)
 	{
-		LastInstanceItemID = -1;
+		id = -1;
 		for (const auto& Pair : items)
 		{
-			if (Pair.Value.ID > LastInstanceItemID)
+			if (Pair.Value.ID > id)
 			{
-				LastInstanceItemID = Pair.Value.ID;
+				id = Pair.Value.ID;
 			}
 		}
 	}
 
-	// Increment to get a guaranteed new ID
-	return ++LastInstanceItemID;
+	//TArray< FInstanceItemData> itemsInMap;
+
+	//GetInstancedItems().GenerateValueArray(itemsInMap);
+	//FInstanceItemData iidFound = GetDataByID<FInstanceItemData>(itemsInMap, instanceItemFilter, id);
+
+	//if (id == iidFound.ID)
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("ID Found"));
+	//}
+
+	return ++id;
+
 }
 int32 UBaseGameInstance::GetNextBoxID()
 {
-	int32 boxID = 0;
+	FScopeLock Lock(&BoxIDLock);
+
 	TMap<int32, FInstanceBoxData> boxes = GetInstancedBoxes();
-	if (boxes.Num() > 0)
+
+	if (LastBoxID < 0 || LastBoxID < boxes.Num() - 1)
 	{
-		boxID = GetLastMapItem(FInstanceBoxData, boxes).boxID + 1;
+		LastBoxID = -1;
+		for (const auto& Pair : boxes)
+		{
+			if (Pair.Value.ID > LastBoxID)
+			{
+				LastBoxID = Pair.Value.ID;
+			}
+		}
 	}
-	return boxID;
+
+	return ++LastBoxID;
 }
 
 int32 UBaseGameInstance::GetNextInstanceBoxDataID()
 {
-	int32 instanceBoxDataID = 0;
+	FScopeLock Lock(&BoxDataIDLock);
+
 	TMap<int32, FInstanceBoxData> boxes = GetInstancedBoxes();
-	if (boxes.Num() > 0)
+
+	int32& id = LastBoxID;
+
+	if (id < 0 || id < boxes.Num() - 1)
 	{
-		instanceBoxDataID = GetLastMapItem(FInstanceBoxData, boxes).ID + 1;
+		id = -1;
+		for (const auto& Pair : boxes)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
 	}
-	return instanceBoxDataID;
+
+	return ++id;
 }
 
 int32 UBaseGameInstance::GetNextInstanceArmourDataID()
 {
-	int32 instanceArmourDataID = 0;
+	FScopeLock Lock(&InstanceArmourDataLock);
+
 	TMap<int32, FInstanceArmourData> armour = GetInstancedArmour();
-	if (armour.Num() > 0)
+
+	int32& id = LastInstanceArmourDataID;
+
+	if (id < 0 || id < armour.Num() - 1)
 	{
-		instanceArmourDataID = GetLastMapItem(FInstanceArmourData, armour).ID + 1;
+		id = -1;
+		for (const auto& Pair : armour)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
 	}
-	return instanceArmourDataID;
+
+	return ++id;
 }
 
 int32 UBaseGameInstance::GetNextInstanceContainerDataID()
 {
-	int32 instanceContainerDataID = 0;
-	TMap<int32, FInstanceContainerData> containers = GetInstancedContainers();
-	if (containers.Num() > 0)
-	{
-		instanceContainerDataID = GetLastMapItem(FInstanceContainerData, containers).ID + 1;
-	}
-	return instanceContainerDataID;
-}
+	FScopeLock Lock(&InstanceContainerDataLock);
 
+	TMap<int32, FInstanceContainerData> containers = GetInstancedContainers();
+
+	int32& id = LastInstanceContainerDataID;
+
+	if (id < 0 || id < containers.Num() - 1)
+	{
+		id = -1;
+		for (const auto& Pair : containers)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
+	}
+
+	return ++id;
+}
 
 int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
 {
-	int32 instanceWeaponDataID = 0;
-	TMap<int32, FInstanceWeaponData> instancedWeapons = GetTableManager()->GetWeaponInstanceTable()->GetData();
+	FScopeLock Lock(&InstanceWeaponDataLock);
 
-	if (instancedWeapons.Num() > 0)
+	TMap<int32, FInstanceWeaponData> instancedWeapons = GetTableManager()->GetWeaponInstanceTable()->GetData();
+	
+	int32& id = LastInstanceWeaponDataID;
+
+	if (id < 0 || id < instancedWeapons.Num() - 1)
 	{
-		instanceWeaponDataID = GetLastMapItem(FInstanceWeaponData, instancedWeapons).ID + 1;
+		id = -1;
+		for (const auto& Pair : instancedWeapons)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
 	}
-	return instanceWeaponDataID;
+
+	return ++id;
 }
 
 UFactionManager* UBaseGameInstance::GetFactionManager()
 {
-	if (factionManager == nullptr) { factionManager = NewObject<UFactionManager>(); }
-	return factionManager;
+	return GetSingletonObject(factionManager);
 }
 
 UMissionManager* UBaseGameInstance::GetMissionManager()
@@ -120,13 +186,18 @@ UMissionManager* UBaseGameInstance::GetMissionManager()
 
 URPGEventManager* UBaseGameInstance::GetEventManager()
 {
-	if (eventManager == nullptr) { eventManager = NewObject<URPGEventManager>(); }
-	return eventManager;
+	return GetSingletonObject(eventManager);
 }
 
 
 UTableManager* UBaseGameInstance::GetTableManager()
 {
-	if (tableManager == nullptr) { tableManager = NewObject<UTableManager>(); }
-	return tableManager;
+	return GetSingletonObject(tableManager);
+}
+
+template <class T>
+T* UBaseGameInstance::GetSingletonObject(T*& object)
+{
+    if (object == nullptr) { object = NewObject<T>(); }
+    return object;
 }

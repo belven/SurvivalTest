@@ -337,8 +337,8 @@ struct FInstanceBoxData
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	int32 boxID = UItemStructs::InvalidInt;
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	//int32 boxID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
 };
