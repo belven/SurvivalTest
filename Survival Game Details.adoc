@@ -1,0 +1,1004 @@
+:sectnums: 10
+= Survival Game Decisions
+:toc:
+
+== Building
+
+. Block Size
+. Resources
+. Build Time
+. Structural integrity
+. Health
+. Repairing
+
+== Combat
+
+. Damage
+. Health
+. Armor
+. Health Regen
+. Body Part damage
+
+
+== Projectiles
+// Math for calculating target lead - <<https://forums.epicgames.com/udk/udk-development/udk-programming-and-unrealscript/284041-realistic-bullet-drop-problem, Math>> 
+
+.Test
+image::Images/Lead Maths 1.png[]
+
+image::Images/Lead Maths 2.png[]
+
+== Movement
+
+. Vaulting
+. Jumping
+. Climbing
+. Sprinting
+. Stamina
+
+== Trading
+
+. NPC Traders
+. No built in trading, only item drops
+. What kind of items?
+.. Limit safe zone traders to basic items
+.. Have random spawning traders, out in the wild, with high end gear / items that are hard to come by
+
+== Gameplay Loop
+
+. Find items in buildings / loot from dead players and AI
+. Do missions, get better loot
+. Higher tier missions reward higher rarity loot
+. Then what?
+
+=== Spawning
+
+==== Starting Items
+
+. Do the players start with different items on first spawn +
+. Allow players to disable starting items (like Ark) +
+. Is there a cooldown on spawning with this gear?
+ 
+[cols="1,2,2,2"]
+|===
+|*Weapon / Tool*|*Pros*|*Cons*|*Con Mitigation*
+
+|*Knife* 
+a|
+. We can defend ourselves
+. Hunting for food early
+. Used as a tool to cut things
+. Silent weapon
+a|. Close quarters weapon in a ranged weapon game
+a| . Ranged weapons should be either craftable early, like a bow or found early inside buildings
+
+|*Pistol* 
+a|. Ranged weapon, can kill most basic players and AI 
+. Useful for hunting
+. Useful for mid game still
+a|. Needs ammo
+. Creates Sound
+. Can’t be used as tool
+a|. Provide ammo to start with and spawn more ammo around the starting locations
+. This is a part of survival games, deciding if it's worth revealing your location to possible players or AI
+. The Starting areas will contain possible tool spawns
+
+|*Nothing*| 
+a|. Can’t defend yourself
+. Have to find tools
+a|. The Starting areas will contain possible tool spawns
+
+|*Axe / Gathering Tool*
+a|. Can gather basic resources early
+. Medium damage tool
+. Useful through most of the game
+. Used for hunting
+. Silent weapon
+a|. Close quarters weapon in a ranged weapon game
+a|. This is also part of a the typical survival experience. Players need to progress towards better gear to play the game more effectively
+
+|*Food and water*
+a|. Allows the player to explore for longer
+. Gives players a chance to survive the early stages whilst learning
+a|. Players that die a lot and find their old bodies could start hoarding their old resources, possibly exploiting it
+a|. Make it so starting items despawn rapidly or can't be picked up at all. Maybe even destroy them on death
+ 
+|*Light*
+a|. Can see in the dark
+. Players spawning on a server at night will need to be able to see 
+a|. N/A
+a|. N/A
+
+|*Clothes*
+
+a|. Basic item storage
+. Weather / Temperature resistance
+a|. Players might not have to search for clothes / storage early
+a|. The clothes you start with will have limited storage / durability, forcing the player to find new ones
+
+|*Backpack*
+a|. Good item storage
+a|. Player would have too much storage capacity to start with
+a|. Backpack will have limited storage / durability, forcing the player to find new ones
+|===
+ 
+==== Starting Locations
+
+The map is split into POIs of varying levels of difficulty. This means some areas are much more likely to have certain types of equipment and AI in them. When new players spawn, they can start in specific locations, designed to be for new players.
+ 
+These locations will have minimal AI and extra starting food, water and materials. These extra resources will only occur when a player spawns near them. They will still however have guaranteed starting / basic resources, just a reduced amount as standard.
+
+===== Spawning Algorithm
+
+. Find a location a player hasn’t recently been to, spawn a player +
+.. If all locations have recently had a player spawn, find the location with the longest time since spawned at +
+
+. If the resources in the location have been taken and a player is still in the area, respawn basic resources +
+.. If another player is in the area don’t respawn resources.
+ 
+[cols="1,2,2,2"]
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+|*Starting locations will have minimal AI and extra starting food, water and materials.*
+a|. New players get easy access to what they need to progress in the early stages
+.	The reduced hostile AI will allow players to survive long enough to get somewhere in the game
+a|. The balance of resources in locations could become favoured in these locations
+.	Existing players can farm these locations
+a|. These extra resources will only occur when a player spawns near them. They will still however have guaranteed starting / basic resources, just a reduced amount as standard
+. These locations will only hold minimal starting resources when a player doesn't spawn near them and the location triggers a respawn of resources
+
+|*There are locations specific for new spawning players*
+a|. I can mitigate starting issues by giving players the best chance to survive
+. I can curate the players starting experiences by making the spawn locations lead to specific places / experiences 
+a|. What we do if there are lots of new players spawning at once? Fresh wipe on a server
+. Resources could already be taken
+. Existing players could camp the location
+a|. Lots of players spawning in the starting areas at the same time is kind of the point. Most games like this have an initial survival stage, where everyone is fighting over land and resources
+. If you spawn at a location another player is currently at, and they’re not inside the POI, just nearby, respawn the resources. If a player joins and their friend joins just as they leave, they could exploit the resources spawning. Maybe add a delay before doing this
+. Try and avoid spawning players near existing players as well. If not possible, spawn an AI patrol on a path that would intercept the existing players
+
+|*Hostile Human AI don’t directly spawn at these locations but can patrol into / near them*
+a|. New players aren’t going to spawn into their deaths
+. Players can ease into the combat by gathering resources first and then encountering AI as they progress onwards
+a|. Players might still encounter AI that they can’t coup with, if the resources spawned aren’t managed correctly or found
+.	Some players like the challenge of difficult encounter
+a|. Players starting items should help mitigate this. Failing that, more important items could be spawned closer to the players spawn location
+.	Have spawn points that start near harder tier locations
+
+|*Hostile / Passive Animals can spawn inside / near the starting locations*
+a|. Players can get food to cook
+. Possibly adds some danger to the starting area
+a|. Starting with hostile animals could be difficult to balance around the starting tools / weapons
+a|. We have the ability to control what spawns, where and how much. We just need to balance it
+
+|*Spawn locations are picked automatically by the system*
+a|. Players are equally distributed
+.	Players experience will be fairly standardized
+a|. Players can’t pick their spawn location
+. The system could fail in some cases to spawn someone in a safe environment
+. Players can build near these locations, possibly camping them from roof tops etc
+a|. Allow players to be able to pick a spawn point, maybe limited to after first spawn and possibly on a timer
+. Also solved by allowing players to spawn where they like. 
+. Potential to limit building nearby these locations, maybe even limit the quality or time of buildings close to spawnpoints. Timer could be based on total player base on the server. I.e. longer timers for less populated sever. 
+|===
+
+== Resources
+
+. Type of Resource
+. Spawning / Placement
+. Amount gathered
+. Gather Times
+. Rarity
+. Tools used to gather
+
+== Items
+
+=== Spawning / Placement
+
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+| Each POI will have loot in specific locations 
+a| . This will mean players can get used to where loot spawns
+. We can control where loot can spawn, therefore not cluttering up or spawning loot in bad locations 
+a| . Loot spawns can become stale and easy to predict
+a| . We can have several possible loot locations and not always use all of them. We can also change them in the future to have more varried locations
+
+| Not all loot locations will be used, unless forced by a mission
+a| . Loot can therefore be more random
+a| . Some players might not find certain items, if they're not in obvious spots
+a| . This is just something players have to discover as they play
+
+| Loot will respawn based on the first time a player interacted with it
+a| . This will mean loot isn't spawned on a polling system, therefore players can wait for loot cycles to double up on loot
+a| . What happens to loot that hasn't been found by the player? Will existing spawned loot hang around until found?
+a| . Unlooted loot, will also despawn and force the loot system to re-evaluate the state of current loot in the POI
+
+| Loot will be based on the POI loot tables unless a mission overrides this
+a| . TODO
+a| . TODO
+a| . TODO
+
+| Loot will respawn at a rate based on the amount of players in the server
+a| . TODO
+a| . TODO
+a| . TODO
+
+| Loot inside a container, will only be calculated when a player interacts with it 
+a| . TODO
+a| . TODO
+a| . TODO
+
+| Loot outside of a container, will spawn once a player gets close enough
+a| . TODO
+a| . TODO
+a| . TODO
+
+| 
+a| . TODO
+a| . TODO
+a| . TODO
+
+| 
+a| . TODO
+a| . TODO
+a| . TODO
+
+| 
+a| . TODO
+a| . TODO
+a| . TODO
+|===
+
+==== Loot will be based on the POI loot tables unless a mission overrides this
+. POIs and Missions will both have their own loot tables
+. Both the POI and Mission Loot tables will have fixed items that each need to spawn somewhere
+. Both Loot tables will have optional / possible loot spawns that can be randomly picked from, once the default loot has been calculated and placed
+
+==== Loot Spawn Calculations
+. Player enters the range of a POI
+. The POI activates an amount of lootables in its area
+.. The non-container loot spawns immediately
+.. The Container Lootables decide what they could contain / what type of container they are
+. If a lootable was looted, the system will re-calculate the loot after the respawn time
+.. This calculation will take into account all current lootables that are available. This will therefore, pick a similar type of lootable from the table
+. If a Lootable wasn't looted and past a unlooted respawn time, the system will re-calculate the loot
+
+===== Loot Rarity Calculations
+. The POI has a full list of lootable items / containers
+. The list is retained between spawning loot and simply cycles, i.e. as it reaches the bottom, it picks from the top again
+
+[source,java]
+----
+
+TArray<FLootable> optional_loot;
+TArray<FLootable> fixed_loot;
+TArray<FLootable> available_loot;
+
+
+void CalculateLoot() {
+	for(FLootable loot : GetPOILootables()) {	
+	
+		if(loot.fixed) {
+			for(int i = 0;i < loot.rarity;i++) {
+				fixed_loot.Add(loot);
+				available_loot.Add(loot);
+			}
+		}
+		else {
+			for(int i = 0;i < loot.rarity;i++) {
+				optional_loot.Add(loot);
+			}
+		}
+	}
+	
+	ShuffleArray(optional_loot);
+	
+	int lootable_locations_left = GetPOILootableLocations() - available_loot.Num();
+	
+	for(int i = 0;i < lootable_locations_left;i++) {
+			available_loot.Add(optional_loot[i]);
+	}
+}
+
+
+void LootRespawn(FLootable loot) {
+	ALootable lootable = GetNextFreeLotableLocation();
+	
+	if(!loot.fixed) {
+		loot = GetNextOptionalLoot();
+	}
+	
+	lootable.SetLoot(loot);	
+} 
+
+FLootable GetNextOptionalLoot() {
+	int temp_last_optional_loot_index = last_optional_loot_index;
+	
+	if(last_optional_loot_index > optional_loot.Num()) {
+		last_optional_loot_index = 0;
+	} else {
+		last_optional_loot_index++;
+	}
+		
+	return optional_loot[temp_last_optional_loot_index];
+
+}
+
+----
+
+
+===== Non Mission Loot Spawn
+. Get total lootable locations
+. Set lootable quantity based on the size of the POI / players on server
+.. This could be a fixed percent of the total lootable locations
+.. This is then weighted towards the amount of players on the server 
+. Read the POIloot tables and assign randomly based on table data
+.. Some loot will be fixed / forced, others will be optional / random
+
+===== Mission Loot Spawn
+. Get total lootable locations
+. Set lootable quantity based on the size of the POI / players on server and Mission difficulty
+.. This could be a fixed percent of the total lootable locations
+.. This is then weighted towards the amount of players on the server
+.. Some missions might cause all lootable locations to be available, as they are higher difficulty 
+. Read the POI and Mission loot tables and assign randomly based on table data
+.. Some loot will be fixed / forced, others will be optional / random
+
+=== Loot Tables
+
+|===
+|*Name*|*Type*|*Item Types*
+
+| Lumber Mill | POI | Hammer, Nails, Saw
+
+| Medical Mission | Mission | Medkit, Bandage, Saline
+|===
+
+=== Loot Properties
+
+|===
+|*Name*|*Type*|*Range*
+| ID| Int| 0+
+| Name| String| [a-z]
+| Rarity| Enum| 0 - 5
+| Type| Enum| Item, Container
+| Quantity | Int | 0+
+|===
+
+=== Item Storage
+
+[cols="1,2,2,2"]
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+|*Shape Based Storage*
+a|. Item limits are about physical space that’s occupied. This mean the items are possibly more realistic
+a|. Makes inventory management annoying, especially for automatic sorting
+a|. Make most items small / occupy straight lines or basic squares
+
+|*Slot Based Storage*
+a|. Easy to manage
+. All Items are treated equally
+. Containers can be the same, less limitations on grids
+a|. Items that are larger can be stored in places that are unrealistic
+. Items of a high weight can be carried in large quantities without issue
+a|. This only really matters with very large items. Don’t let people store buildings or vehicles inside a storage chest.
+. Just don’t allow players to have items that would be unrealistic to carry in a container, to be carried in a container
+
+|*Weight Based Storage*
+a|. You can effectively limit a players carry potential, by using somewhat realistic weight calculations
+a|. Balancing the weight of items can become tricky and cause issues amongst players
+. This can also limit the players choices too much by forcing them to be heavily limited in what they can carry
+a|. Weights of items should be carefully considered. Talking with the player base about the weights frequently should be carried out. We can have vehicles and bags specialized at carrying certain types of items
+. Some items shouldn’t have any real weight to them at all and just occupy slots. Items like small meds, ammo and basic tools could have 0 – almost no cost
+
+|*Backpack can be dropped*
+a|. Allows player to hide / make decision about taking the possible weight / valuable items into a bad situation
+a|. This will cause more Objects to spawn in the world
+. More rules about despawning / ownership for it
+a|. Backpacks could always be an extra object spawned but attached to the player. They only “create” objects / UI when opened
+. Should be almost completely public apart from in a PvE server. Despawning should occur after a fairly long time, something around 45 minutes
+
+|*Can create a temporary storage hidden in the ground*
+a|. Players can store kits or create closer storage locations to their current objective
+. Gives something for other players to look for
+a|. More containers to hold in memory
+. Players can lose track of them 
+a|. There would be a limit of 1 per player. They could only store a small amount of items. They wouldn’t require any additional classes / data (do we need to determine if it’s hidden or not?)
+. We can add some basic UI to show the player their location
+
+|*Carts*
+a|. Allow players to transport lots of items in the early stages of the game
+. They are extensions to existing vehicles and therefore can be useful in the later stages
+a|. The physics of the carts movement can be complicated
+. Carts could be abused to stand on and maybe get into locations they shouldn’t
+a|. The cart could be a simple square container with wheels and you attach to it from any point with a rope. It then simply moves towards you as you move away from it.
+. Test out possible situations with carts that could cause issues, mostly due to extra height and glitching through walls etc.
+
+|*Specialised Backpacks*
+a|. This allows players to carry specific types of items easier, therefore giving more choice and variety.
+a|. This could impact the balance of the game by allowing players to carry a lot more items they otherwise couldn't
+. Players could store backpacks inside containers, with items in them.
+a|. Specialised backpacks can only contain items that it's designed for. Within reason. Some items like basic food, water, meds etc. can be stored in all but then is limited to the specific items
+. Make it so only empty backpacks can be stored inside containers. Packing them up into a simple Backpack item with a subtype of their specialty. Also, possibly have backpack specific storage, that is simply a set of hooks / shelves that they sit in.
+
+|*Item type restrictions on containers*
+a|. We can limit the players ability to store certain types of items
+. Players will have to make choices about what loot to keep
+a|. This could make inventory management annoying, having to remember what container has what
+. Having a limit on types in a game where players could amass a lot of gear, could cause a lot of problems for long term players
+a|. We can make UI and hotbar buttons to store items in nearby containers automatically
+. The limits to the containers should be closely managed and we should make sure the players can store enough kits of gear to be able to do normal content and mid / end game content without issue
+|===
+ 
+==== Backpacks
+
+ 
+==== Carts
+
+. Carts are made out of basic materials +
+. Carts can be pulled by the player +
+. Carts *can* be equipped to existing vehicles +
+.. Bikes, motor / pedal 
+.. Cars 
+. Carts current weight can influence the speed of the vehicles and the player +
+. Carts can only be damaged by explosives +
+. Carts can be deconstructed manually by players +
+. When a cart is deconstructed, the items drop on the floor into a single container. +
+.. The container then despawns in the same time loot normally despawns on the floor
+
+== Tools
+
+. Gathering tools
+. Building tools
+. Where can you get them?
+.. Crafted / Found?
+. Raiding Tools?
+
+== World Grid
+
+=== Grid Sizes
+
+=== Grid Shapes
+
+=== Grid Detection
+
+=== Grid Spawning
+
+=== Grid LOD
+
+1.  At what point does the AI and loot actually spawn in as visible objects
+
+== Buildings
+
+=== POI Static Buildings
+
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+|Players can’t build near static buildings
+a| . This means players can't occupy the POIs and therefore can't easily camp them and hoard their resources 
+a| . Players building locations could be quite limited and could force lots of players into a small location. 
+a| . I would make the space between POIs large enough for the server size, to accommodate large groups of players.
+
+|The buildings follow the same building rules as player buildings, with regards to construction, style and data storage.
+a| . This means I can perfect the building system by using it myself to produce the buildings in all POIs
+. The POIs will have the same restrictions, which means they'll be place consistently alongside player buildings
+. The aesthetics of the buildings will be the same as the players. Meaning they will fit nicely in to the world
+a| . If my building system doesn't work well then I can make poor POIs for the players to explore
+. The aesthetics might be lower quality than they otherwise could be, when limited to the players building system
+a| . This will be tested heavily by me and anyone making POIs, as we have to use the same system
+. I could put some rule breaks in for the POIs to allow them to be more involved than player buildings. Mostly decorations
+
+|Buildings can change their style / appearance based on mission types in the area
+a| . This allows POIs to react to changes in the real world, adding / changing parts to suit the mission that's in progress. 
+a| . This could be hard to implement well
+a| . I need to make sure I keep it simple and efficient where possible, only making it complex after the system is fully working without transitions or convoys etc.
+|===
+
+==== POI Static Buildings Mission Triggers
+. AI could spawn on the sides of the map, coming towards the mission location as a convoy
+. On arrival to the POI, the buildings start converting from the ground up, fairly rapidly over time, within 20 seconds or so
+.. This could be done by swapping out the existing actors with the incoming changes, using some kind of LOD and mesh morphing effect. Possibly a simple particle effect to cover the parts
+. The vehicle or leader of the AI could be the one to walk around the buildings at random, triggering this effect and the last building is the main HQ / mission outpost
+
+=== Player Buildings
+
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+|Player buildings require upkeep
+a| . Players buildings don't persist forever, therefore keeping the server clean of players who have left for a long time
+. Players can't hoard locations without having to put in the effort
+. Gives players a reason to play often and forces conflict in specific locations 
+a| . Players will have to play to maintain their bases
+. The upkeep system can be hard to balance
+. Players can stockpile upkeep items
+a| . We can make upkeep based on group and base size. Solo players shouldn't have to play for more than a few hours a week at most. Large groups might need to play every 3 days
+. We need to figure out a reasonable system for calculating upkeep, keeping in mind that different players will have completely different time schedules
+. Upkeep items can only be delivered to your base and not stored. This could be fuel that gets stored in a generator that has a maximum storage
+
+| Players can upgrade their bases to the next size up
+a| . Players, regardless of group size, will be able to expand their bases in the same way, with the same restrictions
+. Players can have one base each inside a group, with the upkeep cost based on the size of the base
+a| . If not balanced well, solo players could have issues maintaining a larger base
+. Solo players could still occupy large areas of the map
+a| . The upkeep could be kept at a standard rate, for each tier. I.e. 7 grid slots last a week, 14 last 2 etc. Which would make the upkeep more consistent
+. The amount of bases limit should keep solo players in check, compared to groups of players
+
+| Players leaving a squad can still retain their bases
+a| . This allows players to keep their efforts intact without being exploited by the squad
+a| . Players could get team mates to help them with their base, by joining their squad and leaving
+a| . This issue is likely to be an issue in all games of this nature and is just the way things can be between players
+
+| Player bases that run out of upkeep, loose their ownership and after X time get removed completely
+a| . Old bases will eventually disappear from the server, clearing out unused resources
+a| . Players that can't upkeep their bases will eventually lose them
+a| . This is just the nature of the game
+
+| Player bases that have run out of upkeep, become claimed by the next player (assuming they don't have a base already) that contributes upkeep to the central node 
+a| . This will allow existing players to claim old bases
+a| . N/A
+a| . N/A
+
+| Players can control building rights manually
+a| . This allows players to gift / pass on basses
+. Players can control access to different aspects of their base
+a| . N/A
+a| . N/A
+
+| Bases will require a central Building Node, that all other building parts are connected to
+a| . This will ensure that players can only make one base at a time and simplify the base control zone system
+a| . N/A
+a| . N/A
+
+| All building parts will show areas they can be placed nearby, without issue
+a| . This will make it much easier for players to place building parts
+. This is more intricate than snapping points and will simplify the building process
+a| . This might be an intensive process
+a| . The player will be triggering a similar, if not identical process, each time they move the mouse, so we might as well pre-populate valid locations for them
+|===
+
+==== Player bases that run out of upkeep, loose their ownership and after 2 Days gets removed completely
+. When a base has lost all upkeep the following occurs:
+.. The ownership is blanked
+.. All doors are opened
+.. All permissions are removed
+. The next player to fuel that base, assuming they don't already have one, gets ownership of it,
+closing all doors and setting all permissions as if it was built by them
+
+
+==== Player Building Stats
+. Original Creator
+. Original Squad
+. Current Owner
+. Current Owner Type
+
+==== Building Rights when players leaving squad
+. If only Original Creator exists, then default to them
+.. If Original Creator is no longer active, then longest standing squad member
+. If Original Squad is set, then the base is still controlled by the squad
+.. If Squad is fully dispanded then longest standing squad member gets the base
+
+==== Players can upgrade their bases to the next size up
+. Players can extend the bases control zone by adding extensions on to the central node
+.. This increases the size of the control zone at the cost of more upkeep
+.. This will still perform the control zone check, to make sure it doesn't conflict with existing basses
+.. This will have a max limit of 2 upgrades
+
+We want to avoid players being restricted in building, when joining or leaving a squad. 
+
+In order to avoid issues limited base sizes, we could simply make the upkeep more and the players need to get higher level components to craft the base extensions 
+
+==== Building Placement Calculations
+
+. Get all currently placed central Nodes
+. Check distance to each node
+. If the Radius of control for that node + ours is greater than the distance, can't place node
+.. If Distance < Node.ControlRadius() + OtherNode.ControlRadius() 
+ 
+=== Building Room sizes / scale
+
+.  How big is a foundation block?
+.  How many blocks can fit into a world grid
+
+==== Building Upkeep
+
+. How do player buildings despawn
+. How long does upkeep last
+. What items are
+
+===== Upkeep Approach
+
+[cols="1,2,2,2"]
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+|Fuel
+a| . Requires players to get from Mid to High End locations both from missions and crafting
+. We can limit the carry amount of fuel specifically, and make it so it can't be stored in containers, other than the base 
+a| . This will force players to engage in the Mid to End game content, in order to upkeep their base
+. Players might get annoyed about having limited ways of maintaining their base 
+a| . We want to force player conflict and to make sure players have to engage with the mid / end game content, at least somewhat frequently
+. By limiting the resource for upkeep, we can control the rate that players can gather upkeep and where they fight for it. This also simplifies upkeep, so players don't need to spend a lot of time gathering other resources
+
+|Basic resources
+a| . This will allow all players to upkeep bases easily, by using basic local resources
+. The players can store long term upkeep and not have to worry about needing to fight or loose upkeep 
+a| . Players don't have to try very hard to actually maintain their base
+. Players can effectively upkeep their base forever, with the right storage and gathering routines
+a| . Everybody will be gathering these resources all the time, as they will be used for most things, therefore, there will still be a lot of player interaction
+. Players still need to actually play the game to move stuff around and we could limit the upkeep container storage, so they still have a limit of how much upkeep they can have at one time
+
+|Being online / interaction
+a| . Very simple system for upkeep
+. Players can simply log on and off and maintain their base 
+a| . This doesn't require any really player activity at all, therefore, PvP might be limited and some content not explored at all 
+. Players bases will last almost forever unless raided
+a| . Upkeep is generated by being online for a length of time. This means that players will create upkeep for their base by persisting online for X minutes. We could also make it so mission completions generate base upkeep
+. We could possibly make a system that exponentially decays bases based on last login duration. This means that players that log on once a week, will loose more upkeep than players that log on daily
+
+|===
+ 
+ 
+== Weapons
+
+. Where to get weapons
+.. AI
+.. Players
+.. Loot boxes
+.. Trader
+. Melee Weapons
+.. Knife default melee attack
+.. Axes
+.. Machete
+. Durability?
+. Gun Jamming?
+
+=== Type
+
+. Pistol / Sidearm
+. Melee
+. SMG
+. Assault Rifle
+. LMG
+. Marksman / Sniper Rifle
+
+=== Damage
+
+. Bullet
+. Explosive
+. Melee
+. Damage falloff
+. Critical Hits
+
+=== Attachments
+
+. Scopes
+. Flashlights / Laser
+. Barrels
+. Magazines
+. Stocks
+
+=== Weapon Stats
+
+. Bullet Velocity
+. Ammo Type
+. Magazine Size
+. Fire Rate
+. Bullet Spread / Pattern
+. Rarity
+
+== Missions
+
+. Difficulty
+. Types of enemies
+. Types of loot
+. Amount of enemies
+. Spawn / refresh rate
+. How many in play at once?
+
+== Task and Action System
+
+=== Overview
+This system is designed to provide the AI and Player character with a common means of handling input / control requests. In many cases, most tasks can be interrupted by any input but in some cases we need to either enforce a restriction or a delay. This way we avoid async issues and the player still feels like their inputs have been registered. 
+
+In cases where the Player / AI would perform an action, like reloading, this would be an animation and then a consequent update to their inventory and held weapon. Given that this manipulates the inventory, we need to enforce some integrity here for the data, therefore, we need to stop the player from doing anything else with both their weapon and their inventory. The AI and player can still queue up tasks but they won't complete until the reload is finished    
+
+++++
+<style>
+.tableblock.stripes-none tbody tr { background: transparent !important; }
+</style>
+++++
+
+.Tasks and Actions
+[stripes=none, cols="1,1,3"]
+|===
+|*Task*|*Action*|*Notes* 
+
+|*Patrol* 2+| This will move the AI through continuous patrol locations until interrupted
+||*MoveTo*|  This action, once completed, will repeat with the next patrol path, looping one forever
+|*Reload* 2+| This task will, check the inventory, Play a reload animation and then update the inventory
+||*InventoryCheck*
+a| Check that the character has the ammo required, otherwise fail the task. I need to create an error state to cover failed but not failed because something went wrong 
+||*ReloadAnimation*|  Perform a simple reload animation based on the weapon. Hopefully stored in the weapon data
+||*InventoryUpdate*|  This action will find the ammo required and take as much as I can to fill the weapon. This action will lock the characters inventory from further updates. I can either have an actual boolean lock on the inventory OR make it so the action must complete before another is processed. The latter being the better approach
+|*Searching* 2+| This task will involve various movement actions, where the AI, whilst the searching, will look around where they last saw the player. I'll use EQS to generate various search locations based on LOS from the player.   
+||*MoveTo*|  This will just be a basic, continuous movement from place to place
+||*Look Around* |  This action will rotate the AI around for a while, before going back to the task for the next move action.
+|*Sprint* 2+| This is a basic task, that could disrupt some actions, whilst waiting for others. I might need to have tiers of actions, to say some are 100% interruptible and others are but only by specific kinds of actions. Like movement doesn't disrupt reloading, but sprinting might.
+||*StateCheck*|  Check if the character can sprint, not dead (in case of queued sprinting request), has stamina, current task / action is interruptible etc.
+||*StateChange*|  Update the characters state to sprinting
+|*FindAmmo* 2+| A task for the AI to move to and collect ammo
+||*MoveTo*|  A simple move to location action
+||*ScavengeAnimation*|  An animation to represent the AI searching the body
+||*InventoryUpdate*|  An action to transfer the found items into the AIs inventory
+|*UseTool* 2+| Even though attack, / using a tool is realistically just play an animation and check state, it would make sense to use this tasking system for it. That way I can have more control over the AI and Player actions and use the same system for it
+||*EquipmentCheck*| 
+||*ToolAnimation*| 
+|*SwapEquipment* 2+|
+||*InventoryCheck*|  test
+|===
+
+== Combat NPCs
+
+. Accuracy
+.. Is accuracy based on weapon bullet spread?
+.. Is the AI 100% accurate?
+. AI can run out of ammo
+. Difficulty
+.. Based on mission / area etc.
+.. Defines what gear they have equipped and what extra items they can drop
+. AI can try and heal, using consumables in inventory, if they have them
+
+
+=== AI Spawning
+
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+| AI will start as a single actor, the AI Overseer, that has no behaviour until a player would be 
+close enough to render the actual character models 
+a| . TODO
+a| . TODO
+a| . TODO
+
+| When a player is or becomes close enough to an AI spawn, it will spawn the full characters and data
+a| . TODO
+a| . TODO
+a| . TODO
+
+| The AI Overseer, will update its location, in a simple way, every minute, following the patrol path of the AI, unless it's in a POI 
+a| . TODO
+a| . TODO
+a| . TODO
+
+| TODO
+a| . TODO
+a| . TODO
+a| . TODO
+
+|===
+
+=== Loot
+
+. NPCs Fully lootable- If they have it, they drop it
+. Can have things like consumables etc. on them
+
+=== AI States
+
+==== Combat
+
+. Shoots player when possible
+. Reloads when required
+. Holds ground at optimal range / moves towards player to be at optimal range
+. Head towards cover when exposed for too long
+. Changes target if shot by a more optimal hostile
+. Starts *Chasing* state when loses sight of hostile for too long
+
+==== Chasing
+
+. Move towards last sighted hostile
+. Move towards last sound - not made by teammate
+. Starts *Combat* state if shot by something
+. Enters *Searching* state if no new inputs received
+
+==== Searching
+
+. Moves to random locations around last hostile sighting or sound
+. Goes to *Chasing* state if new sound is heard
+. Goes to *Combat* state if sees player
+
+==== Patrol
+
+. Follows a predefined path
+. Goes to *Chasing* state if new sound is heard
+. Goes to *Combat* state if sees player
+
+== UI
+
+. Health
+. Hunger
+. Water
+
+=== Minimap?
+
+. Player Location
+. Player Direction?
+. Team Mates?
+. Gunfire indicators?
+
+=== Full Map
+
+. Base locations?
+. Player Location
+. Team mate locations?
+. Missions
+. NPC Traders?
+
+=== Character UI
+
+. Equipment slots
+.. Specific slots for chest, head, legs etc
+.. Primary / Secondary Weapon Slot
+. Inventory Slots
+.. Fixed min amount
+.. Certain equipment adds to slots
+... Bags
+... Belts
+. Items Icon
+. Items quantity (don’t show if 1 only)
+. Items Name on hover / select
+. Injuries
+. Sickness
+. Highlight relevant items based on what’s selected. I.e if you hover over a gun, highlight ammo / attachments
+
+== Currency
+
+. What is it?
+.. Money?
+.. Items?
+.. Water / Food?
+. Sources
+.. Loot boxes
+.. Selling to traders
+.. NPCs
+. What can you do with it?
+. Is it lootable / carried as an item?
+.. Can you store it in a bank / trader?
+
+== Death
+
+. Random respawn locations or nearest respawn point
+. Respawn timer
+. Loot drop on death
+.. Some loot can be stored in a separate pouch, mostly sidearms and consumables etc.
+. Downed mechanics
+.. Can be revived on kill, only if not killed by headshot / explosive
+.. Revive Time
+.. Possibly Item needed / one revive only (Issues with solo players vs duo, duo getting an advantage due to revive)
+. Players can respawn in their base
+.. It is a crafted building like a bed etc.
+.. How Often?
+... LoL deaths timer gets longer the more often you die
+... In Ark / Rust - the timer starts low and gets longer
+
+== Squads
+. What happens to existing player bases when someone joins a squad?
+.. Do existing bases retain their build limits?
+.. What happens if a player joins another, increases their build size, makes a larger base, then leaves the squad?
+
+=== Squad Stats
+. Member Name
+. Member Join Date / Time
+. Member Duration
+. Member Rank
+
+==== Squad Ranks
+. Name
+. Permissions
+
+== Raiding
+
+When a player or players raids a base, we want the raid to be a similar experience regardless of how many people are involved and the size of the base. We want to make a more simplistic approach to breaching a players defences that allows both sides to engage with the other, without a base simply being taken out by brute force.
+
+The main tool used to breach a players base will be C4. This will be only acquired from the PvE content, i.e. from completing specific types of missions. The time a C4 charge takes to break a door, will be consistent for all bases regardless of size. 
+
+
+[cols="1,2,2,2"]
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+| No Offline Raiding
+a| . Players can play the game when they like, without risk of their bases being destroyed whilst they're offline
+a| . Base raiding could be quite limited on small servers
+. Players in different time zones to the overall server player base, could go uncontested forever
+a| . We can set up a system, so that missions spawn in such a way, that players are forced closer together by finding the average centre location of all players online
+. Why are they playing on a PvP server and only playing PvE?
+
+| The C4 is on a fixed timer before it goes off
+a| . This enables all raids to follow a more simple and structured design
+. Players have a guarantee that their base will last for a fixed duration before players can attempt to enter it at all. 
+. Raiding larger or smaller bases will have the same level of threat and raid time
+a| . If the defenders can simply attempt to defuse the C4, then raiders will basically have one attempt to breach a players base and make no progress towards the raid 
+. Raiding with a larger party might feel wasted
+. Raiding a group as a solo could be impossible
+. Raiding could become stale
+. Base designs could head towards some kind of meta / standard
+a| . Raiders could have several C4 on them and can attempt to breach the base multiple times in a reasonable timeframe
+. Groups of players will still provide a benefit to the attackers, as they will have more ammo and can hold the defenders back more easily
+. A solo player could hold better angles or have better supplies / offensive capabilities.  
+. Additional means of breaching bases could be added, with varying levels of risk. These could be tools that breach a door manually, that require a player to be stood still and create a lot of constant noise
+. I just need to add enough variety of defensive options for the defending player. This could be traps, horizontal and vertical angles, building above doors and having alternate exits to the base to approach attackers flanks
+
+| All Players can manually deconstruct enemy utility (beds, chests etc.) inside their base 
+a| . Once someone breaches a base, they can freely take out enemy spawns and valuables without needing to expend any more resources
+a| . Without the need of tools, ungeared players could destroy a players base easily
+a| . We could enforce the use of basic tools to prevent anyone destroying your base. Players can still take the tools from your base, if you have them
+|===
+
+=== Raiding Tools
+
+[cols="1,2,2,2"]
+|===
+|*Decision*|*Pros*|*Cons*|*Con Mitigation*
+
+| Lockpick
+a| . This can allow players to raid low tier basses, without the need to get explosives
+a| . These could be easy to find and use
+a| . I could make these only spawn in low tier missions and not randomly in loot boxes 
+
+| C4
+a| . This is a easy way to allow players to raid
+. I can have control over the spawn of them
+. It makes sense to use something specifically timed vs something doing constant damage
+a| . N/A
+a| . N/A
+
+| Diamond Drill
+a| . This could offer players a different approach to breaching a base
+. Players could avoid needing to find and carry multiple explosives
+a| . Their durability and time taken to breach a door would need to be balanced well against the C4 
+a| . I would need to carefully consider the use case of a drill over C4 and balance it as I test raiding
+|===
+
+==== Lockpick
+. How long does it take?
+. Where does it come from?
+. How many can you carry?
+.. Stack size
+
+==== C4
+. How long does it take?
+. Where does it come from?
+. How many can you carry?
+.. Weight
+.. Stack size
+
+==== Diamond Drill
+. How long does it take?
+. Where does it come from
+. How many can you carry?
+.. Weight
+.. Durability
+. Does it need power?
+.. Fuel?
+.. Batteries?
+
+== Survival
+
+. Hunger system
+. Water
+. Sickness
+.. Sources of sickness
+... Bad Food
+... Melee and bullet injuries?
+... Poisoned Weapons?
+... Wild Animals?
+.. Could we have a hospital for curing long term stuff?
+. Semi-permanent injuries from combat
+.. Concussion from blunt weapons / explosives
+.. Fall Damage - sprained / broken leg
+.. Bleeding from Bullets / Blades

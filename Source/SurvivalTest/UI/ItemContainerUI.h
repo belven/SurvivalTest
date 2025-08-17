@@ -17,72 +17,72 @@ public:
 	static const int itemsPerRow;
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		void GenerateInventory();
+	void GenerateInventory();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-		void UpdateItem(FInstanceItemData newItemData, FInstanceItemData oldItemData, FItemData itemData);
-		
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		int32 GetColumn();
+	void UpdateItem(FInstanceItemData newItemData, FInstanceItemData oldItemData, FItemData itemData);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		int32 GetNextRowIndex();
+	int32 GetColumn();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	int32 GetNextRowIndex();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void GetGridData(int32& row, int32& column);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetIndex(int32 value) { index = value; }
+	void SetIndex(int32 value) { index = value; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		int32 GetRow();
+	int32 GetRow();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void ResetIndex() { index = 0; }
+	void ResetIndex() { index = 0; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetNextRowIndex() { index = GetNextRowIndex(); }
+	void SetNextRowIndex() { index = GetNextRowIndex(); }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void IncrementIndex() { index++; }
+	void IncrementIndex() { index++; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UItemContainer* GetItemContainer() const { return container; }
+	UItemContainer* GetItemContainer() const { return container; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void ItemUpdated(FInstanceItemData newItem, FInstanceItemData oldItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetItemContainer(UItemContainer* inContainer);
+	void SetItemContainer(UItemContainer* inContainer);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UBaseGameInstance* GetBaseGameInstance() const { return gameInstance; }
+	UBaseGameInstance* GetBaseGameInstance() const { return gameInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		FString GetContainerName();
+	FString GetContainerName();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		void SetBaseGameInstance(UBaseGameInstance* inGameInstance) { gameInstance = inGameInstance; }
+	void SetBaseGameInstance(UBaseGameInstance* inGameInstance) { gameInstance = inGameInstance; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-		UItemContainer* GetItemContainerForArmour(FInstanceItemData data);
+	UItemContainer* GetItemContainerForArmour(FInstanceItemData data);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool IsArmour(FItemData id);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UItemUI* GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widgets);
-	
+
 private:
 	UPROPERTY()
-		UInventoryUI* inventory;
+	UInventoryUI* inventory;
 
 	UPROPERTY()
-		UItemContainer* container;
+	UItemContainer* container;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
 	int32 index;
 
 	UPROPERTY()
-		UBaseGameInstance* gameInstance;
+	UBaseGameInstance* gameInstance;
 };

@@ -6,16 +6,11 @@ USTRUCT(BlueprintType)
 struct FStatusData
 {
 	GENERATED_USTRUCT_BODY()
-
-	FStatusData() : successful(false)
-	{
-	}
-
-	FStatusData(bool inSuccessful) : successful(inSuccessful)
-	{
-	}
-
 	bool successful;
+
+	FStatusData() : successful(false) {}
+
+	FStatusData(bool inSuccessful) : successful(inSuccessful) {}
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionComplete, FStatusData, status);
@@ -31,11 +26,12 @@ public:
 	bool CanBeInterrupted() { return canBeInterrupted; }
 
 	virtual void StartAction();
-	void Cancel();
+	virtual void CancelAction();
+	virtual void ActionComplete(FStatusData data);
 
 private:
 	bool canBeInterrupted;
 
 	UPROPERTY()
-		AController* controller;
+	AController* controller;
 };

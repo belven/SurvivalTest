@@ -39,7 +39,7 @@ bool UCharacterTask::CancelAction(bool force)
 	bool result = false;
 	if (currentAction->CanBeInterrupted() || force)
 	{
-		currentAction->Cancel();
+		currentAction->CancelAction();
 		result = true;
 	}
 	return result;

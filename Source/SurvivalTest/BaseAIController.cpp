@@ -22,6 +22,7 @@
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 
+
 ABaseAIController::ABaseAIController() : Super()
 {
 	// Initialize pointers to nullptr for safety
@@ -40,7 +41,6 @@ ABaseAIController::ABaseAIController() : Super()
 		PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAIController::TargetPerceptionUpdated);
 	}
 
-	// Use FindObject instead of FObjectFinder for runtime safety (FObjectFinder is for editor only)
 	static ConstructorHelpers::FObjectFinder<UEnvQuery> PlayerLocationQueryObj(TEXT("EnvQuery'/Game/FirstPerson/EQS_FindPlayer.EQS_FindPlayer'"));
 	if (PlayerLocationQueryObj.Succeeded())
 	{
@@ -48,7 +48,6 @@ ABaseAIController::ABaseAIController() : Super()
 	}
 	else
 	{
-		// Optionally log a warning if the query asset is missing
 		UE_LOG(LogTemp, Warning, TEXT("Failed to find EQS_FindPlayer EnvQuery asset."));
 	}
 
@@ -94,16 +93,24 @@ void ABaseAIController::ReloadComplete()
 	DetermineNextAction();
 }
 
+bool ABaseAIController::HasRangedWeapon()
+{
+	return projectileWeapon != NULL;
+}
+
 void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
 {
-	if (oldWeapon && oldWeapon->GetWeaponData().type == EWeaponType::Projectile)
-	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
-		pw->OnOutOfAmmo.RemoveAll(this);
-		pw->OnReloadComplete.RemoveAll(this);
-	}
-
 	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
+
+	if (oldWeapon) {
+		oldWeapon->OnWeaponReady.RemoveAll(this);
+
+		if (HasRangedWeapon())
+		{
+			projectileWeapon->OnOutOfAmmo.RemoveAll(this);
+			projectileWeapon->OnReloadComplete.RemoveAll(this);
+		}
+	}
 
 	if (weapon)
 	{
@@ -217,6 +224,8 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 
 void ABaseAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
+	lastMoveResult = Result;
+
 	if (!Result.IsSuccess() && (Result.Code == EPathFollowingResult::Invalid || Result.Code == EPathFollowingResult::Blocked))
 	{
 		UE_LOG(LogTemp, Log, TEXT("OnMoveCompleted Failed"));
@@ -328,7 +337,11 @@ void ABaseAIController::Patrol()
 			MoveToLocation(loc, acceptanceRadius);
 
 			// Increment the path point, to move onto the next one
-			currentPathPoint++;
+			// TODO figure out how to handle the AI movement getting stuck
+			if (lastMoveResult.IsSuccess())
+			{
+				currentPathPoint++;
+			}
 		}
 	}
 }
@@ -367,9 +380,9 @@ void ABaseAIController::AttackWithWeapon()
 
 			FRotator rotation = GetBaseCharacter()->GetActorRotation();
 
-			if (weapon->GetWeaponData().type == EWeaponType::Projectile)
+			if (HasRangedWeapon())
 			{
-				FProjectileWeaponData pw = Cast<UProjectileWeapon>(weapon)->GetProjectileWeaponData();
+				FProjectileWeaponData pw = projectileWeapon->GetProjectileWeaponData();
 				float gravity = pw.gravity * GetWorld()->GetGravityZ();
 				SolveBallisticArc(mActorLocation, targetLoc, pw.bulletVelocity, gravity, rotation);
 			}
@@ -446,7 +459,7 @@ FVector ABaseAIController::IncreaseVectorHeight(const FVector& location, int32 i
 
 bool ABaseAIController::HasAmmoForWeapon()
 {
-	if (projectileWeapon && !projectileWeapon->HasAmmo())
+	if (HasRangedWeapon() && !projectileWeapon->HasAmmo())
 	{
 		int32 ammoID = projectileWeapon->GetProjectileWeaponData().ammoID;
 		int32 ammoQuantity = GetBaseCharacter()->GetInventory()->GetItemAmount(ammoID);
@@ -457,7 +470,7 @@ bool ABaseAIController::HasAmmoForWeapon()
 
 void ABaseAIController::Reload()
 {
-	if (projectileWeapon)
+	if (HasRangedWeapon())
 	{
 		projectileWeapon->Reload();
 	}
@@ -469,18 +482,19 @@ FVector ABaseAIController::GetPredictedLocation(AActor* actor)
 
 	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
 
-	if (weapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (HasRangedWeapon())
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-		lead = pw->GetProjectileWeaponData().bulletVelocity;
+		lead = projectileWeapon->GetProjectileWeaponData().bulletVelocity;
 	}
-	else // This would account for melee weapons, dunno if  I need lead at all.
+	else // This would account for melee weapons, dunno if I need lead at all.
 	{
 		lead = 1;
 	}
 
-	float time = FVector::Dist(GetBaseCharacter()->GetActorLocation(), actor->GetActorLocation()) / lead;
+	// TODO Do we create an AI accuracy stat to use here?
 	//time = FMath::RandRange(time * 0.9f, time * 1.1f);
+
+	float time = FVector::Dist(GetBaseCharacter()->GetActorLocation(), actor->GetActorLocation()) / lead;
 	return actor->GetActorLocation() + (actor->GetVelocity() * time);
 }
 
@@ -500,7 +514,7 @@ void ABaseAIController::GetNearbyAmmo()
 		{
 			for (auto iid : other->GetInventory()->GetItems())
 			{
-				if (projectileWeapon && iid.itemID == projectileWeapon->GetProjectileWeaponData().ammoID)
+				if (HasRangedWeapon() && iid.itemID == projectileWeapon->GetProjectileWeaponData().ammoID)
 				{
 					GetBaseCharacter()->GetInventory()->TransferItem(other->GetInventory(), iid, UItemStructs::InvalidInt);
 					needsAmmo = false;
@@ -520,16 +534,18 @@ void ABaseAIController::StartSprinting()
 
 bool ABaseAIController::FindAllyWithAmmo()
 {
+	bool result = false;
+
 	for (auto ally : alliesSeen)
 	{
 		if (ally->IsDead() && HasAmmo(ally) && FVector::Dist(mActorLocation, ally->GetActorLocation()) < 10000)
 		{
 			MoveToLocation(ally->GetActorLocation(), ABaseCharacter::interactionRadius * 0.7);
 			StartSprinting();
-			return true;
+			result = true;
 		}
 	}
-	return false;
+	return result;
 }
 
 void ABaseAIController::EquipKnife()
@@ -537,10 +553,9 @@ void ABaseAIController::EquipKnife()
 	needsAmmo = false;
 	bool knifeEquipped = false;
 	UBaseGameInstance* game = GetBaseCharacter()->GetGame();
-	int32 containerID = GetBaseCharacter()->GetInventory()->GetInstanceContainerData().ID;
 
 	// Get the AIs inventory items
-	for (auto iid : game->GetInstancedItemsForContainer(containerID))
+	for (auto iid : GetBaseCharacter()->GetInventory()->GetItems())
 	{
 		FItemData id = game->GetItemData(iid.itemID);
 
@@ -601,7 +616,7 @@ void ABaseAIController::FindNewTarget()
 
 	for (AActor* actor : actorsSensed)
 	{
-		if (actor->Implements<UTeam>())
+		if (actor->Implements<UTeam>() && actor->Implements<UDamagable>())
 		{
 			ITeam* team = Cast<ITeam>(actor);
 			IDamagable* damagable = Cast<IDamagable>(actor);

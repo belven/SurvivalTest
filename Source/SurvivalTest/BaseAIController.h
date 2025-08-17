@@ -73,6 +73,7 @@ protected:
 
 	UFUNCTION()
 	void ReloadComplete();
+	bool HasRangedWeapon();
 
 	UFUNCTION()
 	void WeaponEquipped(UWeapon* oldWeapon);
@@ -97,6 +98,8 @@ private:
 	FTimerHandle TimerHandle_Inactive;
 	FTimerHandle TimerHandle_DetermineAction;
 	float inactiveTimerDuration;
+
+	FPathFollowingResult lastMoveResult;
 
 	UPROPERTY()
 	UProjectileWeapon* projectileWeapon;
