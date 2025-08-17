@@ -12,5 +12,5 @@ void UTaskAction::CancelAction()
 
 void UTaskAction::ActionComplete(FStatusData data)
 {
-	OnActionComplete.Broadcast(data)
+	OnActionComplete.Broadcast(data);
 }
