@@ -297,7 +297,10 @@ void ABaseCharacter::AddInteractable(IInteractable* inter)
 	{
 		inter->Highlight(true);
 		overlappingInteractables.AddUnique(inter);
-		GetInventory()->OnContainersUpdated.Broadcast();
+
+		if (GetInventory()) {
+			GetInventory()->OnContainersUpdated.Broadcast();
+		}
 	}
 }
 

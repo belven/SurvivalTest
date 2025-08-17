@@ -250,28 +250,34 @@ void ABaseAIController::WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> 
 
 void ABaseAIController::DetermineNextAction()
 {
-	if (GetBaseCharacter() && GetBaseCharacter()->IsAlive())
+	if (GetBaseCharacter())
 	{
-		inactiveTimerDuration = 3.0f;
+		if (GetBaseCharacter()->IsAlive()) {
+			inactiveTimerDuration = 3.0f;
 
-		isInactive = false;
+			isInactive = false;
 
-		if (needsAmmo)
-		{
-			GetAmmo();
+			if (needsAmmo)
+			{
+				GetAmmo();
+			}
+			else if (target != NULL && target->IsAlive())
+			{
+				CalculateCombat();
+			}
+			else if (target != NULL && target->IsDead())
+			{
+				target = NULL;
+				FindNewTarget();
+			}
+			else if (target == nullptr)
+			{
+				Patrol();
+			}
 		}
-		else if (target != NULL && target->IsAlive())
+		else
 		{
-			CalculateCombat();
-		}
-		else if (target != NULL && target->IsDead())
-		{
-			target = NULL;
-			FindNewTarget();
-		}
-		else if (target == nullptr)
-		{
-			Patrol();
+			KillAI();
 		}
 	}
 	else
