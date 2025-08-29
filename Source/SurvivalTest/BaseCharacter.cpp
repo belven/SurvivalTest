@@ -142,7 +142,7 @@ void ABaseCharacter::BeginPlay()
  * This will need to be updated so that players either load existing gear or a new starter set.
  * AI will also need to have gear sets set in the database, so we can spawn them with specific gear based on the mission
  */
-void ABaseCharacter::SetupLoadout(FString loadoutName)
+void ABaseCharacter::SetupLoadout(const FString& loadoutName)
 {
 	const FLoadoutData ld = game->GetLoadoutData(loadoutName);
 	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
@@ -163,7 +163,7 @@ void ABaseCharacter::SetupLoadout(FString loadoutName)
 	inventory->SetupLoadout(ld);
 }
 
-UStaticMesh* ABaseCharacter::GetItemMesh(FItemData data)
+UStaticMesh* ABaseCharacter::GetItemMesh(const FItemData& data)
 {
 	if (data.mesh.Equals(""))
 		return nullptr;
@@ -288,6 +288,8 @@ void ABaseCharacter::AddInteractable(IInteractable* inter)
 		shouldAdd = true;
 	}
 	// Otherwise, only show inventories of dead characters nearby
+
+	// TODO might need to re-work the IInteractable system and hook into character deaths etc.
 	else if (other != this && other->IsDead())
 	{
 		shouldAdd = true;

@@ -52,7 +52,7 @@ public:
 #pragma region Combat
 	FORCEINLINE UWeapon* GetEquippedWeapon() { return GetInventory() ? GetInventory()->GetEquippedWeapon() : nullptr; }
 
-	UStaticMesh* GetItemMesh(FItemData data);
+	UStaticMesh* GetItemMesh(const FItemData& data);
 
 	FWeaponEquipped OnWeaponEquipped;
 	FCharacterDied OnCharacterDied;
@@ -108,7 +108,7 @@ public:
 	UInventory* GetInventory() const { return inventory; }
 	void SetInventory(UInventory* inInventory) { inventory = inInventory; }
 
-	void SetupLoadout(FString loadoutName);
+	void SetupLoadout(const FString& loadoutName);
 
 	UStaticMeshComponent* GetWeaponMeshComp() const
 	{

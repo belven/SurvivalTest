@@ -143,7 +143,6 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 13000;
 
-
 	// Set up sight config for AI perception
 	sightConfig->SightRadius = range * 0.9;
 	sightConfig->LoseSightRadius = range;
@@ -648,6 +647,8 @@ void ABaseAIController::FindNewTarget()
 
 void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 {
+	// TODO This is a little OTT, might want to add specific events for Character Died etc. for both the AI and the Target
+
 	// Check if the event is a post health change
 	if (inEvent->GetEventType() == EEventType::PostHealthChange)
 	{

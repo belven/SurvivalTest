@@ -10,8 +10,7 @@ void AMainLight::Tick(float DeltaSeconds)
 
 	totalTime += DeltaSeconds;
 
-	int32 timeInt = FMath::RoundToInt32(totalTime);
-	timeOfDay = timeInt % dayLength;
+	timeOfDay = FMath::Fmod(totalTime, dayLength);
 
 	if (timeOfDay < 1)
 		lastTime = 0;
@@ -59,6 +58,7 @@ AMainLight::AMainLight(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UDirectionalLightComponent>(TEXT("LightComponent0")))
 {
 	static ConstructorHelpers::FObjectFinder<UCurveFloat> lightCurveAsset(TEXT("CurveFloat'/Game/FirstPerson/Blueprints/LightLevel.LightLevel'"));
+	PrimaryActorTick.bCanEverTick = true;
 
 	lightCurve = lightCurveAsset.Object;
 	// Structure to hold one-time initialization

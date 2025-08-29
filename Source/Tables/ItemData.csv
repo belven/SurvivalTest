@@ -1,5 +1,5 @@
 "0","Test Weapon","Weapon","Texture2D'/Game/FirstPerson/Icons/Test Weapon.Test Weapon'","StaticMesh'/Game/FirstPerson/Weapons/Test Weapon.Test Weapon'","1"
-"1","Test Ammo","Ammo","Texture2D'/Game/FirstPerson/Icons/539.539'","","20"
+"1","Test Ammo","Ammo","Texture2D'/Game/FirstPerson/Icons/539.539'","","300"
 "2","Knife","Weapon","Texture2D'/Game/FirstPerson/Icons/Knife.Knife'","StaticMesh'/Game/FirstPerson/Weapons/Knife.Knife'","1"
 "3","Axe","Weapon","Texture2D'/Game/FirstPerson/Icons/Axe.Axe'","StaticMesh'/Game/FirstPerson/Weapons/Axe.Axe'","1"
 "4","SMG","Weapon","Texture2D'/Game/FirstPerson/Icons/SMG.SMG'","StaticMesh'/Game/FirstPerson/Weapons/SMG.SMG'","1"

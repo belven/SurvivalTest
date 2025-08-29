@@ -124,14 +124,14 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 	// Are we dropping something that can stack more than once and the item we're dropping onto is the same
 	if (maxStackSize > 1 && itemToTransfer.itemID == existingItem.itemID)
 	{
-		UE_LOG(LogTemp, Log, TEXT("SwapItems same Item ID"));
+		//UE_LOG(LogTemp, Log, TEXT("SwapItems same Item ID"));
 		FInstanceItemData oldExistingItem = existingItem;
 
 		// Are either of the items at max stack?
 		// If so, we're trying to add an item to another
 		if (!existingItem.HasSpace(maxStackSize) || !itemToTransfer.HasSpace(maxStackSize))
 		{
-			UE_LOG(LogTemp, Log, TEXT("SwapItems same Item ID, Swap amounts"));
+			//UE_LOG(LogTemp, Log, TEXT("SwapItems same Item ID, Swap amounts"));
 
 			// if the existingItem.amount is less than the itemToTransfer.amount, then swap amounts
 			if (existingItem.amount < itemToTransfer.amount)
@@ -148,7 +148,7 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 		// Neither item is full, so simply add the dropped item amount onto the existing item
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("SwapItems same Item ID, Add amounts together"));
+			//UE_LOG(LogTemp, Log, TEXT("SwapItems same Item ID, Add amounts together"));
 			existingItem.TakeFrom(itemToTransfer, maxStackSize);
 		}
 
@@ -156,19 +156,19 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 
 		if (itemToTransfer.amount == 0)
 		{
-			UE_LOG(LogTemp, Log, TEXT("SwapItems Remove old Item"));
+			//UE_LOG(LogTemp, Log, TEXT("SwapItems Remove old Item"));
 			RemoveInstanceItem(other, itemToTransfer);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("SwapItems Update old Item"));
+			//UE_LOG(LogTemp, Log, TEXT("SwapItems Update old Item"));
 			UpdateItemData(other, itemToTransfer, originalItemData);
 		}
 	}
 	// We have an item that only stacks once and the items are in the same container, so swap the items
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("SwapItems Single Stack Item"));
+		//UE_LOG(LogTemp, Log, TEXT("SwapItems Single Stack Item"));
 
 		FInstanceItemData otherItem = itemToTransfer;
 		FInstanceItemData ourItem = existingItem;
@@ -205,7 +205,7 @@ void UItemContainer::MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemC
 	int32 emptySlot = destContainer->GetNextEmptySlotForItem(itemToTransfer.itemID);
 	if (!UItemStructs::IsValidID(emptySlot))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("MoveItemToEmptySlot: No valid empty slot in destination container %d"), destContainer->GetContainerInstanceID());
+		//UE_LOG(LogTemp, Warning, TEXT("MoveItemToEmptySlot: No valid empty slot in destination container %d"), destContainer->GetContainerInstanceID());
 		return;
 	}
 
@@ -255,20 +255,20 @@ void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData
 	// Check if our current item is valid for the dropped slot and if the existing item is valid for the other slot
 	if (canSwitchPlaces)
 	{
-		UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem canSwitchPlaces"));
+		//UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem canSwitchPlaces"));
 		SwapItems(other, itemToTransfer, droppedSlot, originalItemData, maxStack, existingItem);
 	}
 	// If the item has no space, then it's a whole stack and should go into the next valid slot, if any
 	// No point adding it to others if it's a whole stack, this also helps dealing with single item stacks of armour and weapons
 	else if (!HasSpace(itemToTransfer))
 	{
-		UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem MoveItemToEmptySlot"));
+		//UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem MoveItemToEmptySlot"));
 		MoveItemToEmptySlot(other, this, itemToTransfer);
 	}
 	// We're not full so try and find existing items OR add it to the inventory as is
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem FillExistingItemsWithDroppedItem"));
+		//UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem FillExistingItemsWithDroppedItem"));
 		FillExistingItemsWithDroppedItem(other, itemToTransfer, originalItemData, maxStack);
 	}
 }
@@ -321,7 +321,7 @@ void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FIn
  */
 FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory, FInstanceItemData itemToTransfer, const int32 droppedSlot)
 {
-	UE_LOG(LogTemp, Log, TEXT("TransferItem"));
+	//UE_LOG(LogTemp, Log, TEXT("TransferItem"));
 
 	// Store a copy of the data so we can use it to update the UI
 	FInstanceItemData originalItemData = itemToTransfer;
@@ -334,7 +334,7 @@ FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory,
 		// Otherwise we've manually moved the item onto a slot
 		if (droppedSlot != UItemStructs::InvalidInt)
 		{
-			UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer"));
+			//UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer"));
 
 			// Get the item, if any, at the slot we've dropped the item onto
 			FInstanceItemData existingItem = GetInstanceItemAtSlot(droppedSlot);
@@ -343,13 +343,13 @@ FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory,
 			// If the ID isn't -1, then we have an existing item in the slot
 			if (existingItem.isValid())
 			{
-				UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Existing Item"));
+				//UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Existing Item"));
 				DropOnExistingItem(sourceInventory, itemToTransfer, droppedSlot, originalItemData, id.maxStack, existingItem, type);
 			}
 			// If the ID is -1, then we don't have an existing item in the slot
 			else if (IsValidForSlot(droppedSlot, type))
 			{
-				UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Empty Slot"));
+				//UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Empty Slot"));
 				MoveItemToSlot(this, itemToTransfer, droppedSlot, existingItem);
 
 				sourceInventory->OnItemUpdated.Broadcast(FInstanceItemData(originalItemData.slot), originalItemData);
@@ -359,14 +359,14 @@ FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory,
 			// Try and add the item to either existing items or an empty slot in our inventory
 			else
 			{
-				UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Existing Item, Invalid Slot"));
+				//UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Existing Item, Invalid Slot"));
 				FillExistingItemsWithDroppedItem(sourceInventory, itemToTransfer, originalItemData, id.maxStack);
 			}
 		}
 		// There was no dropped slot, so try and add the item to either existing items or an empty slot in our inventory 
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Fill Existing Items"));
+			//UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Fill Existing Items"));
 			FillExistingItemsWithDroppedItem(sourceInventory, itemToTransfer, originalItemData, id.maxStack);
 		}
 	}
@@ -377,7 +377,7 @@ FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory,
 
 /**
  * Gets the next slot for an item, taking into account the possibility of it having a EGearType,
- * and therefore possibly being invalid for our inventory. E.g. a weapon might not going into a rucksack, or bullets in a medical case
+ * and therefore possibly being invalid for our inventory. E.g. a weapon might not go into a rucksack, or bullets in a medical case
  *
  *@param itemID the ID of the FItemData we want to check
  *
@@ -404,7 +404,7 @@ int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 */
 FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<int32>& ids)
 {
-	UE_LOG(LogTemp, Log, TEXT("Add Item"));
+	//UE_LOG(LogTemp, Log, TEXT("Add Item"));
 
 	// Are we adding a whole item, i.e. an item that is at it's max stack size? If so, just add it
 	if (HasSpace())
@@ -417,7 +417,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 		{
 			if (emptySlot != UItemStructs::InvalidInt)
 			{
-				UE_LOG(LogTemp, Log, TEXT("Add Item Max Stack"));
+				//UE_LOG(LogTemp, Log, TEXT("Add Item Max Stack"));
 
 				FInstanceItemData newItem = itemToAdd.CopyItem(GetNextInstanceItemDataID(), GetContainerInstanceID(), emptySlot, itemToAdd.amount);
 				UpdateItemData(this, newItem, FInstanceItemData(emptySlot));
@@ -428,7 +428,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Add Item FillExistingItems"));
+			//UE_LOG(LogTemp, Log, TEXT("Add Item FillExistingItems"));
 			FillExistingItems(itemToAdd, stackSize);
 
 			// Keep adding new items until we're either full or added all items
@@ -436,7 +436,7 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 			{
 				if (UItemStructs::IsValidID(emptySlot))
 				{
-					UE_LOG(LogTemp, Log, TEXT("Add Item New Item"));
+					//UE_LOG(LogTemp, Log, TEXT("Add Item New Item"));
 
 					// Make a new item
 					FInstanceItemData newItem = itemToAdd.CopyItem(GetNextInstanceItemDataID(), GetContainerInstanceID(), emptySlot);
@@ -524,7 +524,7 @@ bool UItemContainer::SplitItem(FInstanceItemData& itemToSplit)
 		if (UItemStructs::IsValidID(emptySlot))
 		{
 			FString existingItemName = GetItemName(itemToSplit.itemID);
-			UE_LOG(LogTemp, Log, TEXT("Splitting %d of %s"), itemToSplit.amount, *existingItemName);
+			//UE_LOG(LogTemp, Log, TEXT("Splitting %d of %s"), itemToSplit.amount, *existingItemName);
 
 			int32 total = itemToSplit.amount;
 			int32 halfAmount = FMath::RoundToInt32(total / 2.0f);
@@ -539,9 +539,9 @@ bool UItemContainer::SplitItem(FInstanceItemData& itemToSplit)
 
 			// Create new item
 			FInstanceItemData newItem = itemToSplit.CopyItem(newID, GetContainerInstanceID(), emptySlot, remainingAmount);
-			UE_LOG(LogTemp, Log, TEXT("SplitItem: New ID=%d, EmptySlot=%d, Existing? %s"),
-				newItem.ID, emptySlot,
-				GetGame()->GetInstancedItems().Contains(newItem.ID) ? TEXT("YES") : TEXT("NO"));
+			//UE_LOG(LogTemp, Log, TEXT("SplitItem: New ID=%d, EmptySlot=%d, Existing? %s"),
+				//newItem.ID, emptySlot,
+				//GetGame()->GetInstancedItems().Contains(newItem.ID) ? TEXT("YES") : TEXT("NO"));
 
 			UpdateItemData(this, newItem, FInstanceItemData(emptySlot));
 

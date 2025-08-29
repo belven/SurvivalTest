@@ -60,13 +60,15 @@ void ALootBox::Interact(ABasePlayerController* instigator)
 
 void ALootBox::Highlight(bool activate)
 {
-	if (!isHighlighted && mIsTimerActive(TimerHandle_LootboxClear))
-	{
-		mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, minTime);
-	}
+	if (isHighlighted != activate) {
+		if (!isHighlighted && mIsTimerActive(TimerHandle_LootboxClear))
+		{
+			mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, minTime);
+		}
 
-	isHighlighted = activate;
-	boxMeshComp->SetRenderCustomDepth(activate);
+		isHighlighted = activate;
+		boxMeshComp->SetRenderCustomDepth(activate);
+	}
 }
 
 UBaseGameInstance* ALootBox::GetGame()

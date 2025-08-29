@@ -50,6 +50,8 @@ void UProjectileWeapon::SetCanFireTimer()
 void UProjectileWeapon::ConsumeAmmo()
 {
 	instanceWeaponData.ammo--;
+	// TODO might need to make this a delayed update to the data but instant for the UI.
+	// Perhaps queue data updates every second and have a local ammo count instead
 	GetCharacterOwner()->GetGame()->AddUpdateData(instanceWeaponData);
 
 	if (instanceWeaponData.ammo == 0)
@@ -66,7 +68,7 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 
 	if (!firstShot) {
 		double angle = 360 * (1 - GetRangedWeaponData().accuracy);
-		rot = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FireRotation.Vector(), angle).Rotation();
+		 rot = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FireRotation.Vector(), angle).Rotation();
 	}
 	else
 	{

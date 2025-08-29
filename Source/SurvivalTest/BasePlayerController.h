@@ -7,6 +7,7 @@
 #include "Items/Weapon.h"
 #include "BasePlayerController.generated.h"
 
+class UProjectileWeapon;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
 
 class UInventoryUI;
@@ -85,6 +86,9 @@ private:
 	float CurveFloatValue;
 	float TimelineValue;
 	int32 leanDirection = 0;
+
+	UPROPERTY()
+	UProjectileWeapon* rangedWeapon;
 
 	//UPROPERTY()
 	//UTimelineComponent* leanTimeline;

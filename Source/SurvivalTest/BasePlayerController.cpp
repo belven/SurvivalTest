@@ -13,7 +13,9 @@
 
 class ABaseCharacter;
 
-ABasePlayerController::ABasePlayerController() : Super()
+ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), performAction(false), RotateValue(0), CurveFloatValue(0),
+TimelineValue(0), leanCurve(nullptr), mainHUD(nullptr),
+inventoryWidget(nullptr), baseCharacter(nullptr), rangedWeapon(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
@@ -27,7 +29,7 @@ ABasePlayerController::ABasePlayerController() : Super()
 	if (mainHUDClassFound.Class != nullptr)
 	{
 		mainHUDClass = mainHUDClassFound.Class;
-	}	
+	}
 }
 
 void ABasePlayerController::TimelineCallback()
@@ -36,17 +38,19 @@ void ABasePlayerController::TimelineCallback()
 	CurveFloatValue = leanCurve->GetFloatValue(TimelineValue);
 	FVector cameraPosition;
 
+	FVector cameraRelativeLocation = GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation();
+
 	if (leanDirection == 0)
 	{
-		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->cameraCenter, TimelineValue);
+		cameraPosition = FMath::Lerp(cameraRelativeLocation, GetBaseCharacter()->cameraCenter, TimelineValue);
 	}
 	else if (leanDirection == 1)
 	{
-		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->rightLean, TimelineValue);
+		cameraPosition = FMath::Lerp(cameraRelativeLocation, GetBaseCharacter()->rightLean, TimelineValue);
 	}
 	else
 	{
-		cameraPosition = FMath::Lerp(GetBaseCharacter()->GetBaseCameraComponent()->GetRelativeLocation(), GetBaseCharacter()->leftLean, TimelineValue);
+		cameraPosition = FMath::Lerp(cameraRelativeLocation, GetBaseCharacter()->leftLean, TimelineValue);
 	}
 
 	GetBaseCharacter()->GetBaseCameraComponent()->SetRelativeLocation(cameraPosition);
@@ -59,8 +63,10 @@ void ABasePlayerController::TimelineFinishedCallback()
 
 void ABasePlayerController::ContainersUpdated()
 {
-	if (inventoryWidget && inventoryWidget->GetVisibility() == ESlateVisibility::Visible)
+	// TODO This might be broken now...
+	if (inventoryWidget && inventoryWidget->IsVisible()) {
 		inventoryWidget->GenerateInventory();
+	}
 }
 
 void ABasePlayerController::PlayerTick(float DeltaTime)
@@ -68,7 +74,7 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	leanTimeline.TickTimeline(DeltaTime);
 
-	if (performAction && GetBaseCharacter()->GetEquippedWeapon() != nullptr)
+	if (performAction && mCurrentWeapon())
 	{
 		mCurrentWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation());
 	}
@@ -76,7 +82,7 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 
 void ABasePlayerController::EnemyHit(ABaseCharacter* enemy)
 {
-	if(mainHUD)
+	if (mainHUD)
 	{
 		mainHUD->EnemyHit(enemy);
 	}
@@ -121,41 +127,31 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 		pw->OnReloadComplete.RemoveAll(this);
 	}
 
-	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
-	
+	UWeapon* weapon = mCurrentWeapon();
+
 	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-		pw->OnOutOfAmmo.AddUniqueDynamic(this, &ABasePlayerController::OutOfAmmo);
-		pw->OnReloadComplete.AddUniqueDynamic(this, &ABasePlayerController::ReloadComplete);
+		rangedWeapon = Cast<UProjectileWeapon>(weapon);
+		rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABasePlayerController::OutOfAmmo);
+		rangedWeapon->OnReloadComplete.AddUniqueDynamic(this, &ABasePlayerController::ReloadComplete);
 	}
 }
 
 void ABasePlayerController::Reload()
 {
-	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
-
-	if (weapon	&& weapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (rangedWeapon)
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-		pw->Reload();
+		rangedWeapon->Reload();
 	}
 }
 
 bool ABasePlayerController::HasAmmoForWeapon()
 {
-	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
-
-	if (weapon)
+	if (rangedWeapon)
 	{
-		if (weapon->GetWeaponData().type == EWeaponType::Projectile)
-		{
-			UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
-
-			return GetBaseCharacter()->GetInventory()->GetItemAmount(pw->GetProjectileWeaponData().ammoID) > 0;
-		}
-		return true;
+		return GetBaseCharacter()->GetInventory()->GetItemAmount(rangedWeapon->GetProjectileWeaponData().ammoID) > 0;
 	}
+
 	return false;
 }
 
@@ -184,7 +180,7 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 	FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
 
 	UWeapon* equippedWeapon = mCurrentWeapon();
-	
+
 	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
 	{
 		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID));
@@ -211,7 +207,7 @@ void ABasePlayerController::LeanCenter()
 
 void ABasePlayerController::Sprint()
 {
-	if (!GetBaseCharacter()->IsSprinting()) 
+	if (!GetBaseCharacter()->IsSprinting())
 	{
 		GetBaseCharacter()->StartSprinting();
 	}
@@ -285,7 +281,7 @@ void ABasePlayerController::BeginPlay()
 		inventoryWidget->SetController(this);
 	}
 
-	if(mainHUDClass)
+	if (mainHUDClass)
 	{
 		mainHUD = CreateWidget<UHUDUI>(this, mainHUDClass);
 		mainHUD->SetPlayer(GetBaseCharacter());
@@ -317,7 +313,7 @@ void ABasePlayerController::OpenInventory()
 		inventoryWidget->SetVisibility(ESlateVisibility::Visible);
 		inventoryWidget->GenerateInventory();
 
-		for(IInteractable* i : GetBaseCharacter()->GetOverlappingInteractables())
+		for (IInteractable* i : GetBaseCharacter()->GetOverlappingInteractables())
 		{
 			// TODO make the interaction based on inventories only
 			i->Interact(this);
