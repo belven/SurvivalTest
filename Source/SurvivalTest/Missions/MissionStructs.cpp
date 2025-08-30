@@ -1,6 +1,6 @@
 #include "MissionStructs.h"
 
-EMissionType UMissionStructs::GetMissionType(FString type)
+EMissionType UMissionStructs::GetMissionType(const FString& type)
 {
 	if (type.Equals("Medical"))
 	{

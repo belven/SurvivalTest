@@ -3,7 +3,6 @@
 #include "Item.h"
 #include "ItemStructs.h"
 #include "Engine/EngineTypes.h"
-#include "SurvivalTest/HelperFunctions.h"
 #include "Weapon.generated.h"
 
 #define mSpawnProjectile(projectileClass) GetCharacterOwner()->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
@@ -29,7 +28,7 @@ public:
 	void SetInstanceWeaponData(FInstanceWeaponData inInstanceWeaponData) { instanceWeaponData = inInstanceWeaponData; }
 
 	FWeaponData& GetWeaponData() { return weaponData; }
-	void SetWeaponData(FWeaponData data) { weaponData = data; }
+	void SetWeaponData(const FWeaponData& data) { weaponData = data; }
 	virtual void UseWeapon(const FRotator& LookAtRotation);
 
 	ABaseCharacter* GetCharacterOwner() const { return characterOwner; }

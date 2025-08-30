@@ -18,7 +18,9 @@ class SURVIVALTEST_API AMission : public ATargetPoint, public IEventListener
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
+
 	void MissionComplete();
 	void SpawnMission_Internal();
 	bool ShouldSpawnMission() const { return spawnMission; }
@@ -36,7 +38,7 @@ protected:
 	void SetUpLootBoxes();
 	virtual void BeginPlay() override;
 	bool HasPlayers();
-	void SpawnBox(FVector location);
+	void SpawnBox(const FVector& location);
 	bool IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp);
 
 	TSubclassOf<APawn> AIClass;

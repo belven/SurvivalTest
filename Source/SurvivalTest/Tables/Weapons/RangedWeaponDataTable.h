@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "SurvivalTest/Items/ItemStructs.h"
 #include "SurvivalTest/Tables/CSVTable.h"
 #include "RangedWeaponDataTable.generated.h"
 

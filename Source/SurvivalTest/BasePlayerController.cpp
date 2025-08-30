@@ -1,4 +1,6 @@
 #include "BasePlayerController.h"
+
+#include "HelperFunctions.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
@@ -8,17 +10,17 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "Components/TimelineComponent.h"
-#include "GameFramework/PlayerInput.h"
 #include "Items/ProjectileWeapon.h"
+#include "Kismet/GameplayStatics.h"
 #include "Tasks/ReloadTask.h"
 #include "Tasks/TaskManagerComponent.h"
 #include "UI/HUDUI.h"
 
 class ABaseCharacter;
 
-ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), performAction(false), useEquipment(false), RotateValue(0), CurveFloatValue(0),
-                                                 TimelineValue(0), leanCurve(nullptr), mainHUD(nullptr),
-                                                 inventoryWidget(nullptr), baseCharacter(nullptr), rangedWeapon(nullptr)
+ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), RotateValue(0), CurveFloatValue(0), TimelineValue(0), performAction(false), useEquipment(false),
+                                                 isReloading(false), rangedWeapon(nullptr), leanCurve(nullptr),
+                                                 mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
@@ -118,6 +120,7 @@ void ABasePlayerController::OutOfAmmo()
 
 void ABasePlayerController::ReloadComplete()
 {
+	isReloading = false;
 	if (performAction) {
 		useEquipment = true;
 	}
@@ -144,11 +147,12 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 
 void ABasePlayerController::Reload()
 {
-	if (rangedWeapon)
+	if (rangedWeapon && !isReloading)
 	{
 		if (GetBaseCharacter()->GetTaskManager()->PerformTask(NewObject<UReloadTask>(), false))
 		{
 			useEquipment = false;
+			isReloading = true;
 		}
 	}
 }
@@ -181,9 +185,10 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 
 	UWeapon* equippedWeapon = mCurrentWeapon();
 
-	if (iid.ID != UItemStructs::InvalidInt && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
+	if (iid.isValid() && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
 	{
-		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID));
+		UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID);
+		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
 	}
 }
 

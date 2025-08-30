@@ -2,6 +2,7 @@
 
 #include "GridSectionData.h"
 #include "NavigationSystem.h"
+#include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseGameInstance.h"
 
 void AMainGrid::ClearGrid()
@@ -23,7 +24,7 @@ void AMainGrid::OnConstruction(const FTransform& Transform)
 
 }
 
-AGridSection* AMainGrid::GetGridSection(FVector loc)
+AGridSection* AMainGrid::GetGridSection(const FVector& loc)
 {
 	AGridSection* section = nullptr;
 	int32 x = ModValue(loc.X);
@@ -63,7 +64,6 @@ void AMainGrid::BeginPlay()
 	Super::BeginPlay();
 
 	mGameInstance()->grid = this;
-
 
 	const FVector startLocation = FVector(0, 0, 0);
 	int32 halfBoxSize = boxSize / 2;

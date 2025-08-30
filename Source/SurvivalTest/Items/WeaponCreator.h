@@ -1,6 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "WeaponCreator.generated.h"
 
 #define mNewObject(uClass) NewObject<uClass>() 

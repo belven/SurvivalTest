@@ -1,12 +1,13 @@
 #include "BaseGameInstance.h"
-#include "FactionManager.h"
-#include "HelperFunctions.h"
-#include "Events/RPGEventManager.h"
 #include "Items/ItemContainer.h"
 #include "Missions/MissionManager.h"
 #include "Tables/ArmourDataTable.h"
 #include "Tables/TableManager.h"
 #include "Tables/Items/WeaponInstanceTable.h"
+// ReSharper disable once CppUnusedIncludeDirective
+#include "Events/RPGEventManager.h"
+// ReSharper disable once CppUnusedIncludeDirective
+#include "FactionManager.h"
 
 #define GetLastMapItem(type, values) UHelperFunctions::GetLastMapItem<int32, type>(values)
 

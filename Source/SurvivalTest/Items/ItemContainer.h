@@ -1,11 +1,10 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "ItemStructs.h"
 #include "../BaseGameInstance.h"
 #include "ItemContainer.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemUpdated, FInstanceItemData, newItem, FInstanceItemData, oldItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemUpdated, const FInstanceItemData&, newItem, const FInstanceItemData&, oldItem);
 
 USTRUCT(BlueprintType)
 struct FValidSlots
@@ -45,7 +44,7 @@ class SURVIVALTEST_API UItemContainer : public UObject
 public:
 	UItemContainer();
 
-	static UItemContainer* CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame);
+	static UItemContainer* CreateItemContainer(const FContainerData& inContainerData, const FInstanceContainerData& inInstanceContainerData, UBaseGameInstance* inGame);
 
 	FString GetItemName(int32 itemID);
 	int32 GetNextInstanceItemDataID();

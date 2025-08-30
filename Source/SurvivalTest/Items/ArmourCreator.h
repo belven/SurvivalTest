@@ -1,7 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "SurvivalTest/BaseGameInstance.h"
-#include "UObject/NoExportTypes.h"
 #include "ArmourCreator.generated.h"
 
 class UArmour;

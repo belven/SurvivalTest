@@ -13,7 +13,7 @@ class SURVIVALTEST_API AMainGrid : public ATargetPoint
 public:
 	void ClearGrid();
 	virtual void OnConstruction(const FTransform& Transform) override;
-	AGridSection* GetGridSection(FVector loc);
+	AGridSection* GetGridSection(const FVector& loc);
 	int32 ModValue(double value);
 	AMainGrid();
 	virtual ~AMainGrid() override;

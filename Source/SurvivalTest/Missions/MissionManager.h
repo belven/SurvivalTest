@@ -1,6 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "MissionManager.generated.h"
 
 class AMission;
@@ -15,10 +14,10 @@ public:
 	void CreateMissions();
 
 	TArray<AMission*> GetMissions() const { return missions; }
-	void SetMissions(TArray<AMission*> inMissions) { missions = inMissions; }
+	void SetMissions(const TArray<AMission*>& inMissions) { missions = inMissions; }
 
-	UBaseGameInstance* GetGame() const	{		return game;	}
-	void SetGame(UBaseGameInstance* inGame)	{		game = inGame;	}
+	UBaseGameInstance* GetGame() const { return game; }
+	void SetGame(UBaseGameInstance* inGame) { game = inGame; }
 
 	void AddMission(AMission* inMission);
 	void StartPlay();

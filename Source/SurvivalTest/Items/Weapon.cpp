@@ -1,8 +1,5 @@
 #include "Weapon.h"
-#include "../BaseProjectile.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "SurvivalTest/BaseCharacter.h"
-#include "SurvivalTest/CharacterStructs.h"
 
 UWeapon::UWeapon(): characterOwner(nullptr), weaponMeshComp(nullptr)
 {

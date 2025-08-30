@@ -1,6 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "Interfaces/Team.h"
 #include "FactionManager.generated.h"
 

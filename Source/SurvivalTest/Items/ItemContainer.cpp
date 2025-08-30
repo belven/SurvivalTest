@@ -1,14 +1,12 @@
 #include "ItemContainer.h"
 
-#include <iostream>
-
 #include "../BaseGameInstance.h"
 
 UItemContainer::UItemContainer() : Super()
 {
 }
 
-UItemContainer* UItemContainer::CreateItemContainer(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame)
+UItemContainer* UItemContainer::CreateItemContainer(const FContainerData& inContainerData, const FInstanceContainerData& inInstanceContainerData, UBaseGameInstance* inGame)
 {
 	UItemContainer* ic = NewObject<UItemContainer>();
 	ic->SetContainerData(inContainerData);

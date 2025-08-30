@@ -11,6 +11,7 @@
 #include "Tasks/TaskManagerComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 float ABaseCharacter::interactionRadius = 500;
 const FVector ABaseCharacter::cameraCenter = FVector(50.0f, 0.0f, 80.0f);

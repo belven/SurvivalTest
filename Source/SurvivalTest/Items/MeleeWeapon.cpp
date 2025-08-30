@@ -1,9 +1,11 @@
 #include "MeleeWeapon.h"
 
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BaseGameInstance.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 #define mSphereTraceMultiWeapon(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::None, hits, true);
 

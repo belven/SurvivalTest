@@ -12,5 +12,5 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "HUD")
 	virtual void DrawHUD() override;
 	void DrawStats();
-	void DrawStatBar(float startX, float startY, float lineOffset, FString text, float value, FLinearColor lineColour, float lineLength, float lineThickness);
+	void DrawStatBar(float startX, float startY, float lineOffset, const FString& text, float value, FLinearColor lineColour, float lineLength, float lineThickness);
 };

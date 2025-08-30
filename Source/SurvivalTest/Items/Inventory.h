@@ -14,7 +14,7 @@ class SURVIVALTEST_API UInventory : public UItemContainer
 {
 	GENERATED_BODY()
 public:
-	static UInventory* CreateInventory(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame, ABaseCharacter* inCharacterOwner);
+	static UInventory* CreateInventory(const FContainerData& inContainerData, const FInstanceContainerData& inInstanceContainerData, UBaseGameInstance* inGame, ABaseCharacter* inCharacterOwner);
 
 	FORCEINLINE UWeapon* GetEquippedWeapon() { return equippedWeapon; }
 
@@ -28,7 +28,7 @@ public:
 	void EquipArmour(UArmour* armour);
 	
 	UFUNCTION()
-		void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
+		void ItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem);
 
 	TArray<int32> GetSlotForGear(EGearType type);
 	int32 GetPrimaryWeaponSlot();
@@ -36,7 +36,7 @@ public:
 	int32 GetSidearmWeaponSlot();
 
 	UFUNCTION()
-		void SetupLoadout(FLoadoutData ld);
+		void SetupLoadout(const FLoadoutData& ld);
 
 	TMap<EGearType, UArmour*> GetEquippedArmour() const
 	{

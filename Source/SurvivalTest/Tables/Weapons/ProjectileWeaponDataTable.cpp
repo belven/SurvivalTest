@@ -1,5 +1,7 @@
 #include "ProjectileWeaponDataTable.h"
 
+#include "SurvivalTest/Items/ItemStructs.h"
+
 UProjectileWeaponDataTable::UProjectileWeaponDataTable()
 {
 	path = CSVT::GetTableFilePath("ProjectileWeaponData.csv");

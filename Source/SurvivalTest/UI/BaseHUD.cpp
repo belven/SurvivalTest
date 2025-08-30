@@ -29,7 +29,7 @@ void ABaseHUD::DrawStats()
 	DrawStatBar(startX, startY + 60, 60, "Rest", player->GetCurrentStats().rest / player->GetMaxStats().rest, FLinearColor::White, 100, 15);
 }
 
-void ABaseHUD::DrawStatBar(float startX, float startY, float lineOffset, FString text, float value, FLinearColor lineColour, float lineLength, float lineThickness)
+void ABaseHUD::DrawStatBar(float startX, float startY, float lineOffset, const FString& text, float value, FLinearColor lineColour, float lineLength, float lineThickness)
 {
 	TArray<FStringFormatArg> args;
 	args.Add(FStringFormatArg(text));

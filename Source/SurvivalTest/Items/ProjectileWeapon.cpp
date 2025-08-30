@@ -4,6 +4,7 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/BaseProjectile.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 #define mSetReloadTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, GetProjectileWeaponData().reloadSpeed)
 

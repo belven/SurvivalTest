@@ -4,7 +4,6 @@
 #include "MainLight.h"
 #include "Engine/GameInstance.h"
 #include "Items/ItemStructs.h"
-#include "Kismet/GameplayStatics.h"
 #include "Tables/Items/InstanceItemDataTable.h"
 #include "Tables/TableManager.h"
 #include "BaseGameInstance.generated.h"
@@ -33,7 +32,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	FItemData GetItemData(int32 itemID) { return mTable()->GetItemData(itemID); }
-	FItemData GetItemDataByName(FString itemName) { return mTable()->GetItemDataByName(itemName); }
+	FItemData GetItemDataByName(const FString& itemName) { return mTable()->GetItemDataByName(itemName); }
 
 	void AddUpdateData(const FInstanceArmourData& inData) { mTable()->AddUpdateData(inData); }
 	void AddUpdateData(const FInstanceWeaponData& inData) { mTable()->AddUpdateData(inData); }
@@ -46,10 +45,10 @@ public:
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID) { return mTable()->GetRangedWeaponData(weaponID); }
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID) { return mTable()->GetProjectileWeaponData(rangedWeaponID); }
 	FArmourData GetArmourData(int32 armourID) { return mTable()->GetArmourData(armourID); }
-	FContainerData GetContainerDataName(FString containerName) { return mTable()->GetContainerDataName(containerName); }
+	FContainerData GetContainerDataName(const FString& containerName) { return mTable()->GetContainerDataName(containerName); }
 	FContainerData GetContainerDataByID(int32 containerID) { return mTable()->GetContainerDataByID(containerID); }
 	FArmourData GetArmourDataByItemID(int32 itemID) { return mTable()->GetArmourDataByItemID(itemID); }
-	FLoadoutData GetLoadoutData(FString loadoutName) { return mTable()->GetLoadoutData(loadoutName); }
+	FLoadoutData GetLoadoutData(const FString& loadoutName) { return mTable()->GetLoadoutData(loadoutName); }
 	FConsumableData GetConsumableData(int32 itemID) { return mTable()->GetConsumableData(itemID); }
 	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID) { return mTable()->GetInstanceWeaponDataByInstanceItemID(instanceItemID); }
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID) { return mTable()->GetInstancedArmourByContainerID(inContainerInstanceID); }
@@ -64,7 +63,7 @@ public:
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
 
-	TFunction<bool(FInstanceItemData, int32)> instanceItemFilter = [](FInstanceItemData item, int32 id) { return item.ID == id; };
+	TFunction<bool(FInstanceItemData, int32)> instanceItemFilter = [](const FInstanceItemData& item, int32 id) { return item.ID == id; };
 
 	template<class T>
 	T GetDataByID(TArray<T> items, TFunction<bool(T, int32)> itemFilter, int32 idToFind)

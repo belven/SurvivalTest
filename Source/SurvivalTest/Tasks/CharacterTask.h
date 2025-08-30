@@ -1,7 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "TaskAction.h"
-#include "UObject/NoExportTypes.h"
 #include "CharacterTask.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FTaskComplete, const FStatusData&, status);

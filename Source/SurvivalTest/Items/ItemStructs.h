@@ -1,6 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "SurvivalTest/Missions/MissionStructs.h"
 #include "ItemStructs.generated.h"
 
@@ -97,7 +96,7 @@ public:
 	{
 	}
 
-	FItemData(int32 id, const FString& name, EItemType type, int32 maxStack, FString mesh)
+	FItemData(int32 id, const FString& name, EItemType type, int32 maxStack, const FString& mesh)
 		: ID(id),
 		  name(name),
 		  mesh(mesh),
@@ -234,16 +233,16 @@ class SURVIVALTEST_API UItemStructs : public UObject
 
 public:
 	static const int32 InvalidInt;
-	static EWeaponType GetWeaponType(FString typeName);
-	static EGearType GetGearType(FString typeName);
-	static EItemType GetItemType(FString typeName);
-	static EGearType GetArmourSlot(FString typeName);
-	static ECharacterType GetCharacterType(FString typeName);
-	static EContainerType GetContainerType(FString typeName);
-	static EConsumableType GetConsumableType(FString typeName);
-	static EFireMode GetFireMode(FString typeName);
+	static EWeaponType GetWeaponType(const FString& typeName);
+	static EGearType GetGearType(const FString& typeName);
+	static EItemType GetItemType(const FString& typeName);
+	static EGearType GetArmourSlot(const FString& typeName);
+	static ECharacterType GetCharacterType(const FString& typeName);
+	static EContainerType GetContainerType(const FString& typeName);
+	static EConsumableType GetConsumableType(const FString& typeName);
+	static EFireMode GetFireMode(const FString& typeName);
 	static FString GetFireMode(EFireMode mode);
-	static bool GetBoolean(FString value);
+	static bool GetBoolean(const FString& value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
 	static bool IsValidID(const int ID)
 	{

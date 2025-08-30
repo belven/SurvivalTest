@@ -2,7 +2,6 @@
 #include "CoreMinimal.h"
 #include "BaseEvent.h"
 #include "EventListener.h"
-#include "UObject/NoExportTypes.h"
 #include "RPGEventManager.generated.h"
 
 #define mEventTriggered(GameInstance, baseEvent)  GameInstance->GetEventManager()->EventTriggered(baseEvent)

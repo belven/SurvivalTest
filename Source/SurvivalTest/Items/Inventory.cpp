@@ -6,7 +6,7 @@
 #include "WeaponCreator.h"
 #include "SurvivalTest/BaseCharacter.h"
 
-UInventory* UInventory::CreateInventory(FContainerData inContainerData, FInstanceContainerData inInstanceContainerData, UBaseGameInstance* inGame, ABaseCharacter* inCharacterOwner)
+UInventory* UInventory::CreateInventory(const FContainerData& inContainerData, const FInstanceContainerData& inInstanceContainerData, UBaseGameInstance* inGame, ABaseCharacter* inCharacterOwner)
 {
 	UInventory* ic = NewObject<UInventory>();
 	ic->SetContainerData(inContainerData);
@@ -151,7 +151,7 @@ void UInventory::EquipArmour(UArmour* armour)
 }
 
 
-void UInventory::SetupLoadout(FLoadoutData ld)
+void UInventory::SetupLoadout(const FLoadoutData& ld)
 {
 	TArray<EGearType> gearTypes;
 	gearTypes.AddUnique(EGearType::Head);
@@ -181,7 +181,7 @@ void UInventory::SetupLoadout(FLoadoutData ld)
 	OnItemUpdated.AddUniqueDynamic(this, &UInventory::ItemUpdated);
 }
 
-void UInventory::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
+void UInventory::ItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem)
 {
 	FItemData id = game->GetItemData(inItem.itemID);
 

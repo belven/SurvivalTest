@@ -7,7 +7,7 @@
 
 const int32 UItemStructs::InvalidInt = -1;
 
-EWeaponType UItemStructs::GetWeaponType(FString typeName)
+EWeaponType UItemStructs::GetWeaponType(const FString& typeName)
 {
 	if (typeName.Equals("Melee"))
 	{
@@ -20,7 +20,7 @@ EWeaponType UItemStructs::GetWeaponType(FString typeName)
 	return EWeaponType::Melee;
 }
 
-EGearType UItemStructs::GetGearType(FString typeName)
+EGearType UItemStructs::GetGearType(const FString& typeName)
 {
 	if (typeName.Equals("Legs"))
 	{
@@ -57,7 +57,7 @@ EGearType UItemStructs::GetGearType(FString typeName)
 	return EGearType::Legs;
 }
 
-EItemType UItemStructs::GetItemType(FString typeName)
+EItemType UItemStructs::GetItemType(const FString& typeName)
 {
 	if (typeName.Equals("Weapon"))
 	{
@@ -82,7 +82,7 @@ EItemType UItemStructs::GetItemType(FString typeName)
 	return EItemType::Consumable;
 }
 
-EGearType UItemStructs::GetArmourSlot(FString typeName)
+EGearType UItemStructs::GetArmourSlot(const FString& typeName)
 {
 	if (typeName.Equals("Chest"))
 	{
@@ -103,7 +103,7 @@ EGearType UItemStructs::GetArmourSlot(FString typeName)
 	return EGearType::Head;
 }
 
-ECharacterType UItemStructs::GetCharacterType(FString typeName)
+ECharacterType UItemStructs::GetCharacterType(const FString& typeName)
 {
 	if (typeName.Equals("Player"))
 	{
@@ -124,7 +124,7 @@ ECharacterType UItemStructs::GetCharacterType(FString typeName)
 	return ECharacterType::Neutral;
 }
 
-EContainerType UItemStructs::GetContainerType(FString typeName)
+EContainerType UItemStructs::GetContainerType(const FString& typeName)
 {
 	if (typeName.Equals("Armour"))
 	{
@@ -137,7 +137,7 @@ EContainerType UItemStructs::GetContainerType(FString typeName)
 	return EContainerType::Box;
 }
 
-EConsumableType UItemStructs::GetConsumableType(FString typeName)
+EConsumableType UItemStructs::GetConsumableType(const FString& typeName)
 {
 	if (typeName.Equals("Drink"))
 	{
@@ -154,7 +154,7 @@ EConsumableType UItemStructs::GetConsumableType(FString typeName)
 	return EConsumableType::Drink;
 }
 
-EFireMode UItemStructs::GetFireMode(FString typeName)
+EFireMode UItemStructs::GetFireMode(const FString& typeName)
 {
 	if (typeName.Equals("FullAuto"))
 	{
@@ -182,7 +182,7 @@ FString UItemStructs::GetFireMode(EFireMode mode)
 	}
 }
 
-bool UItemStructs::GetBoolean(FString value)
+bool UItemStructs::GetBoolean(const FString& value)
 {
 	return value.Equals("true") ? true : false;
 }

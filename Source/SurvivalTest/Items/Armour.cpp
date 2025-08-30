@@ -1,6 +1,5 @@
 #include "Armour.h"
 #include "ArmourCreator.h"
-#include "ItemContainer.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/Tables/TableManager.h"

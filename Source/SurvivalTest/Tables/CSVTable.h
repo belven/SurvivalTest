@@ -1,7 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "../Items/ItemStructs.h"
 #include "CSVTable.generated.h"
 
 #define DS UDataStructs
@@ -22,7 +20,7 @@ public:
 
 	FString GetPath() const { return path; }
 
-	static FString GetTableFilePath(FString table)
+	static FString GetTableFilePath(const FString& table)
 	{
 		FString path = TablesFolder + table;
 		path.ReplaceCharInline(*"/", *"\\");
@@ -34,6 +32,6 @@ protected:
 	TArray<TArray<FString>> dataStrings;
 	FString path;
 
-	static int32 GetIntFromString(FString value) { return FCString::Atoi(*value); }
-	static float GetFloatFromString(FString value) { return FCString::Atof(*value); }
+	static int32 GetIntFromString(const FString& value) { return FCString::Atoi(*value); }
+	static float GetFloatFromString(const FString& value) { return FCString::Atof(*value); }
 };

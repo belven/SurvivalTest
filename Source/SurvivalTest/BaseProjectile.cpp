@@ -7,6 +7,7 @@
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
 #include "Items/Weapon.h"
+#include "Kismet/GameplayStatics.h"
 
 const float ABaseProjectile::Default_Initial_Speed = 8000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 20.0f;

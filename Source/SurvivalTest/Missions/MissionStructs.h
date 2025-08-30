@@ -57,5 +57,5 @@ class SURVIVALTEST_API UMissionStructs : public UObject
 {
 	GENERATED_BODY()
 	public:
-		static EMissionType GetMissionType(FString type);
+		static EMissionType GetMissionType(const FString& type);
 };

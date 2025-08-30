@@ -2,6 +2,7 @@
 #include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
+#include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/HelperFunctions.h"
@@ -125,7 +126,7 @@ void ALootBox::CreateLootboxData()
 	container->OnItemUpdated.AddUniqueDynamic(this, &ALootBox::ItemUpdated);
 }
 
-FInstanceItemData ALootBox::CreateLoot(FItemData id)
+FInstanceItemData ALootBox::CreateLoot(const FItemData& id)
 {
 	FInstanceItemData iid;
 	if (id.ID != UItemStructs::InvalidInt)
@@ -143,7 +144,7 @@ void ALootBox::RemoveLootBox()
 	//Destroy();
 }
 
-void ALootBox::ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem)
+void ALootBox::ItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem)
 {
 	if (!mIsTimerActive(TimerHandle_LootboxClear))
 		mSetTimer(TimerHandle_LootboxClear, &ALootBox::RemoveLootBox, 60.0f);

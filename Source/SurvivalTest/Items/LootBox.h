@@ -25,10 +25,10 @@ public:
 	virtual void Highlight(bool activate) override;
 
 	FContainerData GetContainerData() const { return containerData; }
-	void SetContainerData(FContainerData inContainerData) { containerData = inContainerData; }
+	void SetContainerData(const FContainerData& inContainerData) { containerData = inContainerData; }
 
 	UFUNCTION()
-	void ItemUpdated(FInstanceItemData inItem, FInstanceItemData oldItem);
+	void ItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem);
 
 	UFUNCTION()
 	void RemoveLootBox();
@@ -37,10 +37,10 @@ public:
 	void SpawnLoot();
 	void ClearData();
 
-	void SetItemTypes(TArray<int32>inItemTypes) { itemTypes = inItemTypes; }
+	void SetItemTypes(const TArray<int32>& inItemTypes) { itemTypes = inItemTypes; }
 
 protected:
-	FInstanceItemData CreateLoot(FItemData id);
+	FInstanceItemData CreateLoot(const FItemData& id);
 
 	FTimerHandle TimerHandle_LootboxClear;
 	virtual void BeginPlay() override;

@@ -76,7 +76,7 @@ public:
 
 	UPROPERTY()
 	FOnUseItem OnUseItem;
-	
+
 	virtual void BeginPlay() override;
 
 private:
@@ -86,6 +86,7 @@ private:
 	int32 leanDirection = 0;
 	bool performAction;
 	bool useEquipment;
+	bool isReloading;
 
 	UPROPERTY()
 	UProjectileWeapon* rangedWeapon;

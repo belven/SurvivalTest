@@ -1,10 +1,10 @@
 #include "Mission.h"
-#include "Components/ShapeComponent.h"
 #include "DrawDebugHelpers.h"
 #include "MissionArea.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include <NavigationSystem.h>
 #include "MissionManager.h"
+#include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseAIController.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Items/LootBox.h"
@@ -13,7 +13,6 @@
 #include "SurvivalTest/Events/RPGEventManager.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/Tables/LoadoutTableData.h"
-#include "SurvivalTest/Tables/Mission/MissionItemTable.h"
 #include "SurvivalTest/Tables/Mission/MissionLoadoutTable.h"
 
 AMission::AMission()
@@ -90,7 +89,7 @@ bool AMission::HasPlayers()
 	return false;
 }
 
-void AMission::SpawnBox(FVector location)
+void AMission::SpawnBox(const FVector& location)
 {
 	FActorSpawnParameters params;
 	params.Owner = this;

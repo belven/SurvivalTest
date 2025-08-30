@@ -1,7 +1,6 @@
 #include "ItemContainerUI.h"
 
 #include "ItemUI.h"
-#include "SurvivalTest/Tables/ContainerTableData.h"
 
 const int UItemContainerUI::itemsPerRow = 5;
 
@@ -78,9 +77,9 @@ bool UItemContainerUI::IsArmour(FItemData id)
 
 UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widgets)
 {
-	for(UWidget* widget : widgets)
+	for (UWidget* widget : widgets)
 	{
-		if(widget->IsA(UItemUI::StaticClass()))
+		if (widget->IsA(UItemUI::StaticClass()))
 		{
 			UItemUI* itemUI = Cast<UItemUI>(widget);
 
@@ -92,7 +91,7 @@ UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widget
 	return nullptr;
 }
 
-void UItemContainerUI::ItemUpdated(FInstanceItemData newItem, FInstanceItemData oldItem)
+void UItemContainerUI::ItemUpdated(const FInstanceItemData& newItem, const FInstanceItemData& oldItem)
 {
 	UpdateItem(newItem, oldItem, GetBaseGameInstance()->GetItemData(newItem.itemID));
 }
