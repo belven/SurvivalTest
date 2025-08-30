@@ -13,5 +13,8 @@ UCLASS()
 class SURVIVALTEST_API UReloadAction : public UTaskAction
 {
 	GENERATED_BODY()
-	
+public:
+	virtual void StartAction() override;
+
+	static UReloadAction* CreateReloadAction(ABaseCharacter* character);
 };

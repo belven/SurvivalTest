@@ -20,6 +20,7 @@ void UAnimationAction::StartAction()
 {
 	Super::StartAction();
 	character->GetWorldTimerManager().SetTimer(TimerHandle_PlayAnimation, this, &UAnimationAction::TimerEnded, animation_length);
+	UE_LOG(LogTemp, Log, TEXT("Animation Action Started"));
 
 	//UAnimInstance* AnimInstance = character->GetMesh()->GetAnimInstance();
 	//AnimInstance->Montage_Play(animation);
@@ -27,7 +28,9 @@ void UAnimationAction::StartAction()
 
 void UAnimationAction::CancelAction()
 {
+	UE_LOG(LogTemp, Log, TEXT("Animation Action Cancelled"));
 	Super::CancelAction();
+	character->GetWorldTimerManager().ClearAllTimersForObject(this);
 	//UAnimInstance* AnimInstance = character->GetMesh()->GetAnimInstance();
 	//AnimInstance->StopSlotAnimation();
 }
@@ -35,21 +38,20 @@ void UAnimationAction::CancelAction()
 void UAnimationAction::ActionComplete(FStatusData data)
 {
 	Super::ActionComplete(data);
+	UE_LOG(LogTemp, Log, TEXT("Animation Action Completed"));
 
 }
 
 void UAnimationAction::AnimationEnded(UAnimMontage* Montage, bool bInterrupted)
 {
-	FStatusData data;
-	data.successful = !bInterrupted;
-	ActionComplete(data);
+	UE_LOG(LogTemp, Log, TEXT("Animation Action AnimationEnded"));
+	ActionComplete(FStatusData(!bInterrupted));
 }
 
 void UAnimationAction::TimerEnded()
 {
-	FStatusData data;
-	data.successful = true;
-	ActionComplete(data);
+	UE_LOG(LogTemp, Log, TEXT("Animation Action TimerEnded"));
+	ActionComplete(FStatusData(true));
 }
 
 void UAnimationAction::SetAnimation(UAnimMontage* inAnimation)

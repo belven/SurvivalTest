@@ -37,6 +37,8 @@ public:
 
 	void AttackComplete();
 
+	bool IsProjectileWeapon() { return GetWeaponData().type == EWeaponType::Projectile; };
+
 protected:
 	FWeaponData weaponData;
 	FInstanceWeaponData instanceWeaponData;
@@ -50,5 +52,5 @@ protected:
 	UPROPERTY()
 	UStaticMeshComponent* weaponMeshComp;
 
-	virtual ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) { return NULL;  };
+	virtual ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) { return NULL; };
 };

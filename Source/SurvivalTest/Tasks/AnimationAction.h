@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "TaskAction.h"
-#include "SurvivalTest/BaseCharacter.h"
 #include "AnimationAction.generated.h"
 
 UCLASS()
@@ -26,8 +25,6 @@ public:
 protected:
 	void SetAnimation(UAnimMontage* inAnimation);
 
-	UPROPERTY()
-	ABaseCharacter* character;
 	FTimerHandle TimerHandle_PlayAnimation;
 
 	float animation_length = 0;

@@ -4,7 +4,7 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/CharacterStructs.h"
 
-UWeapon::UWeapon()
+UWeapon::UWeapon(): characterOwner(nullptr), weaponMeshComp(nullptr)
 {
 	GunOffset = FVector(0.f, 0.f, 0.f);
 	canAttack = true;
@@ -29,8 +29,6 @@ void UWeapon::AttackComplete()
 	canAttack = true;
 	OnWeaponReady.Broadcast();
 }
-
-
 
 void UWeapon::UseWeapon(const FRotator& LookAtRotation)
 {

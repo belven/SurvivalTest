@@ -53,7 +53,6 @@ public:
 	UFUNCTION()
 	void Sprint();
 
-	bool HasAmmoForWeapon();
 	void OnPrimaryActionReleased();
 	void OnPrimaryWeapon();
 	void OnSecondaryWeapon();
@@ -77,7 +76,6 @@ public:
 
 	UPROPERTY()
 	FOnUseItem OnUseItem;
-	bool performAction;
 	
 	virtual void BeginPlay() override;
 
@@ -86,6 +84,8 @@ private:
 	float CurveFloatValue;
 	float TimelineValue;
 	int32 leanDirection = 0;
+	bool performAction;
+	bool useEquipment;
 
 	UPROPERTY()
 	UProjectileWeapon* rangedWeapon;

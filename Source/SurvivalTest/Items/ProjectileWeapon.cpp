@@ -68,7 +68,7 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 
 	if (!firstShot) {
 		double angle = 360 * (1 - GetRangedWeaponData().accuracy);
-		 rot = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FireRotation.Vector(), angle).Rotation();
+		rot = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FireRotation.Vector(), angle).Rotation();
 	}
 	else
 	{
@@ -89,26 +89,26 @@ void UProjectileWeapon::Reload()
 {
 	canAttack = false;
 	RecoilReset();
-	mSetReloadTimer();
+	//mSetReloadTimer();
 }
 
 void UProjectileWeapon::ReloadExpired()
 {
-	int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
-	int32 ammoMissing = GetProjectileWeaponData().magazineSize - GetInstanceWeaponData().ammo;
-	int32 ammoToTake = FMath::Min(ammoLeft, ammoMissing);
+	//int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
+	//int32 ammoMissing = GetProjectileWeaponData().magazineSize - GetInstanceWeaponData().ammo;
+	//	int32 ammoToTake = FMath::Min(ammoLeft, ammoMissing);
 
-	if (ammoLeft > 0)
-	{
-		FInstanceItemData iid(GetProjectileWeaponData().ammoID, ammoToTake);
+	//if (ammoLeft > 0)
+	//{
+		/*FInstanceItemData iid(GetProjectileWeaponData().ammoID, ammoToTake);
 		GetCharacterOwner()->GetInventory()->RemoveItem(iid);
 
 		GetInstanceWeaponData().ammo += ammoToTake;
-		GetCharacterOwner()->GetGame()->AddUpdateData(GetInstanceWeaponData());
+		GetCharacterOwner()->GetGame()->AddUpdateData(GetInstanceWeaponData());*/
 		canAttack = true;
 		OnWeaponReady.Broadcast();
 		OnReloadComplete.Broadcast();
-	}
+//	}
 }
 
 void UProjectileWeapon::RecoilReset()

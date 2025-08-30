@@ -1,16 +1,14 @@
 #include "BaseCharacter.h"
-#include "BaseProjectile.h"
 #include "BaseGameInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Events/CombatStateEvent.h"
 #include "Events/HealthChangeEvent.h"
 #include "Events/RPGEventManager.h"
-#include "GameFramework/InputSettings.h"
 #include "Items/Armour.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "BasePlayerController.h"
-#include "NavigationSystem.h"
+#include "Tasks/TaskManagerComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
@@ -73,6 +71,9 @@ ABaseCharacter::ABaseCharacter()
 	weaponMeshComp->SetRelativeRotation(FRotator(180));
 	GetMesh()->SetCustomDepthStencilValue(2);
 
+
+	taskManager = CreateDefaultSubobject< UTaskManagerComponent>(TEXT("TaskManager"));
+
 	ResetStats();
 }
 
@@ -134,6 +135,10 @@ void ABaseCharacter::BeginPlay()
 	//navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 	game = mGameInstance();
 	GetOverlapsOnSpawn();
+
+	//AddOwnedComponent(taskManager);
+
+//	AddInstanceComponent(taskManager);
 }
 
 /**

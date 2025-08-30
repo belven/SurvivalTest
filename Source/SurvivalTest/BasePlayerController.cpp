@@ -8,14 +8,17 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "Components/TimelineComponent.h"
+#include "GameFramework/PlayerInput.h"
 #include "Items/ProjectileWeapon.h"
+#include "Tasks/ReloadTask.h"
+#include "Tasks/TaskManagerComponent.h"
 #include "UI/HUDUI.h"
 
 class ABaseCharacter;
 
-ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), performAction(false), RotateValue(0), CurveFloatValue(0),
-TimelineValue(0), leanCurve(nullptr), mainHUD(nullptr),
-inventoryWidget(nullptr), baseCharacter(nullptr), rangedWeapon(nullptr)
+ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), performAction(false), useEquipment(false), RotateValue(0), CurveFloatValue(0),
+                                                 TimelineValue(0), leanCurve(nullptr), mainHUD(nullptr),
+                                                 inventoryWidget(nullptr), baseCharacter(nullptr), rangedWeapon(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
@@ -74,7 +77,7 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	leanTimeline.TickTimeline(DeltaTime);
 
-	if (performAction && mCurrentWeapon())
+	if (useEquipment && mCurrentWeapon())
 	{
 		mCurrentWeapon()->UseWeapon(PlayerCameraManager->GetCameraRotation());
 	}
@@ -115,12 +118,14 @@ void ABasePlayerController::OutOfAmmo()
 
 void ABasePlayerController::ReloadComplete()
 {
-
+	if (performAction) {
+		useEquipment = true;
+	}
 }
 
 void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 {
-	if (oldWeapon && oldWeapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (oldWeapon && oldWeapon->IsProjectileWeapon())
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
 		pw->OnOutOfAmmo.RemoveAll(this);
@@ -129,7 +134,7 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 
 	UWeapon* weapon = mCurrentWeapon();
 
-	if (weapon && weapon->GetWeaponData().type == EWeaponType::Projectile)
+	if (weapon && weapon->IsProjectileWeapon())
 	{
 		rangedWeapon = Cast<UProjectileWeapon>(weapon);
 		rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABasePlayerController::OutOfAmmo);
@@ -141,23 +146,18 @@ void ABasePlayerController::Reload()
 {
 	if (rangedWeapon)
 	{
-		rangedWeapon->Reload();
+		if (GetBaseCharacter()->GetTaskManager()->PerformTask(NewObject<UReloadTask>(), false))
+		{
+			useEquipment = false;
+		}
 	}
 }
 
-bool ABasePlayerController::HasAmmoForWeapon()
-{
-	if (rangedWeapon)
-	{
-		return GetBaseCharacter()->GetInventory()->GetItemAmount(rangedWeapon->GetProjectileWeaponData().ammoID) > 0;
-	}
-
-	return false;
-}
 
 void ABasePlayerController::OnPrimaryActionReleased()
 {
 	performAction = false;
+	useEquipment = false;
 }
 
 void ABasePlayerController::OnPrimaryWeapon()
@@ -256,6 +256,7 @@ void ABasePlayerController::OnPrimaryAction()
 	if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
 	{
 		performAction = true;
+		useEquipment = true;
 	}
 }
 

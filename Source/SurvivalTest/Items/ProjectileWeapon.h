@@ -12,14 +12,22 @@ class SURVIVALTEST_API UProjectileWeapon : public URangedWeapon
 	GENERATED_BODY()
 public:
 	FProjectileWeaponData GetProjectileWeaponData() const { return projectileWeaponData; }
-	void SetProjectileWeaponData(FProjectileWeaponData data) { projectileWeaponData = data; currentAmmo = data.magazineSize;  }
+	void SetProjectileWeaponData(const FProjectileWeaponData& data) { projectileWeaponData = data;  }
 	virtual void UseWeapon(const FRotator& LookAtRotation) override;
 	bool HasAmmo();
 	void SetCanFireTimer();
 	void ConsumeAmmo();
 	void SpawnProjectile(const FRotator& FireRotation);
 	void Reload();
-	ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) override;
+
+	bool NeedsReloading() { return GetCurrentAmmo() < GetProjectileWeaponData().magazineSize;  }
+
+	virtual ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) override;
+
+	int32 GetCurrentAmmo() const
+	{
+		return instanceWeaponData.ammo;
+	}
 
 	FOutOfAmmo OnOutOfAmmo;
 	FReloadComplete OnReloadComplete;
@@ -30,6 +38,5 @@ public:
 	void RecoilReset();
 protected:
 	FProjectileWeaponData projectileWeaponData;
-	int32 currentAmmo;
 	bool firstShot;
 };

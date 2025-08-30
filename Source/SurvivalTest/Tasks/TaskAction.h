@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "SurvivalTest/BaseCharacter.h"
 #include "TaskAction.generated.h"
 
 USTRUCT(BlueprintType)
@@ -29,9 +30,12 @@ public:
 	virtual void CancelAction();
 	virtual void ActionComplete(FStatusData data);
 
-private:
+protected:
 	bool canBeInterrupted;
 
 	UPROPERTY()
 	AController* controller;
+
+	UPROPERTY()
+	ABaseCharacter* character;
 };

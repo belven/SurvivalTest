@@ -10,6 +10,7 @@
 #include "Items/Inventory.h"
 #include "BaseCharacter.generated.h"
 
+class UTaskManagerComponent;
 class UCameraComponent;
 class UBaseGameInstance;
 class USphereComponent;
@@ -40,6 +41,11 @@ public:
 	static const FVector leftLean;
 	static const FVector rightLean;
 	static float interactionRadius;
+
+	UTaskManagerComponent* GetTaskManager() const
+	{
+		return taskManager;
+	}
 
 	float baseWalkSpeed;
 	EMovementState currentMovementState;
@@ -87,7 +93,7 @@ public:
 	void AddInteractable(IInteractable* inter);
 	void RemoveInteractable(IInteractable* inter);
 	TArray<IInteractable*> GetOverlappingInteractables() const { return overlappingInteractables; }
-	void SetOverlappingInteractables(TArray<IInteractable*> inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
+	void SetOverlappingInteractables(const TArray<IInteractable*>& inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
 	virtual void Interact(ABasePlayerController* instigator) override;
 	virtual void Highlight(bool activate) override;
 
@@ -154,4 +160,8 @@ protected:
 
 	UPROPERTY()
 	FCharacterStats maxStats;
+
+	UPROPERTY()
+	UTaskManagerComponent* taskManager;
+
 };

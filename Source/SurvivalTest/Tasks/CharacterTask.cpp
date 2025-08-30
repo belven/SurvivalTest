@@ -3,12 +3,11 @@
 void UCharacterTask::PerformTask(AController* inController)
 {
 	controller = inController;
-	PerformNextAction();
 }
 
 void UCharacterTask::PerformNextAction()
 {
-	 actions.Dequeue(currentAction);
+	actions.Dequeue(currentAction);
 	currentAction->StartAction();
 }
 
@@ -24,7 +23,7 @@ void UCharacterTask::ActionComplete(FStatusData actionStatus)
 	{
 		OnTaskComplete.Broadcast(actionStatus);
 	}
-	else if (actions.Num() > 1)
+	else if (!actions.IsEmpty())
 	{
 		PerformNextAction();
 	}
@@ -34,13 +33,39 @@ void UCharacterTask::ActionComplete(FStatusData actionStatus)
 	}
 }
 
+bool UCharacterTask::CanBeInterrupted()
+{
+	return !currentAction || currentAction->CanBeInterrupted();
+}
+
 bool UCharacterTask::CancelAction(bool force)
 {
 	bool result = false;
-	if (currentAction->CanBeInterrupted() || force)
+	if (CanBeInterrupted() || force)
 	{
-		currentAction->CancelAction();
+		if (currentAction) {
+			currentAction->CancelAction();
+			currentAction->OnActionComplete.RemoveAll(this);
+		}
+
+		if (!actions.IsEmpty())
+		{
+			for (UTaskAction* action : actions.GetData())
+			{
+				action->OnActionComplete.RemoveAll(this);
+			}
+		}
 		result = true;
 	}
 	return result;
+}
+
+ABaseCharacter* UCharacterTask::GetCharacter()
+{
+	ACharacter* src = controller->GetCharacter();
+
+	if (src) {
+		return Cast<ABaseCharacter>(src);
+	}
+	return nullptr;
 }

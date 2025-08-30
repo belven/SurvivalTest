@@ -227,7 +227,7 @@ void ABaseAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollo
 
 	if (!Result.IsSuccess() && (Result.Code == EPathFollowingResult::Invalid || Result.Code == EPathFollowingResult::Blocked))
 	{
-		UE_LOG(LogTemp, Log, TEXT("OnMoveCompleted Failed"));
+		//UE_LOG(LogTemp, Log, TEXT("OnMoveCompleted Failed"));
 	}
 
 	mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
