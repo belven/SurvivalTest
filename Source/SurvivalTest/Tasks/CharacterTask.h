@@ -50,6 +50,7 @@ public:
 	}
 
 private:
+	UPROPERTY()
 	TArray<T> Data;
 	int32 HeadIndex = 0;
 };

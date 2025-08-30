@@ -33,14 +33,18 @@ int32 UHUDUI::GetWeaponMaxAmmo()
 
 FString UHUDUI::GetWeaponText()
 {
+	FString text = "";
+
+	text += GetPlayer()->GetEquippedWeapon() ? GetPlayer()->GetEquippedWeapon()->GetItemData().name : "None";
+
 	int32 ammo = GetWeaponCurrentAmmo();
 
 	if (ammo != -1)
 	{
-		return FString::FromInt(ammo) + "/" + FString::FromInt(GetWeaponMaxAmmo());
+		text += " " + FString::FromInt(ammo) + "/" + FString::FromInt(GetWeaponMaxAmmo());
 	}
 
-	return GetPlayer()->GetEquippedWeapon() ? GetPlayer()->GetEquippedWeapon()->GetItemData().name : "None";
+	return text;
 }
 
 int32 UHUDUI::GetWeaponCurrentAmmo()

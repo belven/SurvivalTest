@@ -46,6 +46,7 @@ bool UCharacterTask::CancelAction(bool force)
 		if (currentAction) {
 			currentAction->CancelAction();
 			currentAction->OnActionComplete.RemoveAll(this);
+			currentAction = nullptr;
 		}
 
 		if (!actions.IsEmpty())

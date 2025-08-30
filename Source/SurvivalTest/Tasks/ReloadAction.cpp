@@ -10,8 +10,8 @@ void UReloadAction::StartAction()
 	UWeapon* equippedWeapon = character->GetEquippedWeapon();
 	UProjectileWeapon* weapon = Cast<UProjectileWeapon>(equippedWeapon);
 
-	int32 ammoMissing = weapon->GetProjectileWeaponData().magazineSize - weapon->GetInstanceWeaponData().ammo;
-	int32 ammoToTake = FMath::Min(weapon->GetCurrentAmmo(), ammoMissing);
+	int32 ammoToTake = weapon->GetProjectileWeaponData().magazineSize - weapon->GetCurrentAmmo();
+	//int32 ammoToTake = FMath::Min(weapon->GetCurrentAmmo(), ammoMissing);
 
 	FInstanceItemData iid(weapon->GetProjectileWeaponData().ammoID, ammoToTake);
 	character->GetInventory()->RemoveItem(iid);

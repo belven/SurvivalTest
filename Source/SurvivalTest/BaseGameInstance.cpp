@@ -4,9 +4,9 @@
 #include "Tables/ArmourDataTable.h"
 #include "Tables/TableManager.h"
 #include "Tables/Items/WeaponInstanceTable.h"
-// ReSharper disable once CppUnusedIncludeDirective
+// ReSharper disable once CppUnusedIncludeDirective Required for GetSingletonObject
 #include "Events/RPGEventManager.h"
-// ReSharper disable once CppUnusedIncludeDirective
+// ReSharper disable once CppUnusedIncludeDirective Required for GetSingletonObject
 #include "FactionManager.h"
 
 #define GetLastMapItem(type, values) UHelperFunctions::GetLastMapItem<int32, type>(values)
@@ -25,7 +25,7 @@ void UBaseGameInstance::Shutdown()
 
 int32 UBaseGameInstance::GetNextInstanceItemDataID()
 {
-	FScopeLock Lock(&InstanceItemIDLock); // Thread-safe guard
+	FScopeLock Lock(&InstanceItemIDLock);
 
 	const TMap<int32, FInstanceItemData>& items = GetInstancedItems();
 
@@ -42,16 +42,6 @@ int32 UBaseGameInstance::GetNextInstanceItemDataID()
 			}
 		}
 	}
-
-	//TArray< FInstanceItemData> itemsInMap;
-
-	//GetInstancedItems().GenerateValueArray(itemsInMap);
-	//FInstanceItemData iidFound = GetDataByID<FInstanceItemData>(itemsInMap, instanceItemFilter, id);
-
-	//if (id == iidFound.ID)
-	//{
-	//	UE_LOG(LogTemp, Log, TEXT("ID Found"));
-	//}
 
 	return ++id;
 

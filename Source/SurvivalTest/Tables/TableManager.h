@@ -1,8 +1,13 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "CSVTable.h"
+#include "SurvivalTest/Items/ItemStructs.h"
 #include "TableManager.generated.h"
 
+struct FInstanceItemData;
+struct FInstanceWeaponData;
+struct FInstanceArmourData;
+enum class EMissionType : uint8;
 class UProjectileWeaponDataTable;
 class UMeleeWeaponDataTable;
 class URangedWeaponDataTable;

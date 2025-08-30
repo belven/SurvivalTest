@@ -55,8 +55,9 @@ void UProjectileWeapon::ConsumeAmmo()
 	// Perhaps queue data updates every second and have a local ammo count instead
 	GetCharacterOwner()->GetGame()->AddUpdateData(instanceWeaponData);
 
-	if (instanceWeaponData.ammo == 0)
+	if (instanceWeaponData.ammo <= 0)
 	{
+		instanceWeaponData.ammo = 0;
 		OnOutOfAmmo.Broadcast();
 	}
 }
@@ -90,26 +91,13 @@ void UProjectileWeapon::Reload()
 {
 	canAttack = false;
 	RecoilReset();
-	//mSetReloadTimer();
 }
 
 void UProjectileWeapon::ReloadExpired()
 {
-	//int32 ammoLeft = GetCharacterOwner()->GetInventory()->GetItemAmount(GetProjectileWeaponData().ammoID);
-	//int32 ammoMissing = GetProjectileWeaponData().magazineSize - GetInstanceWeaponData().ammo;
-	//	int32 ammoToTake = FMath::Min(ammoLeft, ammoMissing);
-
-	//if (ammoLeft > 0)
-	//{
-		/*FInstanceItemData iid(GetProjectileWeaponData().ammoID, ammoToTake);
-		GetCharacterOwner()->GetInventory()->RemoveItem(iid);
-
-		GetInstanceWeaponData().ammo += ammoToTake;
-		GetCharacterOwner()->GetGame()->AddUpdateData(GetInstanceWeaponData());*/
 		canAttack = true;
 		OnWeaponReady.Broadcast();
 		OnReloadComplete.Broadcast();
-//	}
 }
 
 void UProjectileWeapon::RecoilReset()

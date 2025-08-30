@@ -18,7 +18,6 @@ UAnimationAction* UAnimationAction::CreateAnimationActionTemp(ABaseCharacter* in
 
 void UAnimationAction::StartAction()
 {
-	Super::StartAction();
 	character->GetWorldTimerManager().SetTimer(TimerHandle_PlayAnimation, this, &UAnimationAction::TimerEnded, animation_length);
 	UE_LOG(LogTemp, Log, TEXT("Animation Action Started"));
 
@@ -29,7 +28,6 @@ void UAnimationAction::StartAction()
 void UAnimationAction::CancelAction()
 {
 	UE_LOG(LogTemp, Log, TEXT("Animation Action Cancelled"));
-	Super::CancelAction();
 	character->GetWorldTimerManager().ClearAllTimersForObject(this);
 	//UAnimInstance* AnimInstance = character->GetMesh()->GetAnimInstance();
 	//AnimInstance->StopSlotAnimation();
@@ -39,7 +37,6 @@ void UAnimationAction::ActionComplete(FStatusData data)
 {
 	Super::ActionComplete(data);
 	UE_LOG(LogTemp, Log, TEXT("Animation Action Completed"));
-
 }
 
 void UAnimationAction::AnimationEnded(UAnimMontage* Montage, bool bInterrupted)

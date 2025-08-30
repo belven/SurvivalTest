@@ -53,8 +53,8 @@ void UReloadTask::PerformTask(AController* inController)
 
 		weapon->Reload();
 
-		PerformNextAction();
 		UE_LOG(LogTemp, Log, TEXT("ReloadTask started"));
+		PerformNextAction();
 	}
 	else
 	{

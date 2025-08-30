@@ -20,6 +20,8 @@
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Tasks/ReloadTask.h"
+#include "Tasks/TaskManagerComponent.h"
 
 
 ABaseAIController::ABaseAIController() : Super()
@@ -115,7 +117,7 @@ void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
 	{
 		weapon->OnWeaponReady.AddUniqueDynamic(this, &ABaseAIController::WeaponReady);
 
-		if (weapon->GetWeaponData().type == EWeaponType::Projectile)
+		if (weapon->IsProjectileWeapon())
 		{
 			projectileWeapon = Cast<UProjectileWeapon>(weapon);
 			projectileWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
@@ -476,7 +478,10 @@ void ABaseAIController::Reload()
 {
 	if (HasRangedWeapon())
 	{
-		projectileWeapon->Reload();
+		if (!GetBaseCharacter()->GetTaskManager()->PerformTask(NewObject<UReloadTask>(), false))
+		{
+			DetermineNextAction();
+		}
 	}
 }
 
@@ -566,7 +571,8 @@ void ABaseAIController::EquipKnife()
 		// Find the knife, all AI should have one by default
 		if (id.name.Equals("Knife"))
 		{
-			GetBaseCharacter()->GetInventory()->SetEquippedWeapon(UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID));
+			UWeapon* weapon = UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID);
+			GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
 			knifeEquipped = true;
 			DetermineNextAction();
 			break;

@@ -85,4 +85,7 @@ private:
 
 	UPROPERTY()
 	UBaseGameInstance* gameInstance;
+
+	UPROPERTY()
+	FString name = "";
 };

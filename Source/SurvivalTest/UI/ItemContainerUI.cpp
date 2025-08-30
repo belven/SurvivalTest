@@ -40,7 +40,11 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 
 FString UItemContainerUI::GetContainerName()
 {
-	return GetBaseGameInstance()->GetContainerInstanceName(container->GetInstanceContainerData().ID);
+	if (name.IsEmpty())
+	{
+		name = container->GetInstanceContainerData().name;
+	}
+	return name;
 }
 
 UItemContainer* UItemContainerUI::GetItemContainerForArmour(FInstanceItemData data)
