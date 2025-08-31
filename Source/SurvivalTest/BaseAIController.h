@@ -51,7 +51,6 @@ protected:
 	void Inactive();
 	void GetPatrolPath();
 	void Patrol();
-	void KillAI();
 	bool IsInWeaponsRange(float dist);
 	void AttackWithWeapon();
 	void CalculateCombat();
@@ -62,6 +61,8 @@ protected:
 	void AttackWithWeapon(const FRotator& FireDirection);
 	void LookAt(const FVector& lookAtLocation);
 	virtual void BeginPlay() override;
+		UFUNCTION()
+	void CharacterDied();
 
 	UFUNCTION()
 	void OutOfAmmo();

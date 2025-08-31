@@ -70,6 +70,16 @@ void ABaseAIController::BeginPlay()
 	DetermineNextAction();
 }
 
+void ABaseAIController::CharacterDied()
+{
+	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
+	GetBaseCharacter()->GetMovementComponent()->StopMovementImmediately();
+	SetActorTickEnabled(false);
+	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
+	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
+	UnPossess();
+}
+
 void ABaseAIController::OutOfAmmo()
 {
 	if (HasAmmoForWeapon())
@@ -136,6 +146,7 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 	AICharacter = mAsBaseCharacter(aPawn);
 	AICharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABaseAIController::WeaponEquipped);
+	AICharacter->OnCharacterDied.AddUniqueDynamic(this, &ABaseAIController::CharacterDied);
 	if (AICharacter->GetEquippedWeapon())
 	{
 		WeaponEquipped(nullptr);
@@ -275,10 +286,6 @@ void ABaseAIController::DetermineNextAction()
 				Patrol();
 			}
 		}
-		else
-		{
-			KillAI();
-		}
 	}
 	else
 	{
@@ -352,15 +359,6 @@ void ABaseAIController::Patrol()
 	}
 }
 
-void ABaseAIController::KillAI()
-{
-	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	GetBaseCharacter()->GetMovementComponent()->StopMovementImmediately();
-	SetActorTickEnabled(false);
-	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
-	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
-	UnPossess();
-}
 
 bool ABaseAIController::IsInWeaponsRange(float dist)
 {
@@ -660,14 +658,7 @@ void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 		UHealthChangeEvent* hce = Cast<UHealthChangeEvent>(inEvent);
 
 		// If our target is NULL, we can check if we're being attacked and maybe assign a new target
-		if (hce->GetChange().source == GetBaseCharacter())
-		{
-			if (GetBaseCharacter()->IsDead())
-			{
-				KillAI();
-			}
-		}
-		else if (target == NULL)
+		if (target == NULL)
 		{
 			// Only trigger after health changed, the change isn't a heal and the owner of change is our Pawn and if the source is alive still
 			// It's possible we take damage from a dead source

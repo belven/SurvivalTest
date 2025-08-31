@@ -178,6 +178,35 @@ UStaticMesh* ABaseCharacter::GetItemMesh(const FItemData& data)
 }
 
 
+void ABaseCharacter::KillCharacter()
+{
+	// Stop any animation driving the bones
+	//GetMesh()->bPauseAnims = true;
+	//GetMesh()->bNoSkeletonUpdate = true;
+
+	// If you're inside ACharacter, disable capsule collision so ragdoll drives collision
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Make sure collision is enabled so the ragdoll reacts with world
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+
+	// Enable physics simulation on all bodies in the skeletal mesh
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetSimulatePhysics(true);
+
+	// Optionally wake all rigid bodies so it doesn’t hang in air
+	GetMesh()->WakeAllRigidBodies();
+
+	// Detach mesh if necessary (e.g. so capsule doesn’t interfere)
+	//GetMesh()->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+
+	// ReSharper disable once StringLiteralTypo
+	//SetActorEnableCollision(false);
+	UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
+
+	OnCharacterDied.Broadcast();
+}
+
 /**
  * This is used to change the characters health, taking into account the type of change and possibly armour for damage reduction
  *
@@ -213,7 +242,7 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 	{
 		if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius)
 			health_change.source->AddInteractable(this);
-		//UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
+		KillCharacter();
 	}
 
 	health_change.source->EnemyHit(this);
@@ -389,9 +418,7 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
 
 		if (IsDead())
 		{
-			SetActorHiddenInGame(true);
-			SetActorEnableCollision(false);
-			UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
+			KillCharacter();
 		}
 	}
 }

@@ -59,6 +59,7 @@ public:
 	FORCEINLINE UWeapon* GetEquippedWeapon() { return GetInventory() ? GetInventory()->GetEquippedWeapon() : nullptr; }
 
 	UStaticMesh* GetItemMesh(const FItemData& data);
+	void KillCharacter();
 
 	FWeaponEquipped OnWeaponEquipped;
 	FCharacterDied OnCharacterDied;

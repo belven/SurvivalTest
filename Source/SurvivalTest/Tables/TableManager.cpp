@@ -93,10 +93,10 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 
 FInstanceBoxData UTableManager::GetInstanceBoxDataByContainerInstance(int32 containerInstanceID)
 {
-	TArray<FInstanceBoxData> instancedBoxsFound;
-	boxContainers.GenerateValueArray(instancedBoxsFound);
+	TArray<FInstanceBoxData> instancedBoxesFound;
+	boxContainers.GenerateValueArray(instancedBoxesFound);
 
-	for (const FInstanceBoxData ibd : instancedBoxsFound)
+	for (const FInstanceBoxData ibd : instancedBoxesFound)
 	{
 		if (ibd.containerInstanceID == containerInstanceID)
 		{
@@ -369,7 +369,6 @@ void UTableManager::AddUpdateData(const FInstanceWeaponData& inData)
 {
 	GetWeaponInstanceTable()->GetData().Add(inData.ID, inData);
 }
-
 
 void UTableManager::SaveTableToFile(UCSVTable* table)
 {

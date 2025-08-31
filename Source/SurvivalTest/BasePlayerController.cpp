@@ -10,6 +10,8 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseCharacter.h"
 #include "Components/TimelineComponent.h"
+#include "Events/RPGEventManager.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "Items/ProjectileWeapon.h"
 #include "Kismet/GameplayStatics.h"
 #include "Tasks/ReloadTask.h"
@@ -101,6 +103,7 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	baseCharacter->GetInventory()->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
 	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
 	baseCharacter->OnEnemyHit.AddUniqueDynamic(this, &ABasePlayerController::EnemyHit);
+	baseCharacter->OnCharacterDied.AddUniqueDynamic(this, &ABasePlayerController::CharacterDied);
 
 	if (baseCharacter->GetEquippedWeapon())
 	{
@@ -156,7 +159,6 @@ void ABasePlayerController::Reload()
 		}
 	}
 }
-
 
 void ABasePlayerController::OnPrimaryActionReleased()
 {
@@ -294,6 +296,25 @@ void ABasePlayerController::BeginPlay()
 		mainHUD->SetOwningPlayer(this);
 		mainHUD->AddToViewport();
 	}
+}
+
+void ABasePlayerController::CharacterDied()
+{
+	// TODO might need to stop drag actions here
+	CloseInventory();
+	DisableInput(this);
+	performAction = false;
+	GetBaseCharacter()->StopSprinting();
+	GetBaseCharacter()->GetMovementComponent()->StopMovementImmediately();
+	SetActorTickEnabled(false);
+	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
+
+	baseCharacter->GetInventory()->OnContainersUpdated.RemoveAll(this);
+	baseCharacter->OnWeaponEquipped.RemoveAll(this);
+	baseCharacter->OnEnemyHit.RemoveAll(this);
+	baseCharacter->OnCharacterDied.RemoveAll(this);
+	// TODO add death task
+	//GetBaseCharacter()->GetTaskManager().
 }
 
 void ABasePlayerController::MoveForward(float Val)

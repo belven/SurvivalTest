@@ -88,6 +88,9 @@ private:
 	bool useEquipment;
 	bool isReloading;
 
+	UFUNCTION()
+	void CharacterDied();
+
 	UPROPERTY()
 	UProjectileWeapon* rangedWeapon;
 

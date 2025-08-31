@@ -19,7 +19,7 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->SetCollisionProfileName("Projectile");
-	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // TODO Fix collision here
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	RootComponent = CollisionComp;
@@ -35,7 +35,6 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMesh->SetRelativeRotation(FRotator(-90, 0, 0));
 
 	// Overlap handling
-	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);
 
 	// Movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement0"));
@@ -65,9 +64,9 @@ float ABaseProjectile::CalculateDamageFalloff()
 void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this && OtherComp && healthChange.source)
+	if (OtherActor && OtherActor != this && OtherActor != healthChange.source)
 	{
-		if (OtherActor->Implements<UDamagable>())
+		if (OtherActor->Implements<UDamagable>() && healthChange.source)
 		{
 			ITeam* hitTeam = Cast<ITeam>(OtherActor);
 			if (hitTeam && hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy)
@@ -78,13 +77,9 @@ void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 					healthChange.changeAmount = CalculateDamageFalloff();
 					hitTarget->ChangeHealth(healthChange);
 				}
-				Destroy();
 			}
 		}
-		else
-		{
-			Destroy();
-		}
+		Destroy();
 	}
 }
 
@@ -107,4 +102,5 @@ void ABaseProjectile::SetHealthChange(FHealthChange inHealthChange)
 {
 	this->healthChange = inHealthChange;
 	CollisionComp->IgnoreActorWhenMoving(inHealthChange.source, true);
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ABaseProjectile::OnOverlap);
 }
