@@ -70,6 +70,7 @@ ABaseCharacter::ABaseCharacter()
 	weaponMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Weapon Mesh"));
 	weaponMeshComp->SetupAttachment(GetMesh(), FName(TEXT("GripPoint")));
 	weaponMeshComp->SetRelativeRotation(FRotator(180));
+	weaponMeshComp->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	GetMesh()->SetCustomDepthStencilValue(2);
 
 

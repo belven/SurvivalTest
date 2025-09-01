@@ -14,14 +14,16 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "Items/ProjectileWeapon.h"
 #include "Kismet/GameplayStatics.h"
+#include "Tasks/EquipmentSwapTask.h"
 #include "Tasks/ReloadTask.h"
+#include "Tasks/SwapEquipmentAction.h"
 #include "Tasks/TaskManagerComponent.h"
 #include "UI/HUDUI.h"
 
 class ABaseCharacter;
 
 ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), RotateValue(0), CurveFloatValue(0), TimelineValue(0), performAction(false), useEquipment(false),
-                                                 isReloading(false), rangedWeapon(nullptr), leanCurve(nullptr),
+                                                 isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
                                                  mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
@@ -110,6 +112,8 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 		WeaponEquipped(nullptr);
 	}
 
+	reloadTask = NewObject<UReloadTask>();
+
 	InputComponent->BindAction("Jump", IE_Pressed, GetCharacter(), &ACharacter::Jump);
 	InputComponent->BindAction("Jump", IE_Released, GetCharacter(), &ACharacter::StopJumping);
 	InputComponent->BindAxis("Turn Right / Left Mouse", GetCharacter(), &APawn::AddControllerYawInput);
@@ -123,7 +127,6 @@ void ABasePlayerController::OutOfAmmo()
 
 void ABasePlayerController::ReloadComplete()
 {
-	isReloading = false;
 	if (performAction) {
 		useEquipment = true;
 	}
@@ -131,6 +134,7 @@ void ABasePlayerController::ReloadComplete()
 
 void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 {
+
 	if (oldWeapon && oldWeapon->IsProjectileWeapon())
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
@@ -150,12 +154,11 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 
 void ABasePlayerController::Reload()
 {
-	if (rangedWeapon && !isReloading)
+	if (rangedWeapon)
 	{
-		if (GetBaseCharacter()->GetTaskManager()->PerformTask(NewObject<UReloadTask>(), false))
+		if (GetBaseCharacter()->GetTaskManager()->PerformTask(reloadTask, false))
 		{
 			useEquipment = false;
-			isReloading = true;
 		}
 	}
 }
@@ -183,15 +186,24 @@ void ABasePlayerController::OnSidearm()
 
 void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 {
-	FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
-
-	UWeapon* equippedWeapon = mCurrentWeapon();
-
-	if (iid.isValid() && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
+	if (!equipmentSwapTask)
 	{
-		UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID);
-		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
+		equipmentSwapTask = NewObject<UEquipmentSwapTask>();
 	}
+
+	equipmentSwapTask->SetSlot(slot);
+
+	GetBaseCharacter()->GetTaskManager()->PerformTask(equipmentSwapTask, false);
+
+	//FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
+
+	//UWeapon* equippedWeapon = mCurrentWeapon();
+
+	//if (iid.isValid() && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
+	//{
+	//	UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID);
+	//	GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
+	//}
 }
 
 void ABasePlayerController::LeanRight()

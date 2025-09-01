@@ -35,25 +35,38 @@ void UReloadTask::PerformTask(AController* inController)
 {
 	Super::PerformTask(inController);
 
-	UE_LOG(LogTemp, Log, TEXT("ReloadTask PerformTask"));
+	//UE_LOG(LogTemp, Log, TEXT("ReloadTask PerformTask"));
 
 	if (CheckForReload())
 	{
-		UE_LOG(LogTemp, Log, TEXT("CheckForReload Passed"));
+		//UE_LOG(LogTemp, Log, TEXT("CheckForReload Passed"));
 
 		ABaseCharacter* character = GetCharacter();
 		UWeapon* equippedWeapon = character->GetEquippedWeapon();
 		UProjectileWeapon* weapon = Cast<UProjectileWeapon>(equippedWeapon);
 
-		UAnimationAction* animationAction = UAnimationAction::CreateAnimationActionTemp(GetCharacter(), weapon->GetProjectileWeaponData().reloadSpeed);
-		UReloadAction* reloadAction = UReloadAction::CreateReloadAction(character);
+		if (!animationAction) {
+			// TODO change to get and use the animation from the weapon
+
+			// UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().animation);
+			// animationAction = UAnimationAction::CreateAnimationAction(weapon->GetRangedWeaponData().animation, GetCharacter());
+			animationAction = UAnimationAction::CreateAnimationActionTemp(GetCharacter(), weapon->GetProjectileWeaponData().reloadSpeed);
+		}
+		else {
+			//UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().animation);
+			animationAction->SetAnimationLength(weapon->GetProjectileWeaponData().reloadSpeed);
+		}
+
+		if (!reloadAction) {
+			reloadAction = UReloadAction::CreateReloadAction(character);
+		}
 
 		AddAction(animationAction);
 		AddAction(reloadAction);
 
 		weapon->Reload();
 
-		UE_LOG(LogTemp, Log, TEXT("ReloadTask started"));
+		//UE_LOG(LogTemp, Log, TEXT("ReloadTask started"));
 		PerformNextAction();
 	}
 	else

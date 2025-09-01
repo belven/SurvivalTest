@@ -7,8 +7,10 @@
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionTypes.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Tasks/ReloadTask.h"
 #include "BaseAIController.generated.h"
 
+class UEquipmentSwapTask;
 class ABaseCharacter;
 class IDamagable;
 class UAISenseConfig_Sight;
@@ -46,6 +48,7 @@ protected:
 	void StartSprinting();
 	bool FindAllyWithAmmo();
 	void EquipKnife();
+	void EquipWeaponAtSlot(int32 slot, EGearType type);
 
 	void GetAmmo();
 	void Inactive();
@@ -88,6 +91,9 @@ protected:
 	UFUNCTION()
 	virtual void EventTriggered(UBaseEvent* inEvent) override;
 
+	UPROPERTY()
+	UEquipmentSwapTask* equipmentSwapTask;
+
 public:
 	virtual FPathFollowingRequestResult MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath) override;
 
@@ -99,6 +105,9 @@ private:
 	FTimerHandle TimerHandle_Inactive;
 	FTimerHandle TimerHandle_DetermineAction;
 	float inactiveTimerDuration;
+
+	UPROPERTY()
+	UReloadTask* reloadTask;
 
 	FPathFollowingResult lastMoveResult;
 

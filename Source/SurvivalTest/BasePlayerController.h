@@ -7,6 +7,8 @@
 #include "Items/Weapon.h"
 #include "BasePlayerController.generated.h"
 
+class UEquipmentSwapTask;
+class UReloadTask;
 class UProjectileWeapon;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
 
@@ -87,6 +89,12 @@ private:
 	bool performAction;
 	bool useEquipment;
 	bool isReloading;
+
+	UPROPERTY()
+	UReloadTask* reloadTask;
+
+	UPROPERTY()
+	UEquipmentSwapTask* equipmentSwapTask;
 
 	UFUNCTION()
 	void CharacterDied();

@@ -22,6 +22,21 @@ public:
 	UFUNCTION()
 	void TimerEnded();
 
+	float GetAnimationLength1() const
+	{
+		return animation_length;
+	}
+
+	void SetAnimationLength(float inAnimationLength)
+	{
+		animation_length = inAnimationLength;
+	}
+
+	float GetAnimationLength() const
+	{
+		return animation_length;
+	}
+
 protected:
 	void SetAnimation(UAnimMontage* inAnimation);
 

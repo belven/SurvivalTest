@@ -1,5 +1,35 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "EquipmentSwapTask.h"
 
+#include "AnimationAction.h"
+#include "SwapEquipmentAction.h"
+
+void UEquipmentSwapTask::PerformTask(AController* inController)
+{
+	Super::PerformTask(inController);
+
+	if (!animationAction) {
+		// TODO change to get and use the animation from the weapon
+
+		// UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().animation);
+		// animationAction = UAnimationAction::CreateAnimationAction(weapon->GetRangedWeaponData().weaponSwapAnimation, GetCharacter());
+		animationAction = UAnimationAction::CreateAnimationActionTemp(GetCharacter(), 1.5);
+	}
+	else {
+		//UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().weaponSwapAnimation);
+		animationAction->SetAnimationLength(1.5);
+	}
+
+	if (!swapAction)
+	{
+		swapAction = USwapEquipmentAction::CreateSwapEquipmentAction(GetCharacter(), slot);
+	}
+	else {
+				swapAction->SetSlot(slot);
+	}
+
+	AddAction(animationAction);
+	AddAction(swapAction);
+
+	//UE_LOG(LogTemp, Log, TEXT("EquipmentSwapTask started"));
+	PerformNextAction();
+}

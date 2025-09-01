@@ -20,11 +20,12 @@
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Tasks/EquipmentSwapTask.h"
 #include "Tasks/ReloadTask.h"
 #include "Tasks/TaskManagerComponent.h"
 
 
-ABaseAIController::ABaseAIController() : Super()
+ABaseAIController::ABaseAIController() : Super(FObjectInitializer::Get())
 {
 	// Initialize pointers to nullptr for safety
 	PerceptionComponent = nullptr;
@@ -147,10 +148,10 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	AICharacter = mAsBaseCharacter(aPawn);
 	AICharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABaseAIController::WeaponEquipped);
 	AICharacter->OnCharacterDied.AddUniqueDynamic(this, &ABaseAIController::CharacterDied);
-	if (AICharacter->GetEquippedWeapon())
-	{
-		WeaponEquipped(nullptr);
-	}
+
+	UNavigationSystemV1::GetCurrent(GetWorld())->OnNavigationGenerationFinishedDelegate.AddUniqueDynamic(this, &ABaseAIController::NavDone);
+
+	reloadTask = NewObject<UReloadTask>();
 
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 13000;
@@ -173,14 +174,8 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 	// Set up our EQS query 
 	FindViableCombatLocationRequest = FEnvQueryRequest(FindWeaponLocationQuery, this);
 
-	if (!UNavigationSystemV1::GetCurrent(GetWorld())->IsNavigationBuildInProgress())
-	{
-		UNavigationSystemV1::GetCurrent(GetWorld())->OnNavigationGenerationFinishedDelegate.AddUniqueDynamic(this, &ABaseAIController::NavDone);
-	}
-	else
-	{
-		DetermineNextAction();
-	}
+	isInactive = true;
+	DetermineNextAction();
 }
 
 // ReSharper disable once CppPassValueParameterByConstReference
@@ -266,30 +261,28 @@ void ABaseAIController::DetermineNextAction()
 		if (GetBaseCharacter()->IsAlive()) {
 			inactiveTimerDuration = 3.0f;
 
-			isInactive = false;
-
 			if (needsAmmo)
 			{
 				GetAmmo();
+				isInactive = false;
 			}
 			else if (target != NULL && target->IsAlive())
 			{
 				CalculateCombat();
+				isInactive = false;
 			}
 			else if (target != NULL && target->IsDead())
 			{
 				target = NULL;
 				FindNewTarget();
+				isInactive = false;
 			}
 			else if (target == nullptr)
 			{
 				Patrol();
+				isInactive = false;
 			}
 		}
-	}
-	else
-	{
-		isInactive = false;
 	}
 
 	mSetTimer(TimerHandle_Inactive, &ABaseAIController::Inactive, inactiveTimerDuration);
@@ -476,7 +469,7 @@ void ABaseAIController::Reload()
 {
 	if (HasRangedWeapon())
 	{
-		if (!GetBaseCharacter()->GetTaskManager()->PerformTask(NewObject<UReloadTask>(), false))
+		if (!GetBaseCharacter()->GetTaskManager()->PerformTask(reloadTask, false))
 		{
 			DetermineNextAction();
 		}
@@ -569,8 +562,11 @@ void ABaseAIController::EquipKnife()
 		// Find the knife, all AI should have one by default
 		if (id.name.Equals("Knife"))
 		{
-			UWeapon* weapon = UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID);
-			GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
+			//	UWeapon* weapon = UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID);
+			//	GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
+
+			EquipWeaponAtSlot(iid.slot, EGearType::Weapon);
+
 			knifeEquipped = true;
 			DetermineNextAction();
 			break;
@@ -581,6 +577,18 @@ void ABaseAIController::EquipKnife()
 	{
 		GetBaseCharacter()->GetInventory()->SetEquippedWeapon(nullptr);
 	}
+}
+
+void ABaseAIController::EquipWeaponAtSlot(int32 slot, EGearType type)
+{
+	if (!equipmentSwapTask)
+	{
+		equipmentSwapTask = NewObject<UEquipmentSwapTask>();
+	}
+
+	equipmentSwapTask->SetSlot(slot);
+
+	GetBaseCharacter()->GetTaskManager()->PerformTask(equipmentSwapTask, false);
 }
 
 void ABaseAIController::GetAmmo()

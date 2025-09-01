@@ -4,7 +4,7 @@
 
 void UReloadAction::StartAction()
 {
-	UE_LOG(LogTemp, Log, TEXT("Reload Action Started"));
+	//UE_LOG(LogTemp, Log, TEXT("Reload Action Started"));
 	Super::StartAction();
 
 	UWeapon* equippedWeapon = character->GetEquippedWeapon();

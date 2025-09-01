@@ -1,19 +1,41 @@
 #include "SwapEquipmentAction.h"
 
-USwapEquipmentAction* USwapEquipmentAction::CreateSwapEquipmentAction(ABaseCharacter* character)
+#include "SurvivalTest/HelperFunctions.h"
+#include "SurvivalTest/Items/Weapon.h"
+#include "SurvivalTest/Items/WeaponCreator.h"
+
+USwapEquipmentAction* USwapEquipmentAction::CreateSwapEquipmentAction(ABaseCharacter* character, int32 slot)
 {
-	return nullptr;
+	USwapEquipmentAction* sea = NewObject<USwapEquipmentAction>();
+	sea->character = character;
+	sea->slot = slot;
+	sea->canBeInterrupted = false;
+	//TODO Disable player inventory actions here
+	return sea;
 }
 
 void USwapEquipmentAction::StartAction()
 {
-	//FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
+	FInstanceItemData iid = character->GetInventory()->GetInstanceItemAtSlot(slot);
 
-	//UWeapon* equippedWeapon = mCurrentWeapon();
+	UWeapon* equippedWeapon = character->GetEquippedWeapon();
 
-	//if (iid.isValid() && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
-	//{
-	//	UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID);
-	//	GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
-	//}
+	bool idIsValid = iid.isValid();
+	bool ItemsAreDifferent = !equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID;
+
+	if (idIsValid && ItemsAreDifferent)
+	{
+		FString name = equippedWeapon ? equippedWeapon->GetItemData().name : "Empty";
+
+		UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, character->GetWorld(), iid.ID);
+
+		UE_LOG(LogTemp, Log, TEXT("Swapping from %s to %s"), *name, *weapon->GetItemData().name);
+		character->GetInventory()->SetEquippedWeapon(weapon);
+		ActionComplete(FStatusData(true));
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Log, TEXT("Swapping failed"));
+		ActionComplete(FStatusData(false));
+	}
 }
