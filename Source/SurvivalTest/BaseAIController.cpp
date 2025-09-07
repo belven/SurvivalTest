@@ -259,7 +259,7 @@ void ABaseAIController::DetermineNextAction()
 	if (GetBaseCharacter())
 	{
 		if (GetBaseCharacter()->IsAlive()) {
-			inactiveTimerDuration = 3.0f;
+			inactiveTimerDuration = 5.0f;
 
 			if (needsAmmo)
 			{

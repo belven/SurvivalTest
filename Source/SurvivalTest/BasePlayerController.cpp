@@ -16,15 +16,15 @@
 #include "Kismet/GameplayStatics.h"
 #include "Tasks/EquipmentSwapTask.h"
 #include "Tasks/ReloadTask.h"
-#include "Tasks/SwapEquipmentAction.h"
 #include "Tasks/TaskManagerComponent.h"
+#include "BaseBuilding/BuildingPart.h"
 #include "UI/HUDUI.h"
 
 class ABaseCharacter;
 
 ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), RotateValue(0), CurveFloatValue(0), TimelineValue(0), performAction(false), useEquipment(false),
-                                                 isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
-                                                 mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr)
+isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
+mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
@@ -106,7 +106,7 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
 	baseCharacter->OnEnemyHit.AddUniqueDynamic(this, &ABasePlayerController::EnemyHit);
 	baseCharacter->OnCharacterDied.AddUniqueDynamic(this, &ABasePlayerController::CharacterDied);
-
+	
 	if (baseCharacter->GetEquippedWeapon())
 	{
 		WeaponEquipped(nullptr);
@@ -134,7 +134,6 @@ void ABasePlayerController::ReloadComplete()
 
 void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 {
-
 	if (oldWeapon && oldWeapon->IsProjectileWeapon())
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
@@ -149,6 +148,11 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 		rangedWeapon = Cast<UProjectileWeapon>(weapon);
 		rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABasePlayerController::OutOfAmmo);
 		rangedWeapon->OnReloadComplete.AddUniqueDynamic(this, &ABasePlayerController::ReloadComplete);
+	}
+
+	if (performAction)
+	{
+		useEquipment = true;
 	}
 }
 
@@ -192,18 +196,8 @@ void ABasePlayerController::EquipWeaponAtSlot(int32 slot, EGearType type)
 	}
 
 	equipmentSwapTask->SetSlot(slot);
-
+	useEquipment = false;
 	GetBaseCharacter()->GetTaskManager()->PerformTask(equipmentSwapTask, false);
-
-	//FInstanceItemData iid = GetBaseCharacter()->GetInventory()->GetInstanceItemAtSlot(slot);
-
-	//UWeapon* equippedWeapon = mCurrentWeapon();
-
-	//if (iid.isValid() && (!equippedWeapon || equippedWeapon->GetInstanceWeaponData().instanceItemID != iid.ID))
-	//{
-	//	UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, GetWorld(), iid.ID);
-	//	GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
-	//}
 }
 
 void ABasePlayerController::LeanRight()
@@ -236,11 +230,94 @@ void ABasePlayerController::Sprint()
 	}
 }
 
+void ABasePlayerController::Build()
+{
+	TArray<AActor*> actors;
+	GetBaseCharacter()->GetOverlappingActors(actors, ABuildingPart::StaticClass());
+
+	for (AActor* actor : actors)
+	{
+		ABuildingPart* bp = Cast<ABuildingPart>(actor);
+		CreateBuildingPart(bp, EOneDirection::North);
+		CreateBuildingPart(bp, EOneDirection::South);
+		CreateBuildingPart(bp, EOneDirection::East);
+		CreateBuildingPart(bp, EOneDirection::West);
+	}
+}
+
+void ABasePlayerController::CreateBuildingPart(ABuildingPart* bp, EOneDirection direction)
+{
+	FVector location = bp->GetActorLocation();
+
+	location = MoveVectorByDirection(location, bp->GetActorRotation(), 120, direction);
+
+	FActorSpawnParameters params;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	ABuildingPart* newBP = GetBaseCharacter()->GetWorld()->SpawnActor<ABuildingPart>(ABuildingPart::StaticClass(), location, bp->GetActorRotation(), params);
+
+	FString name;
+
+	switch (direction)
+	{
+	case EOneDirection::North:
+		name = "North";
+		break;
+	case EOneDirection::East:
+		name = "East";
+		break;
+	case EOneDirection::West:
+		name = "West";
+		break;
+	case EOneDirection::South:
+		name = "South";
+		break;
+	case EOneDirection::End:
+		break;
+	}
+
+	if (newBP) {
+		newBP->SetActorLabel(name);
+	}
+}
+
+FVector ABasePlayerController::MoveVectorByDirection(const FVector& centerLocation, const FRotator& currentRotation, float distance, EOneDirection direction)
+{
+	const FRotator ninety = FRotator(0, currentRotation.Yaw + 90, 0);
+	FVector north = FVector(distance, 0, 0);
+	FVector out = centerLocation;
+	out = currentRotation.RotateVector(out);
+	north = currentRotation.RotateVector(north);
+
+	switch (direction)
+	{
+	case EOneDirection::North:
+		out += north;
+		break;
+	case EOneDirection::East:
+		north = ninety.RotateVector(north);
+		out += north;
+		break;
+	case EOneDirection::West:
+		north = ninety.RotateVector(north);
+		out -= north;
+		break;
+	case EOneDirection::South:
+		out -= north;
+		break;
+	case EOneDirection::End:
+		break;
+	}
+
+	return out;
+}
+
 void ABasePlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
 
 	check(InputComponent);
+
+	InputComponent->BindAction("Build", IE_Pressed, this, &ABasePlayerController::Build);
 
 	InputComponent->BindAction("Reload", IE_Pressed, this, &ABasePlayerController::Reload);
 	InputComponent->BindAction("Sprint", IE_Pressed, this, &ABasePlayerController::Sprint);

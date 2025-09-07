@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "BaseBuilding/BuildingPart.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TimelineComponent.h"
@@ -16,6 +17,16 @@ class UInventoryUI;
 class ABaseCharacter;
 class UTimelineComponent;
 class UHUDUI;
+
+UENUM(BlueprintType)
+enum class EOneDirection : uint8
+{
+	North,
+	East,
+	West,
+	South,
+	End
+};
 
 UCLASS()
 class SURVIVALTEST_API ABasePlayerController : public APlayerController
@@ -54,6 +65,11 @@ public:
 
 	UFUNCTION()
 	void Sprint();
+
+	UFUNCTION()
+	void Build();
+	void CreateBuildingPart(ABuildingPart* bp, EOneDirection direction);
+	FVector MoveVectorByDirection(const FVector& centerLocation, const FRotator& currentRotation, float distance, EOneDirection direction);
 
 	void OnPrimaryActionReleased();
 	void OnPrimaryWeapon();

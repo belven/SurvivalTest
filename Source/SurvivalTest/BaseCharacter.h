@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "BasePlayerController.h"
 #include "NavigationInvokerComponent.h"
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
