@@ -2,6 +2,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "MainLight.h"
+#include "BaseBuilding/BuildingPart.h"
 #include "Engine/GameInstance.h"
 #include "Items/ItemStructs.h"
 #include "Tables/Items/InstanceItemDataTable.h"
@@ -12,6 +13,7 @@
 #define mGameInstance() Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))
 #define mTable() GetTableManager()
 
+class AObjectInstanceManager;
 class UTableManager;
 class UFactionManager;
 class URPGEventManager;
@@ -91,19 +93,25 @@ public:
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return mTable()->GetInstancedBoxes(); }
 	void SetMainLight(AMainLight* inMainLight) { mainLight = inMainLight; }
 
+	TMap<FString, ABuildingPart*>& GetBuildingParts() { return buildingParts; }
+
 	AMainLight* GetMainLight() const { return mainLight; }
 
+	UPROPERTY()
 	TArray<APatrolPath*> paths;
 
 	UPROPERTY()
 	AMainGrid* grid;
 
+	UPROPERTY()
+	TMap<FString, ABuildingPart*> buildingParts;
+
 	URPGEventManager* GetEventManager();
 	UTableManager* GetTableManager();
 	UFactionManager* GetFactionManager();
 	UMissionManager* GetMissionManager();
+	AObjectInstanceManager* GetObjectInstanceManager();
 
-private:
 	FCriticalSection InstanceItemIDLock;
 	int32 LastInstanceItemID = -1;
 
@@ -124,6 +132,9 @@ private:
 
 	UPROPERTY()
 	UMissionManager* missionManager;
+
+	UPROPERTY()
+	AObjectInstanceManager* objectInstanceManager;
 
 	UPROPERTY()
 	AMainLight* mainLight;

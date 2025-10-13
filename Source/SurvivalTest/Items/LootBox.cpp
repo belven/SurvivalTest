@@ -45,12 +45,9 @@ void ALootBox::BeginPlay()
 			if (cd.Value.name.Equals(defaultContainer))
 			{
 				SetContainerData(cd.Value);
-				itemTypes = GetGame()->GetTableManager()->GetItemsForMissionType(cd.Value.type);
+				SpawnLoot();
 			}
 		}
-
-		if (GetContainerData().ID != UItemStructs::InvalidInt)
-			SpawnLoot();
 	}
 }
 
@@ -83,15 +80,22 @@ void ALootBox::ClearData()
 {
 	itemTypes.Empty();
 
-	for (FInstanceItemData iid : GetGame()->GetInstancedItemsForContainer(container->GetInstanceContainerData().ID))
-	{
-		GetGame()->GetInstancedItems().Remove(iid.ID);
+	if (container != NULL) {
+		for (FInstanceItemData iid : GetGame()->GetInstancedItemsForContainer(container->GetInstanceContainerData().ID))
+		{
+			GetGame()->GetInstancedItems().Remove(iid.ID);
+		}
 	}
 }
 
 void ALootBox::SpawnLoot()
 {
 	SetUpBox();
+
+	if (itemTypes.IsEmpty())
+	{
+		itemTypes = GetGame()->GetTableManager()->GetItemsForMissionType(GetContainerData().type);
+	}
 
 	for (int i = 0; i < FMath::RandRange(minItems, GetContainerData().slots); ++i)
 	{

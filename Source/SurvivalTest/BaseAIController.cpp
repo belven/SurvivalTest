@@ -71,12 +71,12 @@ void ABaseAIController::BeginPlay()
 	DetermineNextAction();
 }
 
-void ABaseAIController::CharacterDied()
+void ABaseAIController::CharacterDied(ABaseCharacter* deadCharacter)
 {
 	GetWorld()->GetTimerManager().ClearAllTimersForObject(this);
-	GetBaseCharacter()->GetMovementComponent()->StopMovementImmediately();
+	deadCharacter->GetMovementComponent()->StopMovementImmediately();
 	SetActorTickEnabled(false);
-	GetBaseCharacter()->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
+	deadCharacter->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
 	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
 	UnPossess();
 }
@@ -298,21 +298,26 @@ void ABaseAIController::GetPatrolPath()
 	// Do we already have a patrol path
 	if (currentPath == NULL)
 	{
-		// Get the first patrol path from the game instance
-		currentPath = GameInstance(GetWorld())->paths[0];
+		auto gi = GameInstance(GetWorld());
 
-		// Check if the path is valid
-		if (currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
+		if (!gi->paths.IsEmpty())
 		{
-			currentPath = NULL;
+			// Get the first patrol path from the game instance
+			currentPath = gi->paths[0];
 
-			// Set path point to -1, as there aren't any valid patrol paths and we don't keep checking every tick
-			currentPathPoint = -1;
-		}
-		else
-		{
-			const USplineComponent* spline = currentPath->GetSpline();
-			currentPathPoint = FMath::RandRange(0, spline->GetNumberOfSplinePoints() - 1);
+			// Check if the path is valid
+			if (currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
+			{
+				currentPath = NULL;
+
+				// Set path point to -1, as there aren't any valid patrol paths and we don't keep checking every tick
+				currentPathPoint = -1;
+			}
+			else
+			{
+				const USplineComponent* spline = currentPath->GetSpline();
+				currentPathPoint = FMath::RandRange(0, spline->GetNumberOfSplinePoints() - 1);
+			}
 		}
 	}
 }
@@ -538,7 +543,7 @@ bool ABaseAIController::FindAllyWithAmmo()
 
 	for (auto ally : alliesSeen)
 	{
-		if (ally->IsDead() && HasAmmo(ally) && FVector::Dist(mActorLocation, ally->GetActorLocation()) < 10000)
+		if (ally && ally->IsDead() && HasAmmo(ally) && FVector::Dist(mActorLocation, ally->GetActorLocation()) < 10000)
 		{
 			MoveToLocation(ally->GetActorLocation(), ABaseCharacter::interactionRadius * 0.7);
 			StartSprinting();

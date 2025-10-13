@@ -6,13 +6,12 @@
 #include "MissionManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseAIController.h"
-#include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Items/LootBox.h"
 #include "SurvivalTest/BaseGameInstance.h"
-#include "SurvivalTest/Events/BaseEvent.h"
-#include "SurvivalTest/Events/RPGEventManager.h"
+#include "SurvivalTest/HelperFunctions.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/Tables/LoadoutTableData.h"
+#include "SurvivalTest/Tables/Items/ItemDataTable.h"
 #include "SurvivalTest/Tables/Mission/MissionLoadoutTable.h"
 
 AMission::AMission()
@@ -25,8 +24,9 @@ AMission::AMission()
 
 FContainerData AMission::GetRandomContainerData()
 {
-	TArray<FContainerData> cds;
-
+	// TODO clean up data once mission is over
+	//if (cds.IsEmpty())
+	//{
 	for (auto& cdFound : game->GetTableManager()->GetContainerData()->GetData())
 	{
 		if (cdFound.Value.type == missionType)
@@ -34,12 +34,26 @@ FContainerData AMission::GetRandomContainerData()
 			cds.Add(cdFound.Value);
 		}
 	}
+	//}
 
-	if (cds.Num() > 0)
+	if (!cds.IsEmpty())
 	{
-		return cds[FMath::RandRange(0, cds.Num() - 1)];
+		return UHelperFunctions::GetRandom(cds);
 	}
-	return {};
+	else
+	{
+		TArray<FContainerData> data;
+		game->GetTableManager()->GetContainerData()->GetData().GenerateValueArray(data);
+
+		for (FContainerData cd : data)
+		{
+			if (cd.type != EMissionType::End) {
+				cds.Add(cd);
+			}
+		}
+
+		return UHelperFunctions::GetRandom(cds);
+	}
 }
 
 void AMission::SetUpLootBoxes()
@@ -51,17 +65,30 @@ void AMission::SetUpLootBoxes()
 	{
 		ALootBox* loot = Cast<ALootBox>(actor);
 		FContainerData cd = GetRandomContainerData();
-		TArray<int32> itemTypes = game->GetTableManager()->GetItemsForMissionType(missionType);	
+		TArray<int32> itemTypes = game->GetTableManager()->GetItemsForMissionType(missionType);
 
-		if (cd.ID != UItemStructs::InvalidInt)
+		if (cd.ID == UItemStructs::InvalidInt)
 		{
-			loot->SetContainerData(cd);
-			loot->SetItemTypes(itemTypes);
-			loot->SetActorHiddenInGame(false);
-			loot->ClearData();
-			loot->SpawnLoot();
+			for (FItemData id : game->GetTableManager()->GetItemDataTable()->GetData())
+			{
+				itemTypes.Add(id.ID);
+			}
 		}
+
+		loot->SetContainerData(cd);
+		loot->SetItemTypes(itemTypes);
+		loot->SetActorHiddenInGame(false);
+		loot->ClearData();
+		loot->SpawnLoot();
 	}
+}
+
+void AMission::SpawnDefault()
+{
+	EMissionType mt = mGetRandomEnum<EMissionType>(EMissionType::End);
+	SetMissionType(mt);
+	SetUpLootBoxes();
+	SpawnAI();
 }
 
 void AMission::BeginPlay()
@@ -73,7 +100,6 @@ void AMission::BeginPlay()
 
 	game = mGameInstance();
 	game->GetMissionManager()->AddMission(this);
-	game->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &AMission::EventTriggered);
 	SpawnBox(GetActorLocation());
 }
 
@@ -101,7 +127,7 @@ void AMission::SpawnBox(const FVector& location)
 
 	area->GetBox()->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMission::BeginOverlap);
 	area->GetBox()->OnComponentEndOverlap.AddUniqueDynamic(this, &AMission::EndOverlap);
-	//DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
+	DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
 }
 
 void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex)
@@ -117,49 +143,29 @@ void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* Othe
 	}
 }
 
-void AMission::EventTriggered(UBaseEvent* inEvent)
-{
-	if (!missionComplete && inEvent->GetEventType() == EEventType::PostHealthChange && aiSpawned.Contains(inEvent->GetEventOwner()))
-	{
-		bool aiAlive = false;
-		for (ABaseCharacter* character : aiSpawned)
-		{
-			if (character->IsAlive())
-			{
-				aiAlive = true;
-				break;
-			}
-		}
-
-		if (!aiAlive)
-			MissionComplete();
-	}
-}
-
 void AMission::MissionComplete()
 {
 	missionComplete = true;
 	SetUpLootBoxes();
 }
 
-void AMission::SpawnMission_Internal()
+void AMission::SpawnAI()
 {
-	if (!HasPlayers() && spawnMission)
+	FNavLocation location;
+	UMissionLoadoutTable* mlt = game->GetTableManager()->GetMissionLoadoutTable();
+
+	FActorSpawnParameters params;
+	params.Owner = this;
+	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
+
+	for (auto& mld : mlt->GetData())
 	{
-		spawnMission = false;
-		missionSpawned = true;
-		FNavLocation location;
-		UMissionLoadoutTable* mlt = game->GetTableManager()->GetMissionLoadoutTable();
-
-		FActorSpawnParameters params;
-		params.Owner = this;
-		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-		for (auto& mld : mlt->GetData())
+		if (mld.type == GetMissionType())
 		{
 			FLoadoutData ld = game->GetTableManager()->GetLoadoutTableData()->GetLoadoutDataByID(mld.loadoutID);
 
-			UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
 			nav->GetRandomPointInNavigableRadius(GetActorLocation(), boxSize / 2, location);
 
 			ABaseCharacter* character = GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
@@ -168,15 +174,34 @@ void AMission::SpawnMission_Internal()
 			{
 				character->SetupLoadout(ld.name);
 				aiSpawned.Add(character);
+				character->OnCharacterDied.AddUniqueDynamic(this, &AMission::CharacterDied);
 			}
 		}
+	}
 
-		for (ABaseCharacter* character : aiSpawned)
-		{
-			ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
+	aiAlive = aiSpawned;
+
+	for (ABaseCharacter* character : aiSpawned)
+	{
+		ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
+
+		if (con) {
 			con->alliesSeen = aiSpawned;
 			con->alliesSeen.Remove(character);
 		}
+	}
+}
+
+void AMission::SpawnMission_Internal()
+{
+	if (!HasPlayers() && spawnMission)
+	{
+		spawnMission = false;
+		missionSpawned = true;
+
+		SpawnAI();
+
+		SetUpLootBoxes();
 	}
 }
 
@@ -200,12 +225,11 @@ void AMission::SpawnMission()
 
 bool AMission::IsPlayer(AActor* inActor, UPrimitiveComponent* inOtherComp)
 {
-	// TODO find better way to check for player
-	if (inActor->IsA(ABaseCharacter::StaticClass()) && inOtherComp->GetName().Equals("CollisionCylinder"))
+	if (inActor->IsA(ABaseCharacter::StaticClass()))
 	{
 		ABaseCharacter* character = Cast<ABaseCharacter>(inActor);
 
-		return character->GetController() && character->GetController()->IsA(ABasePlayerController::StaticClass());
+		return character->IsPlayer();
 	}
 	return false;
 }
@@ -216,5 +240,14 @@ void AMission::BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle_CheckNoPlayers);
 		players.FindOrAdd(Cast<AMissionArea>(OverlappedComponent->GetOwner()))++;
+	}
+}
+
+void AMission::CharacterDied(ABaseCharacter* character)
+{
+	aiAlive.Remove(character);
+
+	if (aiAlive.IsEmpty()) {
+		MissionComplete();
 	}
 }

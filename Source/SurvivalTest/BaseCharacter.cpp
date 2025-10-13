@@ -205,7 +205,7 @@ void ABaseCharacter::KillCharacter()
 	//SetActorEnableCollision(false);
 	UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 
-	OnCharacterDied.Broadcast();
+	OnCharacterDied.Broadcast(this);
 }
 
 /**
@@ -276,9 +276,12 @@ int32 ABaseCharacter::GetDamageResistance()
 {
 	int32 total = 0;
 
-	for (auto a : GetInventory()->GetEquippedArmour())
+	if (GetInventory() != NULL && !GetInventory()->GetEquippedArmour().IsEmpty())
 	{
-		total += a.Value->GetData().resistance;
+		for (auto a : GetInventory()->GetEquippedArmour())
+		{
+			total += a.Value->GetData().resistance;
+		}
 	}
 
 	return total;
@@ -352,7 +355,10 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
 	inter->Highlight(false);
 	overlappingInteractables.Remove(inter);
-	GetInventory()->OnContainersUpdated.Broadcast();
+
+	if (GetInventory()) {
+		GetInventory()->OnContainersUpdated.Broadcast();
+	}
 }
 
 void ABaseCharacter::Consume(EConsumableType type, int32 value)

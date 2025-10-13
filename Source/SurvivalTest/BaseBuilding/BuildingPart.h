@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/ArrowComponent.h"
+#include "Components/BoxComponent.h"
 #include "BuildingPart.generated.h"
 
 USTRUCT(BlueprintType)
@@ -23,6 +24,8 @@ public:
 	FRotator rotation;
 };
 
+class UStaticMeshComponent;
+
 UCLASS()
 class SURVIVALTEST_API ABuildingPart : public AActor
 {
@@ -31,13 +34,17 @@ class SURVIVALTEST_API ABuildingPart : public AActor
 public:
 	ABuildingPart();
 
-	virtual void OnConstruction(const FTransform& Transform) override;
+	/*UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building Part", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* buildingPartComp;*/
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building Part", meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* buildingPartComp;
 
 protected:
 	virtual void BeginPlay() override;
+
+	int32 meshID;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building Part", meta = (AllowPrivateAccess = "true"))
+	UStaticMesh* mesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building Part", meta = (AllowPrivateAccess = "true"))
 	FString meshRef;
@@ -45,5 +52,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Building Part", meta = (AllowPrivateAccess = "true"))
 	FBuildingPartData buildingData;
 
+	UPROPERTY()
 	UArrowComponent* arrow;
+
+	UPROPERTY()
+	UBoxComponent* collision;
 };

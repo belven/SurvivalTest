@@ -32,7 +32,8 @@ void UMissionManager::StartPlay()
 			mission = mGetRandom<AMission*>(missions);
 
 			if (!mission->MissionSpawned()) {
-				EMissionType mt = mGetRandom<EMissionType>(types);
+				EMissionType mt = mGetRandomEnum<EMissionType>(EMissionType::End);
+			//	EMissionType mt = static_cast<EMissionType>(FMath::RandRange(0, static_cast<uint8>(EMissionType::End) - 1)); //  mGetRandom<EMissionType>(types);
 				mission->SetMissionType(mt);
 				mission->SpawnMission();
 			}
@@ -47,7 +48,7 @@ void UMissionManager::StartPlay()
 	for(AMission* m : missions)
 	{
 		if (!m->MissionSpawned()) {
-			//m->SpawnLoot();
+			m->SpawnDefault();
 		}
 	}
 }

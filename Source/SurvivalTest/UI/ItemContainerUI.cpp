@@ -40,7 +40,7 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 
 FString UItemContainerUI::GetContainerName()
 {
-	if (name.IsEmpty())
+	if (name.IsEmpty() && container  != NULL)
 	{
 		name = container->GetInstanceContainerData().name;
 	}

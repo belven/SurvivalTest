@@ -8,6 +8,7 @@
 #include "Events/RPGEventManager.h"
 // ReSharper disable once CppUnusedIncludeDirective Required for GetSingletonObject
 #include "FactionManager.h"
+#include "ObjectInstanceManager.h"
 
 #define GetLastMapItem(type, values) UHelperFunctions::GetLastMapItem<int32, type>(values)
 
@@ -141,7 +142,7 @@ int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
 	FScopeLock Lock(&InstanceWeaponDataLock);
 
 	TMap<int32, FInstanceWeaponData> instancedWeapons = GetTableManager()->GetWeaponInstanceTable()->GetData();
-	
+
 	int32& id = LastInstanceWeaponDataID;
 
 	if (id < 0 || id < instancedWeapons.Num() - 1)
@@ -175,6 +176,12 @@ UMissionManager* UBaseGameInstance::GetMissionManager()
 	return missionManager;
 }
 
+AObjectInstanceManager* UBaseGameInstance::GetObjectInstanceManager()
+{
+	if (objectInstanceManager == NULL) objectInstanceManager = GetWorld()->SpawnActor< AObjectInstanceManager>(AObjectInstanceManager::StaticClass());
+	return objectInstanceManager;
+}
+
 URPGEventManager* UBaseGameInstance::GetEventManager()
 {
 	return GetSingletonObject(eventManager);
@@ -189,6 +196,6 @@ UTableManager* UBaseGameInstance::GetTableManager()
 template <class T>
 T* UBaseGameInstance::GetSingletonObject(T*& object)
 {
-    if (object == nullptr) { object = NewObject<T>(); }
-    return object;
+	if (object == nullptr) { object = NewObject<T>(); }
+	return object;
 }

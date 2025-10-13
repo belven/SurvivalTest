@@ -38,7 +38,7 @@ public:
 	UFUNCTION()
 		void SetupLoadout(const FLoadoutData& ld);
 
-	TMap<EGearType, UArmour*> GetEquippedArmour() const
+	TMap<EGearType, UArmour*>& GetEquippedArmour()
 	{
 		return equippedArmour;
 	}

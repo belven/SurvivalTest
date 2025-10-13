@@ -22,9 +22,13 @@ UENUM(BlueprintType)
 enum class EOneDirection : uint8
 {
 	North,
+	NorthEast,
+	NorthWest,
 	East,
 	West,
 	South,
+	SouthEast,
+	SouthWest,
 	End
 };
 
@@ -113,7 +117,7 @@ private:
 	UEquipmentSwapTask* equipmentSwapTask;
 
 	UFUNCTION()
-	void CharacterDied();
+	void CharacterDied(ABaseCharacter* deadCharacter);
 
 	UPROPERTY()
 	UProjectileWeapon* rangedWeapon;

@@ -102,11 +102,12 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
+	baseCharacter->SetIsPlayer(true);
 	baseCharacter->GetInventory()->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
 	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
 	baseCharacter->OnEnemyHit.AddUniqueDynamic(this, &ABasePlayerController::EnemyHit);
 	baseCharacter->OnCharacterDied.AddUniqueDynamic(this, &ABasePlayerController::CharacterDied);
-	
+
 	if (baseCharacter->GetEquippedWeapon())
 	{
 		WeaponEquipped(nullptr);
@@ -235,48 +236,93 @@ void ABasePlayerController::Build()
 	TArray<AActor*> actors;
 	GetBaseCharacter()->GetOverlappingActors(actors, ABuildingPart::StaticClass());
 
-	for (AActor* actor : actors)
-	{
-		ABuildingPart* bp = Cast<ABuildingPart>(actor);
-		CreateBuildingPart(bp, EOneDirection::North);
-		CreateBuildingPart(bp, EOneDirection::South);
-		CreateBuildingPart(bp, EOneDirection::East);
-		CreateBuildingPart(bp, EOneDirection::West);
+	if (!actors.IsEmpty()) {
+		for (AActor* actor : actors)
+		{
+			ABuildingPart* bp = Cast<ABuildingPart>(actor);
+			CreateBuildingPart(bp, EOneDirection::North);
+			CreateBuildingPart(bp, EOneDirection::NorthEast);
+			CreateBuildingPart(bp, EOneDirection::NorthWest);
+			CreateBuildingPart(bp, EOneDirection::South);
+			CreateBuildingPart(bp, EOneDirection::SouthEast);
+			CreateBuildingPart(bp, EOneDirection::SouthWest);
+			CreateBuildingPart(bp, EOneDirection::East);
+			CreateBuildingPart(bp, EOneDirection::West);
+		}
 	}
+	else
+	{
+
+	}
+
 }
 
 void ABasePlayerController::CreateBuildingPart(ABuildingPart* bp, EOneDirection direction)
 {
-	FVector location = bp->GetActorLocation();
+	FRotator rotation;
+	FVector location;
 
-	location = MoveVectorByDirection(location, bp->GetActorRotation(), 120, direction);
-
-	FActorSpawnParameters params;
-	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	ABuildingPart* newBP = GetBaseCharacter()->GetWorld()->SpawnActor<ABuildingPart>(ABuildingPart::StaticClass(), location, bp->GetActorRotation(), params);
-
-	FString name;
-
-	switch (direction)
-	{
-	case EOneDirection::North:
-		name = "North";
-		break;
-	case EOneDirection::East:
-		name = "East";
-		break;
-	case EOneDirection::West:
-		name = "West";
-		break;
-	case EOneDirection::South:
-		name = "South";
-		break;
-	case EOneDirection::End:
-		break;
+	if (bp != NULL) {
+		location = bp->GetActorLocation();
+		rotation = bp->GetActorRotation();
 	}
 
-	if (newBP) {
-		newBP->SetActorLabel(name);
+	location = MoveVectorByDirection(location, rotation, 120, direction);
+
+	FString location_string = FString::SanitizeFloat(location.X) + "X" + FString::SanitizeFloat(location.Y) + "Y" + FString::SanitizeFloat(location.Z) + "Z";
+
+	TMap<FString, ABuildingPart*> building_parts = GameInstance(GetBaseCharacter()->GetWorld())->GetBuildingParts();
+
+	if (!building_parts.Contains(location_string))
+	{
+		FActorSpawnParameters params;
+		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
+		ABuildingPart* newBP = GetBaseCharacter()->GetWorld()->SpawnActor<ABuildingPart>(ABuildingPart::StaticClass(), location, rotation, params);
+
+		if (newBP) {
+			building_parts.Add(location_string, newBP);
+
+			FString name;
+
+			switch (direction)
+			{
+			case EOneDirection::North:
+				name = "North";
+				break;
+			case EOneDirection::East:
+				name = "East";
+				break;
+			case EOneDirection::West:
+				name = "West";
+				break;
+			case EOneDirection::South:
+				name = "South";
+				break;
+			case EOneDirection::End:
+				name = "End";
+				break;
+			case EOneDirection::NorthEast:
+				name = "NorthEast";
+				break;
+			case EOneDirection::NorthWest:
+				name = "NorthWest";
+				break;
+			case EOneDirection::SouthEast:
+				name = "SouthEast";
+				break;
+			case EOneDirection::SouthWest:
+				name = "SouthWest";
+				break;
+			}
+
+			if (newBP) {
+				newBP->SetActorLabel(name);
+			}
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("building_parts building already exists"));
 	}
 }
 
@@ -284,13 +330,24 @@ FVector ABasePlayerController::MoveVectorByDirection(const FVector& centerLocati
 {
 	const FRotator ninety = FRotator(0, currentRotation.Yaw + 90, 0);
 	FVector north = FVector(distance, 0, 0);
+	FVector east = FVector(0, distance, 0);
 	FVector out = centerLocation;
+
 	out = currentRotation.RotateVector(out);
 	north = currentRotation.RotateVector(north);
+	east = currentRotation.RotateVector(east);
 
 	switch (direction)
 	{
 	case EOneDirection::North:
+		out += north;
+		break;
+	case EOneDirection::NorthWest:
+		out += north;
+		out -= east;
+		break;
+	case EOneDirection::NorthEast:
+		out += east;
 		out += north;
 		break;
 	case EOneDirection::East:
@@ -303,6 +360,14 @@ FVector ABasePlayerController::MoveVectorByDirection(const FVector& centerLocati
 		break;
 	case EOneDirection::South:
 		out -= north;
+		break;
+	case EOneDirection::SouthEast:
+		out -= north;
+		out += east;
+		break;
+	case EOneDirection::SouthWest:
+		out -= north;
+		out -= east;
 		break;
 	case EOneDirection::End:
 		break;
@@ -387,7 +452,7 @@ void ABasePlayerController::BeginPlay()
 	}
 }
 
-void ABasePlayerController::CharacterDied()
+void ABasePlayerController::CharacterDied(ABaseCharacter* deadCharacter)
 {
 	// TODO might need to stop drag actions here
 	CloseInventory();

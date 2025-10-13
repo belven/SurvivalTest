@@ -5,7 +5,6 @@
 #include "MissionStructs.h"
 #include "NavigationData.h"
 #include "NavigationInvokerComponent.h"
-#include "SurvivalTest/Events/EventListener.h"
 #include "Mission.generated.h"
 
 class AMissionArea;
@@ -13,15 +12,13 @@ class UBaseGameInstance;
 class ABaseCharacter;
 
 UCLASS(HideCategories=("Rendering", "Replication", "Collision", "HLOD", "World_Partition", "Input", "Replication", "Actor", "Cooking", "Data_Layers"))
-class SURVIVALTEST_API AMission : public ATargetPoint, public IEventListener
+class SURVIVALTEST_API AMission : public ATargetPoint
 {
 	GENERATED_BODY()
 
 public:
-	UFUNCTION()
-	virtual void EventTriggered(UBaseEvent* inEvent) override;
-
 	void MissionComplete();
+	void SpawnAI();
 	void SpawnMission_Internal();
 	bool ShouldSpawnMission() const { return spawnMission; }
 	bool MissionSpawned() const { return missionSpawned; }
@@ -31,11 +28,12 @@ public:
 	void SpawnMission();
 	EMissionType GetMissionType() const { return missionType; }
 	void SetMissionType(EMissionType inMissionType) { missionType = inMissionType; }
+	void SetUpLootBoxes();
+	void SpawnDefault();
 
 protected:
 	AMission();
 	FContainerData GetRandomContainerData();
-	void SetUpLootBoxes();
 	virtual void BeginPlay() override;
 	bool HasPlayers();
 	void SpawnBox(const FVector& location);
@@ -43,9 +41,11 @@ protected:
 
 	TSubclassOf<APawn> AIClass;
 	FTimerHandle TimerHandle_CheckNoPlayers;
-	EMissionType missionType;
 	bool spawnMission = true;
 	bool missionSpawned = false;
+
+	UPROPERTY()
+	TArray<FContainerData> cds;
 
 	UPROPERTY()
 	UBaseGameInstance* game;
@@ -58,9 +58,15 @@ protected:
 	
 	UFUNCTION()
 	void BeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
+
+	UFUNCTION()
+	void CharacterDied(ABaseCharacter* character);
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	int32 boxSize;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	EMissionType missionType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	int32 boxHeight;
@@ -73,6 +79,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	TArray<ABaseCharacter*> aiSpawned;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	TArray<ABaseCharacter*> aiAlive;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	TArray<AMissionArea*> missionArea;

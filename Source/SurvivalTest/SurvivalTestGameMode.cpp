@@ -1,5 +1,6 @@
 #include "SurvivalTestGameMode.h"
 #include "BasePlayerController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Missions/MissionManager.h"
 #include "UI/BaseHUD.h"
 #include "UObject/ConstructorHelpers.h"

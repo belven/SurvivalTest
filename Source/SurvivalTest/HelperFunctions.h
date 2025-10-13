@@ -13,6 +13,7 @@
 #define mCurrentWeapon() GetBaseCharacter()->GetEquippedWeapon()
 
 #define mGetRandom UHelperFunctions::GetRandom
+#define mGetRandomEnum UHelperFunctions::GetRandomEnum
 
 UCLASS()
 class SURVIVALTEST_API UHelperFunctions : public UObject
@@ -43,6 +44,12 @@ public:
 	//	itemArray.GenerateValueArray(values);
 	//	return values.Last();
 	//}
+
+	template <class T>
+	static T GetRandomEnum(T end)
+	{
+		return static_cast<T>(FMath::RandRange(0, static_cast<uint8>(end) - 1));
+	}
 
 	template <class T>
 	static T GetRandom(TArray<T> itemArray)

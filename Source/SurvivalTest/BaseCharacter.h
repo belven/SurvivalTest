@@ -19,7 +19,7 @@ class UInventory;
 class UWeapon;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWeaponEquipped, UWeapon*, oldWeapon);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FCharacterDied);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FCharacterDied, ABaseCharacter*, character);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnemyHit, ABaseCharacter*, enemy);
 
 UCLASS(config = Game)
@@ -128,10 +128,14 @@ public:
 	UBaseGameInstance* GetGame() const { return game; }
 	void SetGame(UBaseGameInstance* inGame) { game = inGame; }
 
+	bool IsPlayer() { return isPlayer; }
+	void SetIsPlayer(bool newIsPlayer) { isPlayer = newIsPlayer; }
+
 protected:
 	float timeMoved;
 	bool inCombat;
 	bool isRequestingSprint;
+	bool isPlayer = false;
 
 	void ResetStats();
 	virtual void BeginPlay() override;

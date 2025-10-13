@@ -64,8 +64,9 @@ protected:
 	void AttackWithWeapon(const FRotator& FireDirection);
 	void LookAt(const FVector& lookAtLocation);
 	virtual void BeginPlay() override;
-		UFUNCTION()
-	void CharacterDied();
+
+	UFUNCTION()
+	void CharacterDied(ABaseCharacter* deadCharacter);
 
 	UFUNCTION()
 	void OutOfAmmo();

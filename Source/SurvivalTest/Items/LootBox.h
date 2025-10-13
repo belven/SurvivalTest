@@ -32,7 +32,7 @@ public:
 
 	UFUNCTION()
 	void RemoveLootBox();
-	
+
 	UFUNCTION()
 	void SpawnLoot();
 	void ClearData();
@@ -52,11 +52,11 @@ protected:
 	UStaticMeshComponent* boxMeshComp;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
-		int32 minItems = 3;
+	int32 minItems = 3;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = LootBox, meta = (AllowPrivateAccess = "true"))
-		FString defaultContainer;
-	
+	FString defaultContainer;
+
 	FContainerData containerData;
 
 	FInstanceContainerData icd;
@@ -64,9 +64,9 @@ protected:
 
 	bool isHighlighted = false;
 	int32 minTime = 10;
-	
+
 	TArray<int32> itemTypes;
-	
+
 	UPROPERTY()
 	UItemContainer* container;
 
