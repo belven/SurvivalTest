@@ -24,9 +24,10 @@ AMission::AMission()
 
 FContainerData AMission::GetRandomContainerData()
 {
+	FContainerData foundData = {};
+
 	// TODO clean up data once mission is over
-	//if (cds.IsEmpty())
-	//{
+
 	for (auto& cdFound : game->GetTableManager()->GetContainerData()->GetData())
 	{
 		if (cdFound.Value.type == missionType)
@@ -34,26 +35,36 @@ FContainerData AMission::GetRandomContainerData()
 			cds.Add(cdFound.Value);
 		}
 	}
-	//}
 
 	if (!cds.IsEmpty())
 	{
-		return UHelperFunctions::GetRandom(cds);
+		foundData = UHelperFunctions::GetRandom(cds);
 	}
 	else
 	{
 		TArray<FContainerData> data;
 		game->GetTableManager()->GetContainerData()->GetData().GenerateValueArray(data);
 
-		for (FContainerData cd : data)
+		if (!data.IsEmpty())
 		{
-			if (cd.type != EMissionType::End) {
-				cds.Add(cd);
+			for (FContainerData cd : data)
+			{
+				// TODO we need ot ignore the player and base containers
+				if (cd.ID > 3) {
+					cds.Add(cd);
+				}
 			}
-		}
 
-		return UHelperFunctions::GetRandom(cds);
+			foundData = UHelperFunctions::GetRandom(cds);
+		}
 	}
+
+	if (foundData.ID == UItemStructs::InvalidInt)
+	{
+		UE_LOG(LogTemp, Log, TEXT("GetRandomContainerData array is empty"));
+	}
+
+	return foundData;
 }
 
 void AMission::SetUpLootBoxes()
@@ -65,7 +76,7 @@ void AMission::SetUpLootBoxes()
 	{
 		ALootBox* loot = Cast<ALootBox>(actor);
 		FContainerData cd = GetRandomContainerData();
-		TArray<int32> itemTypes = game->GetTableManager()->GetItemsForMissionType(missionType);
+		TArray<int32> itemTypes;
 
 		if (cd.ID == UItemStructs::InvalidInt)
 		{
@@ -73,6 +84,10 @@ void AMission::SetUpLootBoxes()
 			{
 				itemTypes.Add(id.ID);
 			}
+		}
+		else
+		{
+			itemTypes = game->GetTableManager()->GetContainerItems(cd.ID);
 		}
 
 		loot->SetContainerData(cd);

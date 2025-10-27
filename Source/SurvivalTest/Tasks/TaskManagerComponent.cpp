@@ -25,7 +25,7 @@ bool UTaskManagerComponent::PerformTask(UCharacterTask* newTask, bool force)
 
 	if (!currentTask)
 	{
-		UE_LOG(LogTemp, Log, TEXT("New Task Started, no existing Task"));
+		//UE_LOG(LogTemp, Log, TEXT("New Task Started, no existing Task"));
 		currentTask = newTask;
 		currentTask->OnTaskComplete.AddUniqueDynamic(this, &UTaskManagerComponent::TaskComplete);
 		currentTask->PerformTask(GetController());
@@ -35,7 +35,7 @@ bool UTaskManagerComponent::PerformTask(UCharacterTask* newTask, bool force)
 	{
 		if (currentTask->CanBeInterrupted() || force)
 		{
-			UE_LOG(LogTemp, Log, TEXT("New Task Started, Existing Task interrupted"));
+			//UE_LOG(LogTemp, Log, TEXT("New Task Started, Existing Task interrupted"));
 			currentTask->CancelAction(force);
 			currentTask->OnTaskComplete.RemoveAll(this);
 
@@ -46,7 +46,7 @@ bool UTaskManagerComponent::PerformTask(UCharacterTask* newTask, bool force)
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("New Task Queued"));
+			//UE_LOG(LogTemp, Log, TEXT("New Task Queued"));
 			newTask->OnTaskComplete.AddUniqueDynamic(this, &UTaskManagerComponent::TaskComplete);
 			tasks.Enqueue(newTask);
 			result = true;
@@ -68,7 +68,7 @@ void UTaskManagerComponent::TaskComplete(const FStatusData& status)
 {
 	if (!tasks.IsEmpty())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Task Completed, next task in queue started"));
+		//UE_LOG(LogTemp, Log, TEXT("Task Completed, next task in queue started"));
 		currentTask->OnTaskComplete.RemoveAll(this);
 
 		tasks.Dequeue(currentTask);
@@ -76,7 +76,7 @@ void UTaskManagerComponent::TaskComplete(const FStatusData& status)
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("All Tasks Completed"));
+		//UE_LOG(LogTemp, Log, TEXT("All Tasks Completed"));
 		currentTask = NULL;
 	}
 }

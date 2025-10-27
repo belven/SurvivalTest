@@ -23,6 +23,7 @@ class UMissionLoadoutTable;
 class UInstanceItemDataTable;
 class UMissionItemTable;
 class UWeaponInstanceTable;
+class UContainerItemTableData;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -44,6 +45,7 @@ public:
 	UInstanceItemDataTable* GetInstanceItemDataTable();
 	UMissionItemTable* GetMissionItemTable();
 	UWeaponInstanceTable* GetWeaponInstanceTable();
+	UContainerItemTableData* GetContainerItemDataTable();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
@@ -76,6 +78,7 @@ public:
 	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
 	FString GetContainerInstanceName(int32 containerID);
+	TArray<int32> GetContainerItems(int32 containerID);
 
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
@@ -128,4 +131,7 @@ private:
 
 	UPROPERTY()
 	UWeaponInstanceTable* weaponInstances;
+
+	UPROPERTY()
+	UContainerItemTableData* containerItemDataTable;
 };

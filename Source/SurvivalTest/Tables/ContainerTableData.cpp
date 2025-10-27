@@ -15,7 +15,7 @@ void UContainerTableData::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.slots = GetIntFromString(row[index++]);
 		data.name = row[index++];
 		data.mesh = row[index++];
-		data.type = UMissionStructs::GetMissionType(row[index++]);
+		//data.type = UMissionStructs::GetMissionType(row[index++]);
 		containerData.Add(data.ID,data);
 	}
 }

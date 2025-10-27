@@ -42,6 +42,8 @@ protected:
 	TSubclassOf<APawn> AIClass;
 	FTimerHandle TimerHandle_CheckNoPlayers;
 	bool spawnMission = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
 	bool missionSpawned = false;
 
 	UPROPERTY()

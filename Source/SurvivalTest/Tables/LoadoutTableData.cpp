@@ -1,5 +1,7 @@
 #include "LoadoutTableData.h"
 
+#include "SurvivalTest/Items/ItemStructs.h"
+
 ULoadoutTableData::ULoadoutTableData() : Super()
 {
 	path = CSVT::GetTableFilePath("LoadoutData.csv");

@@ -1,7 +1,7 @@
 #include "Weapon.h"
 #include "SurvivalTest/BaseCharacter.h"
 
-UWeapon::UWeapon(): characterOwner(nullptr), weaponMeshComp(nullptr)
+UWeapon::UWeapon() : characterOwner(nullptr), weaponMeshComp(nullptr)
 {
 	GunOffset = FVector(0.f, 0.f, 0.f);
 	canAttack = true;
@@ -9,10 +9,23 @@ UWeapon::UWeapon(): characterOwner(nullptr), weaponMeshComp(nullptr)
 
 UStaticMesh* UWeapon::GetItemMesh()
 {
-	if (GetItemData().mesh.Equals(""))
-		return nullptr;
+	UStaticMesh* meshFound = NULL;
 
-	return LoadObject<UStaticMesh>(this, *GetItemData().mesh);
+	if (GetItemData().mesh.Equals(""))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No mesh string set in item for %s"), *GetItemData().name);
+	}
+	else 
+	{
+		meshFound = LoadObject<UStaticMesh>(this, *GetItemData().mesh);
+	}
+
+	if (!meshFound) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No static mesh object found for %s"), *GetItemData().name);
+	}
+
+	return meshFound;
 }
 
 void UWeapon::SetOwner(ABaseCharacter* val)

@@ -1,7 +1,9 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "SurvivalTest/Items/ItemStructs.h"
 #include "SurvivalTest/Tables/CSVTable.h"
 #include "WeaponInstanceTable.generated.h"
+
 
 UCLASS()
 class SURVIVALTEST_API UWeaponInstanceTable : public UCSVTable

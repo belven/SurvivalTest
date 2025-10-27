@@ -33,7 +33,6 @@ void UMissionManager::StartPlay()
 
 			if (!mission->MissionSpawned()) {
 				EMissionType mt = mGetRandomEnum<EMissionType>(EMissionType::End);
-			//	EMissionType mt = static_cast<EMissionType>(FMath::RandRange(0, static_cast<uint8>(EMissionType::End) - 1)); //  mGetRandom<EMissionType>(types);
 				mission->SetMissionType(mt);
 				mission->SpawnMission();
 			}

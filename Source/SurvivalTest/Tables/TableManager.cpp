@@ -14,6 +14,7 @@
 #include "Mission/MissionItemTable.h"
 #include "Mission/MissionLoadoutTable.h"
 #include "Mission/MissionTable.h"
+#include "ContainerItemTableData.h"
 
 void UTableManager::LoadTableData()
 {
@@ -29,6 +30,7 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetMissionTable());
 	LoadTableFromFile(GetMissionLoadoutTable());
 	LoadTableFromFile(GetMissionItemTable());
+	LoadTableFromFile(GetContainerItemDataTable());
 }
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
@@ -482,6 +484,26 @@ UWeaponInstanceTable* UTableManager::GetWeaponInstanceTable()
 {
 	if (weaponInstances == nullptr) { weaponInstances = NewObject<UWeaponInstanceTable>(); }
 	return weaponInstances;	
+}
+
+UContainerItemTableData* UTableManager::GetContainerItemDataTable()
+{
+	if (containerItemDataTable == nullptr) { containerItemDataTable = NewObject<UContainerItemTableData>(); }
+	return containerItemDataTable;
+}
+
+TArray<int32> UTableManager::GetContainerItems(int32 containerID)
+{
+	TArray<int32> items;
+
+	for (FContainerItemData data : containerItemDataTable->GetData())
+	{
+		if (data.containerID == containerID)
+		{
+			items.Add(data.itemID);
+		}
+	}
+	return items;
 }
 
 #pragma endregion Getters

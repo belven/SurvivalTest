@@ -51,9 +51,36 @@ public:
 		return static_cast<T>(FMath::RandRange(0, static_cast<uint8>(end) - 1));
 	}
 
+	//template <class T>
+	//USTRUCT(BlueprintType)
+	//struct  FResult
+	//{
+	//	GENERATED_USTRUCT_BODY()
+	//private:
+	//	T value;
+
+	//public:
+	//	operator T() const { return value; }
+
+	//	void SetValue(T newValue)
+	//	{
+	//		value = newValue;
+	//		set = true;
+	//	}
+
+	//	bool set = false;
+	//};
+
 	template <class T>
 	static T GetRandom(TArray<T> itemArray)
 	{
-		return itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
+		//FResult<T> result;
+
+	//	if (!itemArray.IsEmpty()) {
+		return  itemArray[FMath::RandRange(0, itemArray.Num() - 1)];
+		//	}
+
+		//	UE_LOG(LogTemp, Log, TEXT("GetRandom array is empty"));
+		//	return result;
 	}
 };

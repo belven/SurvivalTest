@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "CSVTable.h"
+#include "SurvivalTest/Items/ItemStructs.h"
 #include "ContainerTableData.generated.h"
 
 UCLASS()

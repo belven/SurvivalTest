@@ -1,7 +1,5 @@
 #include "InstanceBoxDataTable.h"
 
-#include "SurvivalTest/Items/ItemStructs.h"
-
 UInstanceBoxDataTable::UInstanceBoxDataTable() : Super()
 {
 	path = CSVT::GetTableFilePath("InstanceBoxDataTable.csv");

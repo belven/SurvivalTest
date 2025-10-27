@@ -25,6 +25,20 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FMissionContainerData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+	EMissionType type;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+	int32 containerID;
+};
+
+USTRUCT(BlueprintType)
 struct FMissionItemData
 {
 	GENERATED_USTRUCT_BODY()
@@ -58,4 +72,22 @@ class SURVIVALTEST_API UMissionStructs : public UObject
 	GENERATED_BODY()
 	public:
 		static EMissionType GetMissionType(const FString& type);
+
+		static FString GetMissionTypeString(EMissionType type)
+		{
+			switch (type)
+			{
+			case EMissionType::Medical:
+				return "Medical";
+			case EMissionType::Military:
+				return "Military";
+			case EMissionType::Civilian:
+				return "Civilian";
+			case EMissionType::Secret:
+				return "Secret";
+			case EMissionType::End:
+				return "Unknown";
+			}
+			return "Unknown";
+		}
 };

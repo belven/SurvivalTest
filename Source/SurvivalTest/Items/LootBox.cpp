@@ -38,7 +38,7 @@ void ALootBox::BeginPlay()
 	Super::BeginPlay();
 	SetActorHiddenInGame(false);
 
-	if (!defaultContainer.Equals(""))
+	if (!defaultContainer.IsEmpty())
 	{
 		for (auto cd : GetGame()->GetTableManager()->GetContainerData()->GetData())
 		{
@@ -71,8 +71,9 @@ void ALootBox::Highlight(bool activate)
 
 UBaseGameInstance* ALootBox::GetGame()
 {
-	if (!gameIn)
+	if (!gameIn) {
 		gameIn = GameInstance(GetWorld());
+	}
 	return gameIn;
 }
 
@@ -94,22 +95,29 @@ void ALootBox::SpawnLoot()
 
 	if (itemTypes.IsEmpty())
 	{
-		itemTypes = GetGame()->GetTableManager()->GetItemsForMissionType(GetContainerData().type);
+		itemTypes = GetGame()->GetTableManager()->GetContainerItems(GetContainerData().ID);
 	}
 
-	for (int i = 0; i < FMath::RandRange(minItems, GetContainerData().slots); ++i)
+	if (!itemTypes.IsEmpty())
 	{
-		int32 lootItem = mGetRandom<int32>(itemTypes);
-		FItemData id = GetGame()->GetItemData(lootItem);
-		FInstanceItemData iid = CreateLoot(id);
-
-		TArray<int32> ids;
-		FInstanceItemData added = container->AddItem(iid, ids);
-
-		if (added.amount == 0 && id.type == EItemType::Armour)
+		for (int i = 0; i < FMath::RandRange(minItems, GetContainerData().slots); ++i)
 		{
-			UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
+			int32 lootItem = mGetRandom<int32>(itemTypes);
+			FItemData id = GetGame()->GetItemData(lootItem);
+			FInstanceItemData iid = CreateLoot(id);
+
+			TArray<int32> ids;
+			FInstanceItemData added = container->AddItem(iid, ids);
+
+			if (added.amount == 0 && id.type == EItemType::Armour)
+			{
+				UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
+			}
 		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("Failed to get item types for container of type %s"), *UMissionStructs::GetMissionTypeString(GetContainerData().type));
 	}
 }
 

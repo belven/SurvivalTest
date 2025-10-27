@@ -152,6 +152,9 @@ protected:
 	UPROPERTY()
 	UBaseGameInstance* game;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	FString characterName;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Factions, meta = (AllowPrivateAccess = "true"))
 	EFaction faction;
 

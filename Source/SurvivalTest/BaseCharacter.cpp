@@ -150,10 +150,12 @@ void ABaseCharacter::BeginPlay()
  * AI will also need to have gear sets set in the database, so we can spawn them with specific gear based on the mission
  */
 void ABaseCharacter::SetupLoadout(const FString& loadoutName)
-{
+{	
 	const FLoadoutData ld = game->GetLoadoutData(loadoutName);
 	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
 	FContainerData cd = game->GetContainerDataName("Character Inventory");
+
+	characterName = loadoutName;
 
 	FInstanceContainerData icd;
 	icd.ID = instanceContainerDataID;
