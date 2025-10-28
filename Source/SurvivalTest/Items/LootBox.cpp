@@ -117,7 +117,7 @@ void ALootBox::SpawnLoot()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("Failed to get item types for container of type %s"), *UMissionStructs::GetMissionTypeString(GetContainerData().type));
+		UE_LOG(LogTemp, Log, TEXT("Failed to get item types for container %s"), *GetContainerData().name);
 	}
 }
 
@@ -135,7 +135,15 @@ void ALootBox::CreateLootboxData()
 	icd.name = "Loot Box " + FString::FromInt(ibd.ID);
 
 	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerData.ID), icd, gameIn);
-	container->OnItemUpdated.AddUniqueDynamic(this, &ALootBox::ItemUpdated);
+
+	if (container != NULL)
+	{
+		container->OnItemUpdated.AddUniqueDynamic(this, &ALootBox::ItemUpdated);
+	}
+	else 
+	{
+		UE_LOG(LogTemp, Log, TEXT("Failed to create container instance for %s"), *GetContainerData().name);
+	}
 }
 
 FInstanceItemData ALootBox::CreateLoot(const FItemData& id)

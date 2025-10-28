@@ -38,6 +38,9 @@ public:
 	void CalculateSprint(float DeltaSeconds);
 	void EnemyHit(ABaseCharacter* inActor);
 
+	UFUNCTION()
+	void OtherCharacterDied(ABaseCharacter* character);
+
 	static const FVector cameraCenter;
 	static const FVector leftLean;
 	static const FVector rightLean;
@@ -92,8 +95,10 @@ public:
 
 #pragma region Interactables
 	void GetOverlapsOnSpawn();
-	void AddInteractable(IInteractable* inter);
+
+	void AddInteractable(IInteractable* interractable);
 	void RemoveInteractable(IInteractable* inter);
+
 	TArray<IInteractable*> GetOverlappingInteractables() const { return overlappingInteractables; }
 	void SetOverlappingInteractables(const TArray<IInteractable*>& inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
 	virtual void Interact(ABasePlayerController* instigator) override;

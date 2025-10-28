@@ -32,26 +32,17 @@ FContainerData AMission::GetRandomContainerData()
 	{
 		for (auto& cdFound : game->GetTableManager()->GetMissionContainers(missionType))
 		{
-			FContainerData containerData = game->GetTableManager()->GetContainerDataByID(cdFound.containerID);
-
-			if (containerData.ID != UItemStructs::InvalidInt)
-			{
-				cds.Add(containerData);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Log, TEXT("Container data invalid for mission type %s"), *UMissionStructs::GetMissionTypeString(missionType));				
-			}
+			cds.Add(game->GetTableManager()->GetContainerDataByID(cdFound.containerID));
 		}
-	}
 
-	if (!cds.IsEmpty())
-	{
-		foundData = UHelperFunctions::GetRandom(cds);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("No containers set for mission type %s"), *UMissionStructs::GetMissionTypeString(missionType));
+		if (!cds.IsEmpty())
+		{
+			foundData = UHelperFunctions::GetRandom(cds);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("No containers set for mission type %s"), *UMissionStructs::GetMissionTypeString(missionType));
+		}
 	}
 
 	return foundData;

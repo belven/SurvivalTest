@@ -15,6 +15,7 @@
 #include "Mission/MissionLoadoutTable.h"
 #include "Mission/MissionTable.h"
 #include "ContainerItemTableData.h"
+#include "Mission/MissionContainerTableData.h"
 
 void UTableManager::LoadTableData()
 {
@@ -31,6 +32,7 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetMissionLoadoutTable());
 	LoadTableFromFile(GetMissionItemTable());
 	LoadTableFromFile(GetContainerItemDataTable());
+	LoadTableFromFile(GetMissionContainerTableData());
 }
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
@@ -300,7 +302,7 @@ FArmourData UTableManager::GetArmourDataByItemID(int32 itemID)
 	return {};
 }
 
-FLoadoutData UTableManager::GetLoadoutData(FString loadoutName)
+FLoadoutData UTableManager::GetLoadoutData(const FString& loadoutName)
 {
 	for (const FLoadoutData ld : GetLoadoutTableData()->GetData())
 	{
@@ -400,6 +402,34 @@ TArray<int32> UTableManager::GetItemsForMissionType(EMissionType type)
 	return itemTypes;
 }
 
+TArray<int32> UTableManager::GetContainerItems(int32 containerID)
+{
+	TArray<int32> items;
+
+	for (FContainerItemData data : containerItemDataTable->GetData())
+	{
+		if (data.containerID == containerID)
+		{
+			items.Add(data.itemID);
+		}
+	}
+	return items;
+}
+
+TArray<FMissionContainerData> UTableManager::GetMissionContainers(EMissionType type)
+{
+	TArray<FMissionContainerData> missionContainers;
+
+	for (FMissionContainerData data : GetMissionContainerTableData()->GetData())
+	{
+		if (data.type == type)
+		{
+			missionContainers.Add(data);
+		}
+	}
+	return missionContainers;
+}
+
 #pragma region Getters
 
 UItemDataTable* UTableManager::GetItemDataTable()
@@ -492,18 +522,10 @@ UContainerItemTableData* UTableManager::GetContainerItemDataTable()
 	return containerItemDataTable;
 }
 
-TArray<int32> UTableManager::GetContainerItems(int32 containerID)
+UMissionContainerTableData* UTableManager::GetMissionContainerTableData()
 {
-	TArray<int32> items;
-
-	for (FContainerItemData data : containerItemDataTable->GetData())
-	{
-		if (data.containerID == containerID)
-		{
-			items.Add(data.itemID);
-		}
-	}
-	return items;
+	if (missionContainerTableData == nullptr) { missionContainerTableData = NewObject<UMissionContainerTableData>(); }
+	return missionContainerTableData;
 }
 
 #pragma endregion Getters

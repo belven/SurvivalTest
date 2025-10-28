@@ -73,7 +73,6 @@ ABaseCharacter::ABaseCharacter()
 	weaponMeshComp->SetCollisionEnabled(ECollisionEnabled::Type::NoCollision);
 	GetMesh()->SetCustomDepthStencilValue(2);
 
-
 	taskManager = CreateDefaultSubobject< UTaskManagerComponent>(TEXT("TaskManager"));
 
 	ResetStats();
@@ -127,7 +126,7 @@ void ABaseCharacter::Interact(ABasePlayerController* instigator)
 
 void ABaseCharacter::Highlight(bool activate)
 {
-
+	GetMesh()->SetRenderCustomDepth(activate);
 }
 
 void ABaseCharacter::BeginPlay()
@@ -150,7 +149,7 @@ void ABaseCharacter::BeginPlay()
  * AI will also need to have gear sets set in the database, so we can spawn them with specific gear based on the mission
  */
 void ABaseCharacter::SetupLoadout(const FString& loadoutName)
-{	
+{
 	const FLoadoutData ld = game->GetLoadoutData(loadoutName);
 	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
 	FContainerData cd = game->GetContainerDataName("Character Inventory");
@@ -243,9 +242,11 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 
 	if (IsDead())
 	{
-		if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius)
-			health_change.source->AddInteractable(this);
 		KillCharacter();
+
+		//if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius) {
+		//	health_change.source->AddInteractable(this);
+		//}
 	}
 
 	health_change.source->EnemyHit(this);
@@ -313,39 +314,44 @@ void ABaseCharacter::GetOverlapsOnSpawn()
 /**
  * Adds a given IInteractable to our interactable list
  *
- * @param inter The interactable to add
+ * @param interractable The interactable to add
  *
  */
-void ABaseCharacter::AddInteractable(IInteractable* inter)
+void ABaseCharacter::AddInteractable(IInteractable* interractable)
 {
-	bool shouldAdd = false;
-
-	ABaseCharacter* other = Cast<ABaseCharacter>(inter);
-
-	// If the other is not a Character, then it's a regular container, so add it regardless.
-	// TODO - This is where we should check for loot permissions in teams
-	if (other == NULL)
+	if (IsPlayer() && interractable != this)
 	{
-		shouldAdd = true;
-	}
-	// Otherwise, only show inventories of dead characters nearby
+		bool shouldAdd = false;
 
-	// TODO might need to re-work the IInteractable system and hook into character deaths etc.
-	else if (other != this && other->IsDead())
-	{
-		shouldAdd = true;
-	}
+		ABaseCharacter* character = Cast<ABaseCharacter>(interractable);
 
-	if (shouldAdd)
-	{
-		inter->Highlight(true);
-		overlappingInteractables.AddUnique(inter);
+		// If the other is not a Character, then it's a regular container, so add it regardless.
+		// OR the character is dead so show it
+		// TODO - This is where we should check for loot permissions in teams
+		if (character == NULL || character->IsDead())
+		{
+			shouldAdd = true;
+		}
+		// Otherwise it's a character that is still alive
+		else
+		{
+			character->OnCharacterDied.AddUniqueDynamic(this, &ABaseCharacter::OtherCharacterDied);
+		}
 
-		if (GetInventory()) {
-			GetInventory()->OnContainersUpdated.Broadcast();
+		if (shouldAdd)
+		{
+			interractable->Highlight(true);
+
+			overlappingInteractables.AddUnique(interractable);
+
+			if (GetInventory()) 
+			{
+				GetInventory()->OnContainersUpdated.Broadcast();
+			}
 		}
 	}
 }
+
 
 /**
  * Removes a given IInteractable from our interactable list
@@ -355,11 +361,29 @@ void ABaseCharacter::AddInteractable(IInteractable* inter)
  */
 void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
-	inter->Highlight(false);
-	overlappingInteractables.Remove(inter);
+	if (IsPlayer())
+	{
+		/*ABaseCharacter* other = Cast<ABaseCharacter>(inter);
 
-	if (GetInventory()) {
-		GetInventory()->OnContainersUpdated.Broadcast();
+		if (other != NULL)
+		{
+			if (other->IsAlive())
+			{
+				overlappingInteractables.Remove(inter);
+				other->OnCharacterDied.RemoveAll(this);
+				inter->Highlight(false);
+			}
+		}
+		else
+		{
+		}*/
+		inter->Highlight(false);
+		overlappingInteractables.Remove(inter);
+
+		if (GetInventory())
+		{
+			GetInventory()->OnContainersUpdated.Broadcast();
+		}
 	}
 }
 
@@ -495,6 +519,11 @@ void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
 {
 	OnEnemyHit.Broadcast(inActor);
+}
+
+void ABaseCharacter::OtherCharacterDied(ABaseCharacter* character)
+{
+	AddInteractable(character);
 }
 
 /**

@@ -32,9 +32,14 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 {
 	container = inContainer;
 
-	if (container != NULL) {
+	if (container != NULL) 
+	{
 		// Set up add and remove listeners for our new container, so we can update our UI as things are added and removed
 		container->OnItemUpdated.AddUniqueDynamic(this, &UItemContainerUI::ItemUpdated);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("UItemContainerUI container was null"));		
 	}
 }
 

@@ -24,6 +24,7 @@ class UInstanceItemDataTable;
 class UMissionItemTable;
 class UWeaponInstanceTable;
 class UContainerItemTableData;
+class UMissionContainerTableData;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -46,6 +47,7 @@ public:
 	UMissionItemTable* GetMissionItemTable();
 	UWeaponInstanceTable* GetWeaponInstanceTable();
 	UContainerItemTableData* GetContainerItemDataTable();
+	UMissionContainerTableData* GetMissionContainerTableData();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
@@ -72,13 +74,14 @@ public:
 	FContainerData GetContainerDataName(FString containerName);
 	FContainerData GetContainerDataByID(int32 containerID);
 	FArmourData GetArmourDataByItemID(int32 itemID);
-	FLoadoutData GetLoadoutData(FString loadoutName);
+	FLoadoutData GetLoadoutData(const FString& loadoutName);
 	EGearType GetGearTypeForItem(int32 itemID);
 	FConsumableData GetConsumableData(int32 itemID);
 	FInstanceWeaponData GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID);
 	FInstanceArmourData GetInstancedArmourByContainerID(int32 inContainerInstanceID);
 	FString GetContainerInstanceName(int32 containerID);
 	TArray<int32> GetContainerItems(int32 containerID);
+	TArray<FMissionContainerData> GetMissionContainers(EMissionType type);
 
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
@@ -134,4 +137,7 @@ private:
 
 	UPROPERTY()
 	UContainerItemTableData* containerItemDataTable;
+
+	UPROPERTY()
+	UMissionContainerTableData* missionContainerTableData;
 };

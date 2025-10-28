@@ -282,8 +282,6 @@ public:
 	FString name = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
 	FString mesh = "";
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
-	EMissionType type = EMissionType::End;
 };
 
 USTRUCT(BlueprintType)

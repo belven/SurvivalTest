@@ -6,4 +6,5 @@
 "5","5","Medical Case","StaticMesh'/Game/FirstPerson/LootBoxes/Medical_Case.Medical_Case'"
 "6","15","Medical Supplies","StaticMesh'/Game/FirstPerson/LootBoxes/Medical_Supplies.Medical_Supplies'"
 "7","15","Military Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Military_Crate.Military_Crate'"
-"8","15","Secret Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Military_Crate.Military_Crate'"
+"8","3","Lunch Box","StaticMesh'/Game/FirstPerson/LootBoxes/Lunchbox.Lunchbox'"
+"9","15","Secret Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Military_Crate.Military_Crate'"
