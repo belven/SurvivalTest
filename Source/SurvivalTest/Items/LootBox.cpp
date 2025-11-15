@@ -6,6 +6,7 @@
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/HelperFunctions.h"
+#include "SurvivalTest/ObjectInstanceManager.h"
 
 ALootBox::ALootBox()
 {
@@ -27,8 +28,12 @@ void ALootBox::SetUpBox()
 	if (!containerData.mesh.Equals(""))
 	{
 		UStaticMesh* mesh = LoadObject<UStaticMesh>(this, *containerData.mesh);
-		boxMeshComp->SetStaticMesh(mesh);
-		//boxMeshComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+
+		if (mesh != NULL) {
+			//meshInstanceID = GetGame()->GetObjectInstanceManager()->CreateStaticMesh(mesh, GetActorTransform(), true);
+			//boxMeshComp->DestroyComponent();
+			boxMeshComp->SetStaticMesh(mesh);
+		}
 	}
 	CreateLootboxData();
 }
@@ -132,7 +137,7 @@ void ALootBox::CreateLootboxData()
 	ibd.containerInstanceID = icd.ID;
 	GetGame()->GetInstancedBoxes().Add(ibd.ID, ibd);
 
-	icd.name = "Loot Box " + FString::FromInt(ibd.ID);
+	icd.name = containerData.name + " " + FString::FromInt(ibd.ID);
 
 	container = UItemContainer::CreateItemContainer(GetGame()->GetContainerDataByID(containerData.ID), icd, gameIn);
 
@@ -148,7 +153,6 @@ void ALootBox::CreateLootboxData()
 
 FInstanceItemData ALootBox::CreateLoot(const FItemData& id)
 {
-	FInstanceItemData iid;
 	if (id.ID != UItemStructs::InvalidInt)
 	{
 		int32 randomAmount = FMath::RandRange(1, id.maxStack);

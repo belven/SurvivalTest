@@ -7,7 +7,7 @@ AObjectInstanceManager::AObjectInstanceManager()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 }
 
-int32 AObjectInstanceManager::CreateStaticMesh(UStaticMesh* mesh, const FTransform& Transform)
+int32 AObjectInstanceManager::CreateStaticMesh(UStaticMesh* mesh, const FTransform& Transform, bool applyCustomStencilDepth)
 {
 	int32 ID = -1;
 	UInstancedStaticMeshComponent* comp = NULL;
@@ -21,6 +21,11 @@ int32 AObjectInstanceManager::CreateStaticMesh(UStaticMesh* mesh, const FTransfo
 		else
 		{
 			comp = NewObject<UInstancedStaticMeshComponent>(this);
+
+			if (applyCustomStencilDepth) {
+				comp->SetCustomDepthStencilValue(2);
+			}
+
 			comp->SetStaticMesh(mesh);
 			comp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			comp->SetupAttachment(RootComponent);

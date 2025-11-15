@@ -72,4 +72,7 @@ protected:
 
 	UPROPERTY()
 	UBaseGameInstance* gameIn;
+
+	UPROPERTY()
+	int32 meshInstanceID;
 };

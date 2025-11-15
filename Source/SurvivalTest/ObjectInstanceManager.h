@@ -13,7 +13,7 @@ class SURVIVALTEST_API AObjectInstanceManager : public AActor
 
 public:
 	AObjectInstanceManager();
-	int32 CreateStaticMesh(UStaticMesh* mesh, const FTransform& Transform);
+	int32 CreateStaticMesh(UStaticMesh* mesh, const FTransform& Transform, bool applyCustomStencilDepth = false);
 
 
 	UPROPERTY()
