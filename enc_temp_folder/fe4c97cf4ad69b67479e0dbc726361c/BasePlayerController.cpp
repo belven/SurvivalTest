@@ -151,7 +151,7 @@ void ABasePlayerController::Craft()
 							fullRecipe.inputs.Add(iod);
 							break;
 						case EInputOrOutput::Output:
-							fullRecipe.outputs.Add(iod);
+							fullRecipe.inputs.Add(iod);
 							break;
 						case EInputOrOutput::End:
 							break;

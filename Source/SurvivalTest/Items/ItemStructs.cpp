@@ -88,15 +88,15 @@ EGearType UItemStructs::GetArmourSlot(const FString& typeName)
 	{
 		return EGearType::Chest;
 	}
-	else 	if (typeName.Equals("Head"))
+	else if (typeName.Equals("Head"))
 	{
 		return EGearType::Head;
 	}
-	else 	if (typeName.Equals("Legs"))
+	else if (typeName.Equals("Legs"))
 	{
 		return EGearType::Legs;
 	}
-	else 	if (typeName.Equals("Vest"))
+	else  if (typeName.Equals("Vest"))
 	{
 		return EGearType::Vest;
 	}
@@ -171,6 +171,53 @@ EFireMode UItemStructs::GetFireMode(const FString& typeName)
 	return EFireMode::End;
 }
 
+ERecipeType UItemStructs::GetRecipeType(const FString& typeName)
+{
+	if (typeName.Equals("Automatic"))
+	{
+		return ERecipeType::Automatic;
+	}
+	if (typeName.Equals("Manual"))
+	{
+		return ERecipeType::Manual;
+	}
+	return ERecipeType::End;
+}
+
+EInputOutputType UItemStructs::GetInputOutputType(const FString& typeName)
+{
+	if (typeName.Equals("Item"))
+	{
+		return EInputOutputType::Item;
+	}
+	if (typeName.Equals("Gas"))
+	{
+		return EInputOutputType::Gas;
+	}
+	if (typeName.Equals("Liquid"))
+	{
+		return EInputOutputType::Liquid;
+	}
+	if (typeName.Equals("Power"))
+	{
+		return EInputOutputType::Power;
+	}
+	return EInputOutputType::End;
+}
+
+EInputOrOutput UItemStructs::GetInputOrOutput(const FString& typeName)
+{
+	if (typeName.Equals("Input"))
+	{
+		return EInputOrOutput::Input;
+	}
+	if (typeName.Equals("Output"))
+	{
+		return EInputOrOutput::Output;
+	}
+	return EInputOrOutput::End;
+}
+
 FString UItemStructs::GetFireMode(EFireMode mode)
 {
 	switch (mode) {
@@ -178,6 +225,40 @@ FString UItemStructs::GetFireMode(EFireMode mode)
 	case EFireMode::FullAuto: return "FullAuto";
 	case EFireMode::Burst: return "Burst";
 	case EFireMode::End: return "End";
+	default: return "End";
+	}
+}
+
+FString UItemStructs::GetRecipeType(ERecipeType type)
+{
+	switch (type) {
+	case ERecipeType::Automatic: return "Automatic";
+	case ERecipeType::Manual: return "Manual";
+	case ERecipeType::End: return "End";
+	default: return "End";
+	}
+}
+
+
+FString UItemStructs::GetInputOutputType(EInputOutputType type)
+{
+	switch (type) {
+	case EInputOutputType::Item: return "Item";
+	case EInputOutputType::Gas: return "Gas";
+	case EInputOutputType::Liquid: return "Liquid";
+	case EInputOutputType::Power: return "Power";
+	case EInputOutputType::End: return "End";
+	default: return "End";
+	}
+}
+
+
+FString UItemStructs::GetInputOrOutput(EInputOrOutput type)
+{
+	switch (type) {
+	case EInputOrOutput::Input: return "Input";
+	case EInputOrOutput::Output: return "Output";
+	case EInputOrOutput::End: return "End";
 	default: return "End";
 	}
 }

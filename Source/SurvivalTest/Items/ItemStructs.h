@@ -1,6 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "SurvivalTest/Missions/MissionStructs.h"
 #include "ItemStructs.generated.h"
 
 UENUM(BlueprintType)
@@ -223,6 +222,25 @@ enum class EConsumableType : uint8
 	End
 };
 
+UENUM(BlueprintType)
+enum class ERecipeType : uint8
+{
+	Manual,
+	Automatic,
+	End
+};
+
+UENUM(BlueprintType)
+enum class EInputOutputType : uint8
+{
+	Item, Liquid, Gas, Power, End
+};
+
+UENUM(BlueprintType)
+enum class EInputOrOutput : uint8
+{
+	Input, Output, End
+};
 
 class UBaseGameInstance;
 
@@ -241,7 +259,13 @@ public:
 	static EContainerType GetContainerType(const FString& typeName);
 	static EConsumableType GetConsumableType(const FString& typeName);
 	static EFireMode GetFireMode(const FString& typeName);
+	static ERecipeType GetRecipeType(const FString& typeName);
+	static EInputOutputType GetInputOutputType(const FString& typeName);
+	static EInputOrOutput GetInputOrOutput(const FString& typeName);
 	static FString GetFireMode(EFireMode mode);
+	static FString GetRecipeType(ERecipeType type);
+	static FString GetInputOutputType(EInputOutputType type);
+	static FString GetInputOrOutput(EInputOrOutput type);
 	static bool GetBoolean(const FString& value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
 	static bool IsValidID(const int ID)
@@ -371,6 +395,68 @@ public:
 };
 
 
+
+USTRUCT(BlueprintType)
+struct FRecipeData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	FString name = "";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	ERecipeType type = ERecipeType::End;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 craftingDeviceID = UItemStructs::InvalidInt;
+};
+
+USTRUCT(BlueprintType)
+struct FRecipeInputOutputData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 recipeID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 inputOutputDataID = UItemStructs::InvalidInt;
+};
+
+USTRUCT(BlueprintType)
+struct FInputOutputData
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 ID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 inputOutputID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	int32 amount = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	EInputOutputType type = EInputOutputType::End;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	EInputOrOutput inputOrOutput = EInputOrOutput::End;
+};
+
+USTRUCT(BlueprintType)
+struct FFullRecipe
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	FRecipeData recipe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	TArray<FInputOutputData> inputs;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	TArray<FInputOutputData> outputs;
+};
 
 USTRUCT(BlueprintType)
 struct FInstanceItemData

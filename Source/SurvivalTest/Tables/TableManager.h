@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "CSVTable.h"
 #include "SurvivalTest/Items/ItemStructs.h"
+#include "SurvivalTest/Missions/MissionStructs.h"
 #include "TableManager.generated.h"
 
 struct FInstanceItemData;
@@ -25,6 +26,9 @@ class UMissionItemTable;
 class UWeaponInstanceTable;
 class UContainerItemTableData;
 class UMissionContainerTableData;
+class URecipeInputOutputDataTable;
+class UInputOutputDataTable;
+class URecipeTable;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -48,6 +52,10 @@ public:
 	UWeaponInstanceTable* GetWeaponInstanceTable();
 	UContainerItemTableData* GetContainerItemDataTable();
 	UMissionContainerTableData* GetMissionContainerTableData();
+
+	URecipeInputOutputDataTable* GetRecipeInputOutputDataTableData();
+	UInputOutputDataTable* GetInputOutputDataTableData();
+	URecipeTable* GetRecipeTableData();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
@@ -140,4 +148,13 @@ private:
 
 	UPROPERTY()
 	UMissionContainerTableData* missionContainerTableData;
+
+	UPROPERTY()
+	URecipeInputOutputDataTable* recipeInputOutputDataTable;
+
+	UPROPERTY()
+	UInputOutputDataTable* inputOutputDataTable;
+
+	UPROPERTY()
+	URecipeTable* recipeTable;
 };

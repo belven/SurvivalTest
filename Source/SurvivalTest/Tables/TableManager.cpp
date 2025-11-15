@@ -15,6 +15,9 @@
 #include "Mission/MissionLoadoutTable.h"
 #include "Mission/MissionTable.h"
 #include "ContainerItemTableData.h"
+#include "Items/InputOutputDataTable.h"
+#include "Items/RecipeInputOutputDataTable.h"
+#include "Items/RecipeTable.h"
 #include "Mission/MissionContainerTableData.h"
 
 void UTableManager::LoadTableData()
@@ -33,6 +36,9 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetMissionItemTable());
 	LoadTableFromFile(GetContainerItemDataTable());
 	LoadTableFromFile(GetMissionContainerTableData());
+	LoadTableFromFile(GetRecipeInputOutputDataTableData());
+	LoadTableFromFile(GetInputOutputDataTableData());
+	LoadTableFromFile(GetRecipeTableData());
 }
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
@@ -526,6 +532,24 @@ UMissionContainerTableData* UTableManager::GetMissionContainerTableData()
 {
 	if (missionContainerTableData == nullptr) { missionContainerTableData = NewObject<UMissionContainerTableData>(); }
 	return missionContainerTableData;
+}
+
+URecipeInputOutputDataTable* UTableManager::GetRecipeInputOutputDataTableData()
+{
+	if (recipeInputOutputDataTable == nullptr) { recipeInputOutputDataTable = NewObject<URecipeInputOutputDataTable>(); }
+	return recipeInputOutputDataTable;
+}
+
+UInputOutputDataTable* UTableManager::GetInputOutputDataTableData()
+{
+	if (inputOutputDataTable == nullptr) { inputOutputDataTable = NewObject<UInputOutputDataTable>(); }
+	return inputOutputDataTable;
+}
+
+URecipeTable* UTableManager::GetRecipeTableData()
+{
+	if (recipeTable == nullptr) { recipeTable = NewObject<URecipeTable>(); }
+	return recipeTable;
 }
 
 #pragma endregion Getters

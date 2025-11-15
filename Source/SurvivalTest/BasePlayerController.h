@@ -57,6 +57,7 @@ public:
 
 	UFUNCTION()
 	void OutOfAmmo();
+	void Craft();
 
 	UFUNCTION()
 	void ReloadComplete();
@@ -101,6 +102,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	UBaseGameInstance* GetBaseGameInstance();
+
 private:
 	float RotateValue;
 	float CurveFloatValue;
@@ -144,4 +147,7 @@ private:
 
 	UPROPERTY()
 	ABaseCharacter* baseCharacter;
+
+	UPROPERTY()
+	UBaseGameInstance* baseGameInstance;
 };
