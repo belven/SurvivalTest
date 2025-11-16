@@ -18,5 +18,5 @@ public:
 	TArray<FInputOutputData>& GetData()
 	{
 		return inputOutputData;
-	}	
+	}
 };

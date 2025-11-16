@@ -1,6 +1,5 @@
 #include "InputOutputDataTable.h"
 
-
 UInputOutputDataTable::UInputOutputDataTable() : Super()
 {
 	path = CSVT::GetTableFilePath("InputOutputData.csv");
