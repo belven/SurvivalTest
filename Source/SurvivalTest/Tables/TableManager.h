@@ -96,10 +96,14 @@ public:
 	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
 	FItemData GetItemDataByName(const FString& inString);
 
+	UFUNCTION(BlueprintCallable, Category = "Recipe")
+	TArray<FFullRecipe>& GetRecipes();
+
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
 	TMap<int32, FInstanceBoxData> boxContainers;
+	TArray<FFullRecipe> recipes;
 
 	UPROPERTY()
 	UItemDataTable* ItemData;

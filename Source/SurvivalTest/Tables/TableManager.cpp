@@ -268,6 +268,44 @@ FItemData UTableManager::GetItemDataByName(const FString& inString)
 	return {};
 }
 
+TArray<FFullRecipe>& UTableManager::GetRecipes()
+{
+	if (recipes.IsEmpty()) {
+		for (FRecipeData recipeData : GetRecipeTableData()->GetData())
+		{
+			FFullRecipe fullRecipe;
+			fullRecipe.recipe = recipeData;
+
+			// ReSharper disable once IdentifierTypo
+			for (FRecipeInputOutputData riod : GetRecipeInputOutputDataTableData()->GetData())
+			{
+				if (riod.recipeID == recipeData.ID)
+				{
+					for (FInputOutputData iod : GetInputOutputDataTableData()->GetData()) {
+						if (iod.ID == riod.inputOutputDataID) {
+							switch (iod.inputOrOutput)
+							{
+							case EInputOrOutput::Input:
+								fullRecipe.inputs.Add(iod);
+								break;
+							case EInputOrOutput::Output:
+								fullRecipe.outputs.Add(iod);
+								break;
+							case EInputOrOutput::End:
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			recipes.Add(fullRecipe);
+		}
+	}
+
+	return recipes;
+}
+
 
 FArmourData UTableManager::GetArmourData(int32 armourID)
 {

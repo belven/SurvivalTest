@@ -12,53 +12,57 @@ void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemD
 	SetItemData(inItemData);
 	SetInstanceItemData(inInstanceData);
 	SetItemContainer(inItemContainer);
+
+
 	UpdateItemDetails();
 }
 
 FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (InMouseEvent.GetPressedButtons().Contains(EKeys::RightMouseButton))
-	{
-		if (itemData.type == EItemType::Consumable && GetInstanceItemData().amount > 0)
+	if (!disabled) {
+		if (InMouseEvent.GetPressedButtons().Contains(EKeys::RightMouseButton))
 		{
-			UBaseGameInstance* baseGameInstance = itemContainer->GetGame();
-			FConsumableData cd = baseGameInstance->GetConsumableData(itemData.ID);
-			ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
-
-			basePlayerController->GetBaseCharacter()->Consume(cd.consumableType, cd.value);
-
-			FInstanceItemData oldData = GetInstanceItemData();
-			instanceItemData.amount--;
-
-			if (GetInstanceItemData().amount > 0)
+			if (itemData.type == EItemType::Consumable && GetInstanceItemData().amount > 0)
 			{
-				GetItemContainer()->UpdateItemData(GetItemContainer(), instanceItemData, oldData);
+				UBaseGameInstance* baseGameInstance = itemContainer->GetGame();
+				FConsumableData cd = baseGameInstance->GetConsumableData(itemData.ID);
+				ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
+
+				basePlayerController->GetBaseCharacter()->Consume(cd.consumableType, cd.value);
+
+				FInstanceItemData oldData = GetInstanceItemData();
+				instanceItemData.amount--;
+
+				if (GetInstanceItemData().amount > 0)
+				{
+					GetItemContainer()->UpdateItemData(GetItemContainer(), instanceItemData, oldData);
+				}
+				else
+				{
+					GetItemContainer()->RemoveInstanceItem(GetItemContainer(), instanceItemData);
+				}
+			}
+		}
+		else if (InMouseEvent.GetPressedButtons().Contains(EKeys::LeftMouseButton) && itemData.ID != UItemStructs::InvalidInt)
+		{
+			if (InMouseEvent.GetModifierKeys().IsLeftShiftDown())
+			{
+				ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
+				UItemContainer* playerInventory = basePlayerController->GetBaseCharacter()->GetInventory();
+
+				if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
+				{
+					playerInventory->TransferItem(GetItemContainer(), GetInstanceItemData(), UItemStructs::InvalidInt);
+				}
+			}
+			else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())
+			{
+				GetItemContainer()->SplitItem(instanceItemData);
 			}
 			else
 			{
-				GetItemContainer()->RemoveInstanceItem(GetItemContainer(), instanceItemData);
+				return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 			}
-		}
-	}
-	else if (InMouseEvent.GetPressedButtons().Contains(EKeys::LeftMouseButton) && itemData.ID != UItemStructs::InvalidInt)
-	{
-		if (InMouseEvent.GetModifierKeys().IsLeftShiftDown())
-		{
-			ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
-			UItemContainer* playerInventory = basePlayerController->GetBaseCharacter()->GetInventory();
-
-			if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
-			{
-				playerInventory->TransferItem(GetItemContainer(), GetInstanceItemData(), UItemStructs::InvalidInt);
-			}
-		}
-		else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())
-		{
-			GetItemContainer()->SplitItem(instanceItemData);
-		}
-		else
-		{
-			return UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton).NativeReply;
 		}
 	}
 	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);

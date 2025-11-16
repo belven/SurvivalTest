@@ -64,4 +64,16 @@ private:
 	FItemData itemData;
 	int32 imageSize = 100;
 	FInstanceItemData instanceItemData;
+	bool disabled;
+
+public:
+	bool IsDisabled() const
+	{
+		return disabled;
+	}
+
+	void SetDisabled(bool inDisabled)
+	{
+		disabled = inDisabled;
+	}
 };

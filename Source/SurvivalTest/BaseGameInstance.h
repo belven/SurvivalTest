@@ -106,10 +106,15 @@ public:
 	UPROPERTY()
 	TMap<FString, ABuildingPart*> buildingParts;
 
+	UFUNCTION(BlueprintCallable)
 	URPGEventManager* GetEventManager();
+	UFUNCTION(BlueprintCallable)
 	UTableManager* GetTableManager();
+	UFUNCTION(BlueprintCallable)
 	UFactionManager* GetFactionManager();
+	UFUNCTION(BlueprintCallable)
 	UMissionManager* GetMissionManager();
+	UFUNCTION(BlueprintCallable)
 	AObjectInstanceManager* GetObjectInstanceManager();
 
 	FCriticalSection InstanceItemIDLock;

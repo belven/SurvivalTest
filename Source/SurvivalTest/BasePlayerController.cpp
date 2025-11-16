@@ -132,47 +132,17 @@ void ABasePlayerController::OutOfAmmo()
 void ABasePlayerController::Craft()
 {
 	UTableManager* tableManager = GetBaseGameInstance()->GetTableManager();
-	TArray<FFullRecipe> recipes;
 
-	for (FRecipeData recipeData : tableManager->GetRecipeTableData()->GetData())
+	for (FFullRecipe fr : tableManager->GetRecipes())
 	{
-		FFullRecipe fullRecipe;
-		fullRecipe.recipe = recipeData;
 
-		for (FRecipeInputOutputData riod : tableManager->GetRecipeInputOutputDataTableData()->GetData())
-		{
-			if (riod.recipeID == recipeData.ID)
-			{
-				for (FInputOutputData iod : tableManager->GetInputOutputDataTableData()->GetData()) {
-					if (iod.ID == riod.inputOutputDataID) {
-						switch (iod.inputOrOutput)
-						{
-						case EInputOrOutput::Input:
-							fullRecipe.inputs.Add(iod);
-							break;
-						case EInputOrOutput::Output:
-							fullRecipe.outputs.Add(iod);
-							break;
-						case EInputOrOutput::End:
-							break;
-						}
-					}
-				}
-			}
-		}
-
-		recipes.Add(fullRecipe);
-	}
-
-	for (FFullRecipe fr : recipes)
-	{
-		for (FInputOutputData iod : fr.outputs) {
+		/*for (FInputOutputData iod : fr.outputs) {
 			TArray<int32> ids;
 			FInstanceItemData iid;
 			iid.itemID = iod.inputOutputID;
 			iid.amount = iod.amount;
 			GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
-		}
+		}*/
 	}
 }
 
