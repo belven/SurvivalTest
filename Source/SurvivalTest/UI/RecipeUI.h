@@ -5,6 +5,8 @@
 #include "SurvivalTest/Items/ItemStructs.h"
 #include "RecipeUI.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FRecipeSelectionChanged, URecipeUI*, recipeUI);
+
 UCLASS()
 class SURVIVALTEST_API URecipeUI : public UUserWidget
 {
@@ -13,6 +15,18 @@ class SURVIVALTEST_API URecipeUI : public UUserWidget
 public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
 	void UpdateRecpie();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
+	UHorizontalBox* GetRecipeInputContainer();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
+	UHorizontalBox* GetRecipeOutputContainer();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
+	void Select();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
+	void Deselect();
 
 	UFUNCTION(BlueprintCallable, Category = "Recipe")
 	FFullRecipe& GetRecipe() { return  recipe; }
@@ -24,9 +38,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Recipe")
 	void SetRecipe(const FFullRecipe& newRecipe);
 
+	void SetSelected(bool selectedState);
+
+	FRecipeSelectionChanged OnRecipeSelectionChanged;
+
 protected:
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
 	UPROPERTY()
 	FFullRecipe recipe;
+
+	UPROPERTY(BlueprintReadWrite, Category="Recipe")
+	bool selected;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Recipe")
 	UHorizontalBox* inputBox;

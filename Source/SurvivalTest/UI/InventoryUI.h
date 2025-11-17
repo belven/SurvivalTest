@@ -31,8 +31,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 		UItemContainer* GetPlayerInventory();
-private:
-	UPROPERTY()
+protected:
+	UPROPERTY(BlueprintReadWrite, Category = "Inventory")
 		ABasePlayerController* controller;
 
 	UPROPERTY()

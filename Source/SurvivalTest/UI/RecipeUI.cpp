@@ -31,22 +31,49 @@ void URecipeUI::SetRecipe(const FFullRecipe& newRecipe)
 
 	if (itemUIClass == NULL)
 	{
-		itemUIClass  = LoadClass<UItemUI>(this, TEXT("/ Script / UMGEditor.WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemUI_BP.ItemUI_BP_C'"));
+		itemUIClass = LoadClass<UItemUI>(this, TEXT("/ Script / UMGEditor.WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemUI_BP.ItemUI_BP_C'"));
 	}
 
-	for (FInputOutputData iod : recipe.inputs)
-	{
-		if (iod.type == EInputOutputType::Item) {
-			AddItemToBox(iod, inputBox);
+	if (GetRecipeInputContainer() && GetRecipeOutputContainer()) {
+		for (FInputOutputData iod : recipe.inputs)
+		{
+			if (iod.type == EInputOutputType::Item) {
+				AddItemToBox(iod, GetRecipeInputContainer());
+			}
 		}
-	}
 
-	for (FInputOutputData iod : recipe.outputs)
-	{
-		if (iod.type == EInputOutputType::Item) {
-			AddItemToBox(iod, outputBox);
+		for (FInputOutputData iod : recipe.outputs)
+		{
+			if (iod.type == EInputOutputType::Item) {
+				AddItemToBox(iod, GetRecipeOutputContainer());
+			}
 		}
+
+		UpdateRecpie();
+	}
+}
+
+void URecipeUI::SetSelected(bool selectedState)
+{
+	selected = selectedState;
+
+	if (selected)
+	{
+		Select();
+	}
+	else
+	{
+		Deselect();
 	}
 
-	UpdateRecpie();
+	OnRecipeSelectionChanged.Broadcast(this);
+}
+
+FReply URecipeUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+	if (InMouseEvent.GetPressedButtons().Contains(EKeys::LeftMouseButton))
+	{
+		SetSelected(!selected);
+	}
+	return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
 }
