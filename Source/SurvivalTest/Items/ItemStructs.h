@@ -410,6 +410,8 @@ public:
 	ERecipeType type = ERecipeType::End;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	int32 craftingDeviceID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+	float craftingTime = 1;
 };
 
 USTRUCT(BlueprintType)
@@ -456,6 +458,41 @@ public:
 	TArray<FInputOutputData> inputs;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	TArray<FInputOutputData> outputs;
+};
+
+USTRUCT(BlueprintType)
+struct FCraftingDeviceRecipes
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CraftingDeviceRecipes")
+	int32 CraftingDeviceID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CraftingDeviceRecipes")
+	int32 RecipeID;
+};
+
+USTRUCT(BlueprintType)
+struct FCraftingDevice
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CraftingDevice")
+	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CraftingDevice")
+	FString Name;
+};
+
+USTRUCT(BlueprintType)
+struct FInstanceCraftingDevice
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InstanceCraftingDevice")
+	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InstanceCraftingDevice")
+	int32 CraftingDeviceID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InstanceCraftingDevice")
+	FVector Location;
 };
 
 USTRUCT(BlueprintType)

@@ -15,6 +15,7 @@ void URecipeTable::LoadData(TArray<TArray<FString>> inDataStrings)
 		data.name = *row[index++];
 		data.type = UItemStructs::GetRecipeType(row[index++]);
 		data.craftingDeviceID = GetIntFromString(row[index++]);
+		data.craftingTime = GetFloatFromString(row[index++]);
 		recipeData.Add(data);
 	}
 }

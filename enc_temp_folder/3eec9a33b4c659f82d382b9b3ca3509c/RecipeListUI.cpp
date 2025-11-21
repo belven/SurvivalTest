@@ -220,10 +220,8 @@ FFullRecipe URecipeListUI::GetRecipe(int32 recipeID)
 {
 	FFullRecipe fr;
 
-	for (URecipeUI* recipe : recipes) 
-	{
-		if (recipe->GetRecipe().recipe.ID == recipeID) 
-		{
+	for (URecipeUI* recipe : recipes) {
+		if (recipe->GetRecipe().recipe.ID == recipeID) {
 			fr = recipe->GetRecipe();
 		}
 	}

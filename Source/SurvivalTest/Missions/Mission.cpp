@@ -185,11 +185,15 @@ void AMission::SpawnAI()
 
 	for (ABaseCharacter* character : aiSpawned)
 	{
-		ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
+		if (character) 
+		{
+			ABaseAIController* con = Cast<ABaseAIController>(character->GetController());
 
-		if (con) {
-			con->alliesSeen = aiSpawned;
-			con->alliesSeen.Remove(character);
+			if (con) 
+			{
+				con->alliesSeen = aiSpawned;
+				con->alliesSeen.Remove(character);
+			}
 		}
 	}
 }
