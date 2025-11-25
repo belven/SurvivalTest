@@ -5,8 +5,10 @@ float APowerSystem::GetTotalPowerProvided()
 	float total = 0;
 	for (APowerSystem* ps : GetPowerSystems())
 	{
-		if (ps->ProvidesPower() && ps->IsActive())
-			total += ps->GetPowerProvided();
+		if (ps != this && ps->ProvidesPower() && ps->IsActive()) 
+		{
+			total += ps->GetTotalPowerProvided();
+		}
 	}
 	return total;
 }
@@ -16,8 +18,10 @@ float APowerSystem::GetTotalPowerConsumed()
 	float total = 0;
 	for (APowerSystem* ps : GetPowerSystems())
 	{
-		if (ps->ConsumesPower() && ps->IsActive())
-			total += ps->GetPowerConsumed();
+		if (ps != this && ps->ConsumesPower() && ps->IsActive())
+		{
+			total += ps->GetTotalPowerConsumed();
+		}
 	}
 	return total;
 }
@@ -25,8 +29,8 @@ float APowerSystem::GetTotalPowerConsumed()
 void APowerSystem::DetermineActiveState()
 {
 	if (isAutomatic && consumesPower) {
-		float powerAvailable = GetPowerProvided();
-		float powerUsed = GetPowerConsumed();
+		float powerAvailable = GetTotalPowerProvided();
+		float powerUsed = GetTotalPowerConsumed();
 
 		if (powerConsumed < (powerAvailable - powerUsed))
 		{

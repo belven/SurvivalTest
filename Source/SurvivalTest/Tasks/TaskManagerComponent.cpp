@@ -1,5 +1,6 @@
 #include "TaskManagerComponent.h"
 #include "SurvivalTest/BaseCharacter.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 UTaskManagerComponent::UTaskManagerComponent() : controller(nullptr), currentTask(nullptr)
 {
@@ -57,11 +58,7 @@ bool UTaskManagerComponent::PerformTask(UCharacterTask* newTask, bool force)
 
 AController* UTaskManagerComponent::GetController()
 {
-	if (controller == NULL)
-	{
-		controller = Cast<ABaseCharacter>(GetOwner())->GetController();
-	}
-	return controller;
+	return UHelperFunctions::CastValue(controller, GetOwner()->GetInstigatorController());
 }
 
 void UTaskManagerComponent::TaskComplete(const FStatusData& status)

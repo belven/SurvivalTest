@@ -21,11 +21,7 @@ void URecipeListUI::RecipeSelectionChanged(URecipeUI* recipeUI)
 
 ABasePlayerController* URecipeListUI::GetBasePlayerController()
 {
-	if (basePlayerController == NULL)
-	{
-		basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
-	}
-	return basePlayerController;
+	return UHelperFunctions::CastValue(basePlayerController, GetOwningPlayer());
 }
 
 void URecipeListUI::OnItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem)
@@ -191,10 +187,11 @@ FTimerManager* URecipeListUI::GetTimerManager()
 {
 	if (timerManager == NULL)
 	{
-		timerManager = &GetBasePlayerController()->GetBaseGameInstance()->GetWorld()->GetTimerManager();
+		timerManager = &GetBasePlayerController()->GetWorld()->GetTimerManager();
 	}
 	return timerManager;
 }
+
 void URecipeListUI::ConsumeRecipeInputs(URecipeUI* recipe)
 {
 	for (FInputOutputData iod : recipe->GetRecipe().inputs) {

@@ -18,7 +18,11 @@
 #include "Items/InputOutputDataTable.h"
 #include "Items/RecipeInputOutputDataTable.h"
 #include "Items/RecipeTable.h"
+#include "Crafting/CraftingDeviceRecipesTable.h"
+#include "Crafting/CraftingDeviceTable.h"
+#include "Crafting/InProgressCraftingTable.h"
 #include "Mission/MissionContainerTableData.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 void UTableManager::LoadTableData()
 {
@@ -39,6 +43,9 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetRecipeInputOutputDataTableData());
 	LoadTableFromFile(GetInputOutputDataTableData());
 	LoadTableFromFile(GetRecipeTableData());
+	LoadTableFromFile(GetCraftingDeviceRecipesTable());
+	LoadTableFromFile(GetCraftingDeviceTableData());
+	LoadTableFromFile(GetInProgressCraftingTable());
 }
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
@@ -85,12 +92,12 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 	else if(icd.type == EContainerType::Player)
 	{
 		int32 playerID = 0;
-		// TODO make player container data
+		// TODO make player container data FInstancePlayerInventory
 	}
 	else if (icd.type == EContainerType::Armour)
 	{
-		int32 armourID = 0;
-
+		FInstanceArmourData armour = GetInstancedArmourByContainerID(icd.ID);
+		GetInstancedBoxes().FindAndRemoveChecked(armour.ID);
 	}
 
 	for(FInstanceItemData iid : items)
@@ -478,116 +485,112 @@ TArray<FMissionContainerData> UTableManager::GetMissionContainers(EMissionType t
 
 UItemDataTable* UTableManager::GetItemDataTable()
 {
-	if (ItemData == nullptr) { ItemData = NewObject<UItemDataTable>(); }
-	return ItemData;
+	return UHelperFunctions::GetValue(ItemData, this);
 }
 
 UWeaponDataTable* UTableManager::GetWeaponDataTable()
 {
-	if (WeaponData == nullptr) { WeaponData = NewObject<UWeaponDataTable>(); }
-	return WeaponData;
+	return UHelperFunctions::GetValue(WeaponData, this);
 }
 
 URangedWeaponDataTable* UTableManager::GetRangedWeaponData()
 {
-	if (rangedWeaponData == nullptr) { rangedWeaponData = NewObject<URangedWeaponDataTable>(); }
-	return rangedWeaponData;
+	return UHelperFunctions::GetValue(rangedWeaponData, this);
 }
 
 UProjectileWeaponDataTable* UTableManager::GetProjectileWeaponData()
 {
-	if (projectileWeaponData == nullptr) { projectileWeaponData = NewObject<UProjectileWeaponDataTable>(); }
-	return projectileWeaponData;
+	return UHelperFunctions::GetValue(projectileWeaponData, this);
 }
 
 UMeleeWeaponDataTable* UTableManager::GetMeleeWeaponData()
 {
-	if (meleeWeaponData == nullptr) { meleeWeaponData = NewObject<UMeleeWeaponDataTable>(); }
-	return meleeWeaponData;
+	return UHelperFunctions::GetValue(meleeWeaponData, this);
 }
 
 UArmourDataTable* UTableManager::GetArmourDataTable()
 {
-	if (armourDataTable == nullptr) { armourDataTable = NewObject<UArmourDataTable>(); }
-	return armourDataTable;
+	return UHelperFunctions::GetValue(armourDataTable, this);
 }
 
 ULoadoutTableData* UTableManager::GetLoadoutTableData()
 {
-	if (loadoutTableData == nullptr) { loadoutTableData = NewObject<ULoadoutTableData>(); }
-	return loadoutTableData;
+	return UHelperFunctions::GetValue(loadoutTableData, this);
 }
 
 UContainerTableData* UTableManager::GetContainerData()
 {
-	if (containerData == nullptr) { containerData = NewObject<UContainerTableData>(); }
-	return containerData;
+	return UHelperFunctions::GetValue(containerData, this);
 }
 
 UConsumableTableData* UTableManager::GetConsumableData()
 {
-	if (consumableData == nullptr) { consumableData = NewObject<UConsumableTableData>(); }
-	return consumableData;
+	return UHelperFunctions::GetValue(consumableData, this);
 }
 
 UMissionTable* UTableManager::GetMissionTable()
 {
-	if (missionTable == nullptr) { missionTable = NewObject<UMissionTable>(); }
-	return missionTable;
+	return UHelperFunctions::GetValue(missionTable, this);
 }
 
 UMissionLoadoutTable* UTableManager::GetMissionLoadoutTable()
 {
-	if (missionLoadoutTable == nullptr) { missionLoadoutTable = NewObject<UMissionLoadoutTable>(); }
-	return missionLoadoutTable;
+	return UHelperFunctions::GetValue(missionLoadoutTable, this);
 }
 
 UInstanceItemDataTable* UTableManager::GetInstanceItemDataTable()
 {
-	if (instanceItemDataTable == nullptr) { instanceItemDataTable = NewObject<UInstanceItemDataTable>(); }
-	return instanceItemDataTable;
+	return UHelperFunctions::GetValue(instanceItemDataTable, this);
 }
 
 UMissionItemTable* UTableManager::GetMissionItemTable()
 {
-	if (missionItemTable == nullptr) { missionItemTable = NewObject<UMissionItemTable>(); }
-	return missionItemTable;
+	return UHelperFunctions::GetValue(missionItemTable, this);
 }
 
 UWeaponInstanceTable* UTableManager::GetWeaponInstanceTable()
 {
-	if (weaponInstances == nullptr) { weaponInstances = NewObject<UWeaponInstanceTable>(); }
-	return weaponInstances;	
+	return UHelperFunctions::GetValue(weaponInstances, this);
 }
 
 UContainerItemTableData* UTableManager::GetContainerItemDataTable()
 {
-	if (containerItemDataTable == nullptr) { containerItemDataTable = NewObject<UContainerItemTableData>(); }
-	return containerItemDataTable;
+	return UHelperFunctions::GetValue(containerItemDataTable, this);
 }
 
 UMissionContainerTableData* UTableManager::GetMissionContainerTableData()
 {
-	if (missionContainerTableData == nullptr) { missionContainerTableData = NewObject<UMissionContainerTableData>(); }
-	return missionContainerTableData;
+	return UHelperFunctions::GetValue(missionContainerTableData, this);
 }
 
 URecipeInputOutputDataTable* UTableManager::GetRecipeInputOutputDataTableData()
 {
-	if (recipeInputOutputDataTable == nullptr) { recipeInputOutputDataTable = NewObject<URecipeInputOutputDataTable>(); }
-	return recipeInputOutputDataTable;
+	return UHelperFunctions::GetValue(recipeInputOutputDataTable, this);
 }
 
 UInputOutputDataTable* UTableManager::GetInputOutputDataTableData()
 {
-	if (inputOutputDataTable == nullptr) { inputOutputDataTable = NewObject<UInputOutputDataTable>(); }
-	return inputOutputDataTable;
+	return UHelperFunctions::GetValue(inputOutputDataTable, this);
 }
 
 URecipeTable* UTableManager::GetRecipeTableData()
 {
-	if (recipeTable == nullptr) { recipeTable = NewObject<URecipeTable>(); }
-	return recipeTable;
+	return UHelperFunctions::GetValue(recipeTable, this);
+}
+
+UCraftingDeviceTable* UTableManager::GetCraftingDeviceTableData()
+{
+	return UHelperFunctions::GetValue(CraftingDeviceTable, this);
+}
+
+UCraftingDeviceRecipesTable* UTableManager::GetCraftingDeviceRecipesTable()
+{
+	return UHelperFunctions::GetValue(CraftingDeviceRecipesTable, this);
+}
+
+UInProgressCraftingTable* UTableManager::GetInProgressCraftingTable()
+{
+	return UHelperFunctions::GetValue(InProgressCraftingTable, this);
 }
 
 #pragma endregion Getters

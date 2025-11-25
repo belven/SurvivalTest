@@ -242,6 +242,12 @@ enum class EInputOrOutput : uint8
 	Input, Output, End
 };
 
+UENUM(BlueprintType)
+enum class EOwnerType : uint8
+{
+	Player, AI, Group, End
+};
+
 class UBaseGameInstance;
 
 UCLASS()
@@ -262,10 +268,12 @@ public:
 	static ERecipeType GetRecipeType(const FString& typeName);
 	static EInputOutputType GetInputOutputType(const FString& typeName);
 	static EInputOrOutput GetInputOrOutput(const FString& typeName);
+	static EOwnerType GetOwnerType(const FString& typeName);
 	static FString GetFireMode(EFireMode mode);
 	static FString GetRecipeType(ERecipeType type);
 	static FString GetInputOutputType(EInputOutputType type);
 	static FString GetInputOrOutput(EInputOrOutput type);
+	static FString GetOwnerType(EOwnerType type);
 	static bool GetBoolean(const FString& value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
 	static bool IsValidID(const int ID)
@@ -333,9 +341,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
 	int32 itemID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
-	int32 value = UItemStructs::InvalidInt;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
 	EConsumableType consumableType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
+	int32 value = UItemStructs::InvalidInt;
 };
 
 USTRUCT(BlueprintType)
@@ -408,8 +416,6 @@ public:
 	FString name = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	ERecipeType type = ERecipeType::End;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
-	int32 craftingDeviceID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	float craftingTime = 1;
 };
@@ -493,6 +499,27 @@ struct FInstanceCraftingDevice
 	int32 CraftingDeviceID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InstanceCraftingDevice")
 	FVector Location;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InstanceCraftingDevice")
+	int32 OwnerID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InstanceCraftingDevice")
+	EOwnerType OwnerType;
+};
+
+USTRUCT(BlueprintType)
+struct FInProgressCrafting
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")
+	int32 ID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")
+	int32 InstanceCraftingDeviceID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")
+	int32 RecipeID;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")
+	int32 QueuePosition;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")
+	float Progress;
 };
 
 USTRUCT(BlueprintType)

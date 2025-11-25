@@ -254,6 +254,7 @@ void ABaseAIController::WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> 
 	}
 }
 
+
 void ABaseAIController::DetermineNextAction()
 {
 	if (GetBaseCharacter())

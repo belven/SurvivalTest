@@ -2,6 +2,7 @@
 #include "Armour.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
+#include "WeaponCreator.h"
 #include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
@@ -107,7 +108,7 @@ void ALootBox::SpawnLoot()
 	{
 		for (int i = 0; i < FMath::RandRange(minItems, GetContainerData().slots); ++i)
 		{
-			int32 lootItem = mGetRandom<int32>(itemTypes);
+			int32 lootItem = mGetRandom(itemTypes, -1);
 			FItemData id = GetGame()->GetItemData(lootItem);
 			FInstanceItemData iid = CreateLoot(id);
 
@@ -117,6 +118,10 @@ void ALootBox::SpawnLoot()
 			if (added.amount == 0 && id.type == EItemType::Armour)
 			{
 				UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
+			}
+			else if (added.amount == 0 && id.type == EItemType::Weapon)
+			{
+				UWeaponCreator::CreateWeapon(id.ID, GetWorld(), ids[0]);
 			}
 		}
 	}
@@ -145,7 +150,7 @@ void ALootBox::CreateLootboxData()
 	{
 		container->OnItemUpdated.AddUniqueDynamic(this, &ALootBox::ItemUpdated);
 	}
-	else 
+	else
 	{
 		UE_LOG(LogTemp, Log, TEXT("Failed to create container instance for %s"), *GetContainerData().name);
 	}

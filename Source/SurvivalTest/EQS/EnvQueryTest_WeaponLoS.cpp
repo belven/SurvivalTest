@@ -28,7 +28,7 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 {
 	// Query Owner will be the controller that ran the query
 	UObject* QueryOwner = QueryInstance.Owner.Get();
-	if (QueryOwner == nullptr)
+	if (QueryOwner == NULL)
 	{
 		return;
 	}

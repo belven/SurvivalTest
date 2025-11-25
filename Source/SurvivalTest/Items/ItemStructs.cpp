@@ -218,10 +218,27 @@ EInputOrOutput UItemStructs::GetInputOrOutput(const FString& typeName)
 	return EInputOrOutput::End;
 }
 
+EOwnerType UItemStructs::GetOwnerType(const FString& typeName)
+{
+	if (typeName.Equals("AI"))
+	{
+		return EOwnerType::AI;
+	}
+	if (typeName.Equals("Player"))
+	{
+		return EOwnerType::Player;
+	}
+	if (typeName.Equals("Group"))
+	{
+		return EOwnerType::Group;
+	}
+	return EOwnerType::End;
+}
+
 FString UItemStructs::GetFireMode(EFireMode mode)
 {
 	switch (mode) {
-		case EFireMode::SemiAuto: return "SemiAuto";
+	case EFireMode::SemiAuto: return "SemiAuto";
 	case EFireMode::FullAuto: return "FullAuto";
 	case EFireMode::Burst: return "Burst";
 	case EFireMode::End: return "End";
@@ -252,7 +269,6 @@ FString UItemStructs::GetInputOutputType(EInputOutputType type)
 	}
 }
 
-
 FString UItemStructs::GetInputOrOutput(EInputOrOutput type)
 {
 	switch (type) {
@@ -260,6 +276,21 @@ FString UItemStructs::GetInputOrOutput(EInputOrOutput type)
 	case EInputOrOutput::Output: return "Output";
 	case EInputOrOutput::End: return "End";
 	default: return "End";
+	}
+}
+
+FString UItemStructs::GetOwnerType(EOwnerType type)
+{
+	switch (type)
+	{
+	case EOwnerType::AI:
+		return "AI";
+	case EOwnerType::Player:
+		return "Player";
+	case EOwnerType::Group:
+		return "Group";
+	default:
+		return "End";
 	}
 }
 

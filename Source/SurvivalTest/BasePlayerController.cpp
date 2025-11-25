@@ -26,8 +26,8 @@
 class ABaseCharacter;
 
 ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), RotateValue(0), CurveFloatValue(0), TimelineValue(0), performAction(false), useEquipment(false),
-isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
-mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr)
+                                                 isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
+                                                 mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr), baseGameInstance(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
@@ -75,7 +75,6 @@ void ABasePlayerController::TimelineFinishedCallback()
 
 void ABasePlayerController::ContainersUpdated()
 {
-	// TODO This might be broken now...
 	if (inventoryWidget && inventoryWidget->IsVisible()) {
 		inventoryWidget->GenerateInventory();
 	}
@@ -477,7 +476,7 @@ UBaseGameInstance* ABasePlayerController::GetBaseGameInstance()
 {
 	if (baseGameInstance == NULL)
 	{
-		baseGameInstance = GameInstance(GetBaseCharacter()->GetWorld());
+		baseGameInstance = GameInstance(GetWorld());
 	}
 
 	return baseGameInstance;

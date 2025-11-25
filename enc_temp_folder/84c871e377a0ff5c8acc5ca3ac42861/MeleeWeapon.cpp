@@ -8,7 +8,7 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/HelperFunctions.h"
 
-#define mSphereTraceMultiWeapon(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::None, hits, true);
+#define mSphereTraceMultiWeapon(start, end, radius, trace, hits, ignore) UKismetSystemLibrary::SphereTraceMulti(GetWorld(), start, end, radius, trace, true, ignore, EDrawDebugTrace::Persistent, hits, true);
 
 void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 {
@@ -25,12 +25,10 @@ void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 		FVector actorForwardVector = GetCharacterOwner()->GetActorForwardVector();
 		actorLocation.Z += GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
-		float scaledCapsuleRadius = GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius();
-
-		FVector startLoc = actorLocation + (actorForwardVector * scaledCapsuleRadius);
-		FVector endLoc = startLoc + (actorForwardVector * GetWeaponData().range);
+		FVector endLoc = actorLocation + (actorForwardVector.Normalize() * GetWeaponData().range);
+		FVector startLoc = actorLocation;
 		float dist = FVector::Dist(endLoc, startLoc);
-		double radius = scaledCapsuleRadius * 1.5;
+		double radius = GetCharacterOwner()->GetCapsuleComponent()->GetScaledCapsuleRadius() * 1.5;
 		mSphereTraceMultiWeapon(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
 		
 		for (FHitResult hit : hits)
@@ -48,13 +46,11 @@ void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 
 		for (IDamagable* hit : hitTargets)
 		{
-			if (hit->IsAlive()) {
-				FHealthChange change;
-				change.changeAmount = GetWeaponData().healthChange;
-				change.source = GetCharacterOwner();
-				change.heals = GetWeaponData().heals;
-				hit->ChangeHealth(change);
-			}
+			FHealthChange change;
+			change.changeAmount = GetWeaponData().healthChange;
+			change.source = GetCharacterOwner();
+			change.heals = GetWeaponData().heals;
+			hit->ChangeHealth(change);
 		}
 	}
 }

@@ -92,10 +92,10 @@ void ABaseProjectile::Tick(float DeltaSeconds)
 		startLoc = GetActorLocation();
 	}
 
-	FVector start = GetActorLocation() - (GetActorForwardVector() * 100);
-	FVector end = GetActorLocation() + (GetActorForwardVector() * 100);
+	FVector start = GetActorLocation() - (GetActorForwardVector() * 50);
+	FVector end = GetActorLocation() + (GetActorForwardVector() * 50);
 
-	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 5);
+	DrawDebugLine(GetWorld(), start, end, FColor::Red, false, 0.2f);
 }
 
 void ABaseProjectile::SetHealthChange(FHealthChange inHealthChange)

@@ -47,7 +47,7 @@ FContainerData AMission::GetRandomContainerData()
 
 	if (!cds.IsEmpty())
 	{
-		foundData = UHelperFunctions::GetRandom(cds);
+		foundData = UHelperFunctions::GetRandom(cds, FContainerData());
 	}
 	else
 	{

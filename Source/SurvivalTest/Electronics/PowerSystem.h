@@ -12,13 +12,21 @@ class SURVIVALTEST_API APowerSystem : public AActor
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
 	virtual float GetTotalPowerProvided();
+	UFUNCTION()
 	float GetTotalPowerConsumed();
+	UFUNCTION()
 	void DetermineActiveState();
+	UFUNCTION()
 	void SystemAdded(APowerSystem* system);
+	UFUNCTION()
 	void SystemRemoved(APowerSystem* system);
+	UFUNCTION()
 	void SystemActiveChanged(APowerSystem* system);
+	UFUNCTION()
 	void AddPowerSystem(APowerSystem* system);
+	UFUNCTION()
 	void RemovePowerSystem(APowerSystem* system);
 
 	virtual bool IsActive() { return isActive; }
@@ -36,6 +44,7 @@ public:
 	FPowerSystemAdded OnPowerSystemAdded;
 	FPowerSystemRemoved OnPowerSystemRemoved;
 	FPowerSystemActiveChanged OnPowerSystemActiveChanged;
+
 private:
 	bool providesPower = false;
 	bool consumesPower = false;
@@ -44,5 +53,7 @@ private:
 	
 	float powerConsumed = 0.0f;
 	float powerProvided = 0.0f;
+
+	UPROPERTY()
 	TArray<APowerSystem*> systems;
 };

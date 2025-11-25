@@ -112,7 +112,7 @@ void AMainGrid::BeginPlay()
 
 			//grid[ModValue(gs->GetActorLocation().X) / boxSize][ModValue(gs->GetActorLocation().Y) / boxSize] = gs;
 			//grid.
-			//DrawDebugBox(GetWorld(), location, extent, FColor::Blue, false, debugDuration);
+			DrawDebugBox(GetWorld(), location, extent, FColor::Blue, false, debugDuration);
 		}
 	}
 

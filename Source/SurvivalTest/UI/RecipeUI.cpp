@@ -1,13 +1,16 @@
 #include "RecipeUI.h"
 
 #include "ItemUI.h"
+#include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BasePlayerController.h"
+#include "SurvivalTest/HelperFunctions.h"
 
 UBaseGameInstance* URecipeUI::GetBaseGameInstance()
 {
 	if (baseGameInstance == NULL) {
 		ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
+		UHelperFunctions::CastValue(baseGameInstance, GameInstance(GetWorld()));
 		baseGameInstance = basePlayerController->GetBaseGameInstance();
 	}
 

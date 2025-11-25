@@ -84,9 +84,6 @@ public:
 		return itemFound;
 	}
 
-
-	template<class T> T* GetSingletonObject(T*& object);
-
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return mTable()->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return mTable()->GetInstancedContainers(); }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return mTable()->GetInstancedArmour(); }
@@ -153,4 +150,3 @@ public:
 	UPROPERTY()
 	UTableManager* tableManager;
 };
-

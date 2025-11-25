@@ -79,21 +79,27 @@ TArray<int32> UInventory::GetSlotForGear(EGearType type)
 	TArray<int32> validSlotsForGear;
 	switch (type)
 	{
-	case EGearType::Head: validSlotsForGear.Add(0);
+	case EGearType::Head:
+		validSlotsForGear.Add(0);
 		break;
-	case EGearType::Chest: validSlotsForGear.Add(1);
+	case EGearType::Chest:
+		validSlotsForGear.Add(1);
 		break;
-	case EGearType::Vest: validSlotsForGear.Add(2);
+	case EGearType::Vest:
+		validSlotsForGear.Add(2);
 		break;
-	case EGearType::Legs: validSlotsForGear.Add(3);
+	case EGearType::Legs:
+		validSlotsForGear.Add(3);
 		break;
 	case EGearType::Weapon:
 		validSlotsForGear.Add(4);
 		validSlotsForGear.Add(5);
 		break;
-	case EGearType::Sidearm: validSlotsForGear.Add(6);
+	case EGearType::Sidearm:
+		validSlotsForGear.Add(6);
 		break;
-	case EGearType::Bag: validSlotsForGear.Add(7);
+	case EGearType::Bag:
+		validSlotsForGear.Add(7);
 		break;
 	default:
 		break;

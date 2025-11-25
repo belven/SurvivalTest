@@ -5,6 +5,8 @@
 #include "SurvivalTest/Missions/MissionStructs.h"
 #include "TableManager.generated.h"
 
+class UInProgressCraftingTable;
+class UCraftingDeviceRecipesTable;
 struct FInstanceItemData;
 struct FInstanceWeaponData;
 struct FInstanceArmourData;
@@ -29,6 +31,7 @@ class UMissionContainerTableData;
 class URecipeInputOutputDataTable;
 class UInputOutputDataTable;
 class URecipeTable;
+class UCraftingDeviceTable;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -56,6 +59,9 @@ public:
 	URecipeInputOutputDataTable* GetRecipeInputOutputDataTableData();
 	UInputOutputDataTable* GetInputOutputDataTableData();
 	URecipeTable* GetRecipeTableData();
+	UCraftingDeviceTable* GetCraftingDeviceTableData();
+	UCraftingDeviceRecipesTable* GetCraftingDeviceRecipesTable();
+	UInProgressCraftingTable* GetInProgressCraftingTable();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
@@ -98,6 +104,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Recipe")
 	TArray<FFullRecipe>& GetRecipes();
+
+
 
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
@@ -161,4 +169,13 @@ private:
 
 	UPROPERTY()
 	URecipeTable* recipeTable;
+
+	UPROPERTY()
+	UCraftingDeviceTable* CraftingDeviceTable;
+
+	UPROPERTY()
+	UCraftingDeviceRecipesTable* CraftingDeviceRecipesTable;
+
+	UPROPERTY()
+	UInProgressCraftingTable* InProgressCraftingTable;
 };
