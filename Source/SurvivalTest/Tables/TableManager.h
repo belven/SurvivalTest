@@ -32,6 +32,7 @@ class URecipeInputOutputDataTable;
 class UInputOutputDataTable;
 class URecipeTable;
 class UCraftingDeviceTable;
+class UInstanceCraftingDeviceTable;
 
 UCLASS()
 class SURVIVALTEST_API UTableManager : public UObject
@@ -62,11 +63,12 @@ public:
 	UCraftingDeviceTable* GetCraftingDeviceTableData();
 	UCraftingDeviceRecipesTable* GetCraftingDeviceRecipesTable();
 	UInProgressCraftingTable* GetInProgressCraftingTable();
+	UInstanceCraftingDeviceTable* GetInstanceCraftingDeviceTable();
 
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
 	void RemoveContainerData(int32 containerInstanceID);
-	FInstanceBoxData GetInstanceBoxDataByContainerInstance(int32 BoxInstanceID);
+	FInstanceBoxData GetInstanceBoxDataByContainerInstance(int32 containerInstanceID);
 	FInstanceContainerData GetInstanceContainerData(int32 containerInstanceID);
 	void SaveTableToFile(UCSVTable* table);
 	TArray<FString> CleanData(TArray<FString> strings);
@@ -85,7 +87,7 @@ public:
 	FRangedWeaponData GetRangedWeaponData(int32 weaponID);
 	FProjectileWeaponData GetProjectileWeaponData(int32 rangedWeaponID);
 	FArmourData GetArmourData(int32 armourID);
-	FContainerData GetContainerDataName(FString containerName);
+	FContainerData GetContainerDataName(const FString& containerName);
 	FContainerData GetContainerDataByID(int32 containerID);
 	FArmourData GetArmourDataByItemID(int32 itemID);
 	FLoadoutData GetLoadoutData(const FString& loadoutName);
@@ -178,4 +180,7 @@ private:
 
 	UPROPERTY()
 	UInProgressCraftingTable* InProgressCraftingTable;
+
+	UPROPERTY()
+	UInstanceCraftingDeviceTable* InstanceCraftingDeviceTable;
 };

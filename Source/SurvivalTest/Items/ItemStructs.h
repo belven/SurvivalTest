@@ -276,9 +276,10 @@ public:
 	static FString GetOwnerType(EOwnerType type);
 	static bool GetBoolean(const FString& value);
 	static FItemData GetRandomItemData(UBaseGameInstance* game);
+
 	static bool IsValidID(const int ID)
 	{
-		return ID != UItemStructs::InvalidInt;
+		return ID != InvalidInt;
 	}
 };
 
@@ -562,7 +563,7 @@ struct FInstanceItemData
 		return !(lhs == rhs);
 	}
 	
-	bool isValid()
+	 bool isValid() const
 	{
 		return UItemStructs::IsValidID(ID);
 	}
@@ -573,6 +574,24 @@ struct FInstanceItemData
 		int32 amountToTake = FMath::Min(itemToAdd.amount, space);
 		amount += amountToTake;
 		itemToAdd.amount -= amountToTake;
+	}
+
+	static FInstanceItemData CreateEmptyItem(const FInstanceItemData& other)
+	{
+		return CreateEmptyItem(other.slot, other.containerInstanceID);
+	}
+
+	static FInstanceItemData CreateEmptyItem(const int32& slot, const int32& newContainerInstanceID)
+	{
+		FInstanceItemData iid;
+		iid.slot = slot;
+		iid.containerInstanceID = newContainerInstanceID;
+		return iid;
+	}
+
+	FInstanceItemData CreateEmptyCopy()
+	{
+		return CreateEmptyItem(*this);
 	}
 
 	// Single method to get a copy of the item with new data, basically just copies itemID

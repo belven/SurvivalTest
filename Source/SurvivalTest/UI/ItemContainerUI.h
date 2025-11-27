@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/GridPanel.h"
 #include "SurvivalTest/Items/ItemContainer.h"
 #include "ItemContainerUI.generated.h"
 
@@ -16,35 +17,26 @@ class SURVIVALTEST_API UItemContainerUI : public UUserWidget
 public:
 	static const int itemsPerRow;
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SetupItemContainerUI(UItemContainer* inContainer, UBaseGameInstance* inGameInstance);
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+	void SetInventoryName();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void AddItemToGrid(FInstanceItemData iid, int32 index);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+	UGridPanel* GetItemGrid();
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void GenerateInventory();
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
-	void UpdateItem(FInstanceItemData newItemData, FInstanceItemData oldItemData, FItemData itemData);
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	int32 GetColumn(int32 index);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 GetColumn();
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 GetNextRowIndex();
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void GetGridData(int32& row, int32& column);
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void SetIndex(int32 value) { index = value; }
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 GetRow();
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void ResetIndex() { index = 0; }
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void SetNextRowIndex() { index = GetNextRowIndex(); }
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void IncrementIndex() { index++; }
+	int32 GetRow(int32 index);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UItemContainer* GetItemContainer() const { return container; }
@@ -71,21 +63,27 @@ public:
 	bool IsArmour(FItemData id);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	UItemUI* GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widgets);
+	UItemUI* GetItemAtSlot(int32 itemSlot);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	FInstanceItemData GetBlankInstanceItemData(int32 containerSlot);
+	void UpdateItemUI(const FInstanceItemData& newItem);
 
 private:
+	static TSubclassOf<UUserWidget> itemUIClass;
+
 	UPROPERTY()
 	UInventoryUI* inventory;
 
 	UPROPERTY()
 	UItemContainer* container;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Inventory, meta = (AllowPrivateAccess = "true"))
-	int32 index;
-
 	UPROPERTY()
 	UBaseGameInstance* gameInstance;
 
 	UPROPERTY()
 	FString name = "";
+
+	UPROPERTY()
+	TMap<int32, UItemUI*> itemUIAtSlots;
 };

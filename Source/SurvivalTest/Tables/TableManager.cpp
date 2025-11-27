@@ -21,6 +21,7 @@
 #include "Crafting/CraftingDeviceRecipesTable.h"
 #include "Crafting/CraftingDeviceTable.h"
 #include "Crafting/InProgressCraftingTable.h"
+#include "Crafting/InstanceCraftingDeviceTable.h"
 #include "Mission/MissionContainerTableData.h"
 #include "SurvivalTest/HelperFunctions.h"
 
@@ -46,6 +47,7 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetCraftingDeviceRecipesTable());
 	LoadTableFromFile(GetCraftingDeviceTableData());
 	LoadTableFromFile(GetInProgressCraftingTable());
+	LoadTableFromFile(GetInstanceCraftingDeviceTable());
 }
 
 void UTableManager::LoadTableFromFile(UCSVTable* table)
@@ -82,14 +84,14 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 	TArray<FInstanceItemData> items = GetInstancedItemsForContainer(containerInstanceID);
 	FInstanceContainerData icd = GetInstanceContainerData(containerInstanceID);
 
-	if(icd.type == EContainerType::Box)
+	if (icd.type == EContainerType::Box)
 	{
 		int32 boxID = GetInstanceBoxDataByContainerInstance(containerInstanceID).ID;
 		GetInstancedBoxes().FindAndRemoveChecked(boxID);
 
 		// TODO make box container CSVTable
 	}
-	else if(icd.type == EContainerType::Player)
+	else if (icd.type == EContainerType::Player)
 	{
 		int32 playerID = 0;
 		// TODO make player container data FInstancePlayerInventory
@@ -100,7 +102,7 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 		GetInstancedBoxes().FindAndRemoveChecked(armour.ID);
 	}
 
-	for(FInstanceItemData iid : items)
+	for (FInstanceItemData iid : items)
 	{
 		GetInstanceItemDataTable()->GetData().FindAndRemoveChecked(iid.ID);
 	}
@@ -125,23 +127,22 @@ FInstanceBoxData UTableManager::GetInstanceBoxDataByContainerInstance(int32 cont
 
 
 FInstanceContainerData UTableManager::GetInstanceContainerData(int32 containerInstanceID)
-	{
+{
 	TArray<FInstanceContainerData> instancedContainersFound;
 	instancedContainers.GenerateValueArray(instancedContainersFound);
 
-		for (const FInstanceContainerData icd : instancedContainersFound)
+	for (const FInstanceContainerData icd : instancedContainersFound)
+	{
+		if (icd.ID == containerInstanceID)
 		{
-			if (icd.ID == containerInstanceID)
-			{
-				return icd;
-			}
+			return icd;
 		}
-		return {};
 	}
+	return {};
+}
 
 FInstanceWeaponData UTableManager::GetInstanceWeaponDataByInstanceItemID(int32 instanceItemID)
 {
-	int32 instanceContainerDataID = 0;
 	TMap<int32, FInstanceWeaponData> instancedWeapons = GetWeaponInstanceTable()->GetData();
 
 	for (auto& iwd : instancedWeapons)
@@ -326,7 +327,7 @@ FArmourData UTableManager::GetArmourData(int32 armourID)
 	return {};
 }
 
-FContainerData UTableManager::GetContainerDataName(FString containerName)
+FContainerData UTableManager::GetContainerDataName(const FString& containerName)
 {
 	for (auto& cd : GetContainerData()->GetData())
 	{
@@ -591,6 +592,11 @@ UCraftingDeviceRecipesTable* UTableManager::GetCraftingDeviceRecipesTable()
 UInProgressCraftingTable* UTableManager::GetInProgressCraftingTable()
 {
 	return UHelperFunctions::GetValue(InProgressCraftingTable, this);
+}
+
+UInstanceCraftingDeviceTable* UTableManager::GetInstanceCraftingDeviceTable()
+{
+	return UHelperFunctions::GetValue(InstanceCraftingDeviceTable, this);
 }
 
 #pragma endregion Getters

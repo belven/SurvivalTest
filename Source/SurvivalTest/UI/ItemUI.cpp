@@ -95,9 +95,7 @@ void UItemUI::SetImage(UImage* image)
 
 void UItemUI::ClearItemData()
 {
-	FInstanceItemData iid;
-	iid.slot = GetInstanceItemData().slot;
-	SetInstanceItemData(iid);
+	SetInstanceItemData(GetInstanceItemData().CreateEmptyCopy());
 	SetItemData(FItemData());
 }
 

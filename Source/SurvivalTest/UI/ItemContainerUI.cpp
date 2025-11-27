@@ -1,27 +1,60 @@
 #include "ItemContainerUI.h"
-
 #include "ItemUI.h"
 
 const int UItemContainerUI::itemsPerRow = 5;
 
-int32 UItemContainerUI::GetColumn()
+TSubclassOf<UUserWidget> UItemContainerUI::itemUIClass = NULL;
+
+void UItemContainerUI::SetupItemContainerUI(UItemContainer* inContainer, UBaseGameInstance* inGameInstance)
+{
+	SetItemContainer(inContainer);
+	SetBaseGameInstance(inGameInstance);
+	SetInventoryName();
+	GenerateInventory();
+}
+
+void UItemContainerUI::AddItemToGrid(FInstanceItemData iid, int32 index)
+{
+	if (itemUIClass == NULL)
+	{
+		itemUIClass = LoadClass<UUserWidget>(GetOwningPlayer(), TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemUI_BP.ItemUI_BP_C'"));
+	}
+
+	if (itemUIClass != NULL)
+	{
+		UItemUI* itemUI = CreateWidget<UItemUI>(GetOwningPlayer(), itemUIClass);
+		itemUI->UpdateItemData(iid, GetBaseGameInstance()->GetItemData(iid.itemID), GetItemContainer());
+		GetItemGrid()->AddChildToGrid(itemUI, GetRow(index), GetColumn(index));
+		itemUIAtSlots.Add(iid.slot, itemUI);
+	}
+}
+
+void UItemContainerUI::GenerateInventory()
+{
+	GetItemGrid()->ClearChildren();
+	itemUIAtSlots.Empty();
+
+	for (int index = 0; index < GetItemContainer()->GetMaxItemCount() - 1; index++)
+	{
+		FInstanceItemData iid = GetItemContainer()->GetInstanceItemAtSlot(index);
+
+		if (iid.isValid())
+		{
+			AddItemToGrid(iid, index);
+		}
+		else
+		{
+			AddItemToGrid(GetBlankInstanceItemData(index), index);
+		}
+	}
+}
+
+int32 UItemContainerUI::GetColumn(int32 index)
 {
 	return index % itemsPerRow;
 }
 
-int32 UItemContainerUI::GetNextRowIndex()
-{
-	int32 nextRow = GetRow() + 1;
-	return (nextRow * itemsPerRow);
-}
-
-void UItemContainerUI::GetGridData(int32& row, int32& column)
-{
-	row = GetRow();
-	column = GetColumn();
-}
-
-int32 UItemContainerUI::GetRow()
+int32 UItemContainerUI::GetRow(int32 index)
 {
 	int32 rowMod = index % itemsPerRow;
 	int32 nearestRow = index - rowMod;
@@ -32,20 +65,20 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 {
 	container = inContainer;
 
-	if (container != NULL) 
+	if (container != NULL)
 	{
 		// Set up add and remove listeners for our new container, so we can update our UI as things are added and removed
 		container->OnItemUpdated.AddUniqueDynamic(this, &UItemContainerUI::ItemUpdated);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Log, TEXT("UItemContainerUI container was null"));		
+		UE_LOG(LogTemp, Log, TEXT("UItemContainerUI container was null"));
 	}
 }
 
 FString UItemContainerUI::GetContainerName()
 {
-	if (name.IsEmpty() && container  != NULL)
+	if (name.IsEmpty() && container != NULL)
 	{
 		name = container->GetInstanceContainerData().name;
 	}
@@ -84,23 +117,38 @@ bool UItemContainerUI::IsArmour(FItemData id)
 	return id.type == EItemType::Armour;
 }
 
-UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot, TArray<UWidget*> widgets)
+UItemUI* UItemContainerUI::GetItemAtSlot(int32 itemSlot)
 {
-	for (UWidget* widget : widgets)
+	if (itemUIAtSlots.Contains(itemSlot))
 	{
-		if (widget->IsA(UItemUI::StaticClass()))
-		{
-			UItemUI* itemUI = Cast<UItemUI>(widget);
-
-			if (itemUI->GetInstanceItemData().slot == itemSlot)
-				return itemUI;
-		}
+		return itemUIAtSlots.FindChecked(itemSlot);
 	}
 
-	return nullptr;
+	UE_LOG(LogTemp, Warning, TEXT("Failed to find item at slot %d in container %s"), itemSlot, *GetContainerName());
+	return NULL;
+}
+
+FInstanceItemData UItemContainerUI::GetBlankInstanceItemData(int32 containerSlot)
+{
+	return FInstanceItemData::CreateEmptyItem(containerSlot, container->GetContainerInstanceID());
+}
+
+void UItemContainerUI::UpdateItemUI(const FInstanceItemData& newItem)
+{
+	UItemUI* itemAtSlot = GetItemAtSlot(newItem.slot);
+	FItemData data = GetBaseGameInstance()->GetItemData(newItem.itemID);
+
+	if (newItem.isValid())
+	{
+		itemAtSlot->UpdateItemData(newItem, data, GetItemContainer());
+	}
+	else
+	{
+		itemAtSlot->UpdateItemData(GetBlankInstanceItemData(newItem.slot), data, GetItemContainer());
+	}
 }
 
 void UItemContainerUI::ItemUpdated(const FInstanceItemData& newItem, const FInstanceItemData& oldItem)
 {
-	UpdateItem(newItem, oldItem, GetBaseGameInstance()->GetItemData(newItem.itemID));
+	UpdateItemUI(newItem);
 }

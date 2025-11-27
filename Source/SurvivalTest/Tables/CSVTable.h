@@ -34,4 +34,20 @@ protected:
 
 	static int32 GetIntFromString(const FString& value) { return FCString::Atoi(*value); }
 	static float GetFloatFromString(const FString& value) { return FCString::Atof(*value); }
+
+	static FVector GetVectorFromString(const FString& value)
+	{
+		FVector location;
+		TArray<FString> strings;
+		value.ParseIntoArray(strings, TEXT(";"));
+
+		if (strings.Num() == 3)
+		{
+			int32 index = 0;
+			location.X = GetFloatFromString(strings[index++]);
+			location.Y = GetFloatFromString(strings[index++]);
+			location.Z = GetFloatFromString(strings[index++]);
+		}
+		return location;
+	}
 };

@@ -284,9 +284,9 @@ void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData
 
 void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToDelete)
 {
-	// TODO Doesn't always remove the UI item correctly. Likley due to not invalidating the ID
+	// TODO Doesn't always remove the UI item correctly. Likely due to not invalidating the ID
 	GetGame()->GetInstancedItems().Remove(itemToDelete.ID);
-	other->OnItemUpdated.Broadcast(itemToDelete, itemToDelete);
+	other->OnItemUpdated.Broadcast(itemToDelete.CreateEmptyCopy(), itemToDelete);
 }
 
 void UItemContainer::FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData, int32 maxStackSize)
