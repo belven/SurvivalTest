@@ -239,7 +239,8 @@ void UInventory::ItemUpdated(const FInstanceItemData& inItem, const FInstanceIte
 			equippedArmour.Remove(armourFound->GetData().slot);
 		}
 	}
-	OnContainersUpdated.Broadcast();
+	// TODO add ability to display armour container
+	//OnContainersUpdated.Broadcast();
 }
 //
 ///**

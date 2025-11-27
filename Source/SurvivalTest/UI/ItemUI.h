@@ -24,6 +24,9 @@ public:
 	void UpdateItemDetails();
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Item")
+	void ClearSelectedState();
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Item")
 	void ClearItem();
 
 	UFUNCTION(BlueprintCallable, Category = "Item")

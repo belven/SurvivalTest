@@ -13,6 +13,7 @@
 #define mGameInstance() Cast<UBaseGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()))
 #define mTable() GetTableManager()
 
+class UItemContainerUI;
 class AObjectInstanceManager;
 class UTableManager;
 class UFactionManager;
@@ -65,12 +66,15 @@ public:
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
 
+	TMap<int32, UItemContainerUI*>& GetCreatedItemContainerUI();
+
 	TFunction<bool(FInstanceItemData, int32)> instanceItemFilter = [](const FInstanceItemData& item, int32 id) { return item.ID == id; };
+	TFunction<bool(FInstanceContainerData, int32)>  instanceContainerDataFilter = [](const FInstanceContainerData& cd, int32 id) { return cd.ID == id; };
 
 	template<class T>
-	T GetDataByID(TArray<T> items, TFunction<bool(T, int32)> itemFilter, int32 idToFind)
+	T GetDataByID(TArray<T> items, TFunction<bool(T, int32)> itemFilter, int32 idToFind, T defaultItem)
 	{
-		T itemFound = NULL;
+		T itemFound = defaultItem;
 
 		for (T item : items)
 		{
@@ -149,4 +153,6 @@ public:
 
 	UPROPERTY()
 	UTableManager* tableManager;
+
+	static TMap<int32, UItemContainerUI*> createdItemContainerUI;
 };

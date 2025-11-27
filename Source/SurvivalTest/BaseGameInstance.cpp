@@ -12,6 +12,7 @@
 #include "ObjectInstanceManager.h"
 
 #define GetLastMapItem(type, values) UHelperFunctions::GetLastMapItem<int32, type>(values)
+TMap<int32, UItemContainerUI*> UBaseGameInstance::createdItemContainerUI;
 
 void UBaseGameInstance::Init()
 {
@@ -22,6 +23,7 @@ void UBaseGameInstance::Init()
 void UBaseGameInstance::Shutdown()
 {
 	mTable()->SaveTableToFile(mTable()->GetInstanceItemDataTable());
+	createdItemContainerUI.Empty();
 	Super::Shutdown();
 }
 
@@ -159,6 +161,11 @@ int32 UBaseGameInstance::GetNextInstanceWeaponDataID()
 	}
 
 	return ++id;
+}
+
+TMap<int32, UItemContainerUI*>& UBaseGameInstance::GetCreatedItemContainerUI()
+{
+	return createdItemContainerUI;
 }
 
 UFactionManager* UBaseGameInstance::GetFactionManager()

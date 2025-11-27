@@ -1,5 +1,6 @@
 #include "ItemUI.h"
 
+#include "InventoryUI.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Image.h"
 #include "SurvivalTest/BaseCharacter.h"
@@ -53,6 +54,23 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 				if (GetInstanceItemData().containerInstanceID != playerInventory->GetInstanceContainerData().ID)
 				{
 					playerInventory->TransferItem(GetItemContainer(), GetInstanceItemData(), UItemStructs::InvalidInt);
+				}
+				else
+				{
+					TArray<UItemContainer*> containers = basePlayerController->GetInventoryWidget()->GetContainers();
+
+					if (!containers.IsEmpty())
+					{
+						for (UItemContainer* ic : containers)
+						{
+							FInstanceItemData iid = ic->TransferItem(GetItemContainer(), GetInstanceItemData(), UItemStructs::InvalidInt);
+
+							if (iid.amount == 0)
+							{
+								break;
+							}
+						}
+					}
 				}
 			}
 			else if (InMouseEvent.GetModifierKeys().IsLeftControlDown())

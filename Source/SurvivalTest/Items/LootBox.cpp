@@ -75,6 +75,17 @@ void ALootBox::Highlight(bool activate)
 	}
 }
 
+void ALootBox::Clear()
+{
+	Highlight(false);
+	
+}
+
+UObject* ALootBox::GetContainer()
+{
+	return GetItemContainer();
+}
+
 UBaseGameInstance* ALootBox::GetGame()
 {
 	if (!gameIn) {

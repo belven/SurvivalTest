@@ -4,12 +4,37 @@
 const int UItemContainerUI::itemsPerRow = 5;
 
 TSubclassOf<UUserWidget> UItemContainerUI::itemUIClass = NULL;
+TSubclassOf<UUserWidget> UItemContainerUI::itemContainerClass;
+
+UItemContainerUI* UItemContainerUI::CreateOrGetItemContainerUI(APlayerController* controller, UItemContainer* inContainer, UBaseGameInstance* inGameInstance)
+{
+	UItemContainerUI* itemContainerUI = NULL;
+
+	TMap<int32, UItemContainerUI*> createdItemContainerUI = inGameInstance->GetCreatedItemContainerUI();
+
+	if (itemContainerClass == NULL)
+	{
+		itemContainerClass = LoadClass<UUserWidget>(controller, TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/ItemContainerUI_BP.ItemContainerUI_BP_C'"));
+	}
+
+	if (createdItemContainerUI.Contains(inContainer->GetContainerInstanceID()))
+	{
+		itemContainerUI = createdItemContainerUI.FindChecked(inContainer->GetContainerInstanceID());
+	}
+	else	if (itemContainerClass != NULL)
+	{
+		itemContainerUI = CreateWidget<UItemContainerUI>(controller, itemContainerClass);
+		itemContainerUI->SetupItemContainerUI(inContainer, inGameInstance);
+		createdItemContainerUI.Add(inContainer->GetContainerInstanceID(), itemContainerUI);
+	}
+
+	return itemContainerUI;
+}
 
 void UItemContainerUI::SetupItemContainerUI(UItemContainer* inContainer, UBaseGameInstance* inGameInstance)
 {
 	SetItemContainer(inContainer);
 	SetBaseGameInstance(inGameInstance);
-	SetInventoryName();
 	GenerateInventory();
 }
 
@@ -69,6 +94,7 @@ void UItemContainerUI::SetItemContainer(UItemContainer* inContainer)
 	{
 		// Set up add and remove listeners for our new container, so we can update our UI as things are added and removed
 		container->OnItemUpdated.AddUniqueDynamic(this, &UItemContainerUI::ItemUpdated);
+		SetInventoryName();
 	}
 	else
 	{
@@ -138,13 +164,17 @@ void UItemContainerUI::UpdateItemUI(const FInstanceItemData& newItem)
 	UItemUI* itemAtSlot = GetItemAtSlot(newItem.slot);
 	FItemData data = GetBaseGameInstance()->GetItemData(newItem.itemID);
 
-	if (newItem.isValid())
+	// TODO this only happened due to the UI being removed as we moved around 
+	if (itemAtSlot)
 	{
-		itemAtSlot->UpdateItemData(newItem, data, GetItemContainer());
-	}
-	else
-	{
-		itemAtSlot->UpdateItemData(GetBlankInstanceItemData(newItem.slot), data, GetItemContainer());
+		if (newItem.isValid())
+		{
+			itemAtSlot->UpdateItemData(newItem, data, GetItemContainer());
+		}
+		else
+		{
+			itemAtSlot->UpdateItemData(GetBlankInstanceItemData(newItem.slot), data, GetItemContainer());
+		}
 	}
 }
 

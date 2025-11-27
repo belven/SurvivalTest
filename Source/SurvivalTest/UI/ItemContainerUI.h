@@ -18,6 +18,9 @@ public:
 	static const int itemsPerRow;
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	static UItemContainerUI* CreateOrGetItemContainerUI(APlayerController* controller, UItemContainer* inContainer, UBaseGameInstance* inGameInstance);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void SetupItemContainerUI(UItemContainer* inContainer, UBaseGameInstance* inGameInstance);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
@@ -27,6 +30,9 @@ public:
 	void AddItemToGrid(FInstanceItemData iid, int32 index);
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Inventory")
+	void ContainerRemovedFromUI();
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "Inventory")
 	UGridPanel* GetItemGrid();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -67,10 +73,19 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FInstanceItemData GetBlankInstanceItemData(int32 containerSlot);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void UpdateItemUI(const FInstanceItemData& newItem);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	TMap<int32, UItemUI*>& GetItemUIAtSlots()
+	{
+		return itemUIAtSlots;
+	}
 
 private:
 	static TSubclassOf<UUserWidget> itemUIClass;
+	static TSubclassOf<UUserWidget> itemContainerClass;
 
 	UPROPERTY()
 	UInventoryUI* inventory;

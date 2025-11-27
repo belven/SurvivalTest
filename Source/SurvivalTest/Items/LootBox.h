@@ -23,6 +23,8 @@ public:
 	virtual UItemContainer* GetItemContainer() override { return container; }
 	virtual void Interact(ABasePlayerController* instigator) override;
 	virtual void Highlight(bool activate) override;
+	virtual void Clear() override;
+	virtual UObject* GetContainer() override;
 
 	FContainerData GetContainerData() const { return containerData; }
 	void SetContainerData(const FContainerData& inContainerData) { containerData = inContainerData; }

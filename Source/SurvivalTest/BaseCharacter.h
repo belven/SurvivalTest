@@ -103,6 +103,8 @@ public:
 	void SetOverlappingInteractables(const TArray<IInteractable*>& inOverlappingInteractables) { this->overlappingInteractables = inOverlappingInteractables; }
 	virtual void Interact(ABasePlayerController* instigator) override;
 	virtual void Highlight(bool activate) override;
+	virtual void Clear() override;
+	virtual UObject* GetContainer() override;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetNearbyContainersNum() { return overlappingInteractables.Num(); }

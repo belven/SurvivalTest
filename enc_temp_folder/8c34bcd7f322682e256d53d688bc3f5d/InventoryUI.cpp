@@ -27,8 +27,18 @@ void UInventoryUI::ContainerRemoved(UItemContainer* container)
 	RemoveContainerFromPanel(container, GetNearbyContainerGrid());
 }
 
+
 void UInventoryUI::GenerateInventory_CPP()
 {
+	//GetNearbyContainerGrid()->ClearChildren();
+
+	//for (auto& container : createdItemContainerUI)
+	//{
+	//	container.Value->ContainerRemovedFromUI();
+	//}
+
+	//createdItemContainerUI.Empty();
+
 	for (UItemContainer* container : GetContainers())
 	{
 		AddContainerToPanel(container, GetNearbyContainerGrid());

@@ -628,12 +628,16 @@ int32 UItemContainer::FindNextEmptyValidSlot(EGearType inType)
 
 void UItemContainer::UpdateDebugItemsList()
 {
-	TArray<FInstanceItemData> data = GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID);
-	lastUpdatedItems.Empty();
+	const bool updateDebug = false;
 
-	for (FInstanceItemData iid : data)
-	{
-		lastUpdatedItems.Add(FItemDataPair(iid, GetGame()->GetItemData(iid.itemID)));
+	if (updateDebug) {
+		TArray<FInstanceItemData> data = GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID);
+		lastUpdatedItems.Empty();
+
+		for (FInstanceItemData iid : data)
+		{
+			lastUpdatedItems.Add(FItemDataPair(iid, GetGame()->GetItemData(iid.itemID)));
+		}
 	}
 }
 

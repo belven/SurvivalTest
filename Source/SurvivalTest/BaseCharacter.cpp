@@ -129,6 +129,16 @@ void ABaseCharacter::Highlight(bool activate)
 	GetMesh()->SetRenderCustomDepth(activate);
 }
 
+void ABaseCharacter::Clear()
+{
+	Highlight(false);
+}
+
+UObject* ABaseCharacter::GetContainer()
+{
+	return GetInventory();
+}
+
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -344,9 +354,11 @@ void ABaseCharacter::AddInteractable(IInteractable* interractable)
 
 			overlappingInteractables.AddUnique(interractable);
 
-			if (GetInventory()) 
+			UItemContainer* container = Cast<UItemContainer>(interractable->GetContainer());
+
+			if (container)
 			{
-				GetInventory()->OnContainersUpdated.Broadcast();
+				GetInventory()->OnContainerAdded.Broadcast(container);
 			}
 		}
 	}
@@ -377,12 +389,14 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 		else
 		{
 		}*/
-		inter->Highlight(false);
+		inter->Clear();
 		overlappingInteractables.Remove(inter);
 
-		if (GetInventory())
+		UItemContainer* container = Cast<UItemContainer>(inter->GetContainer());
+
+		if (container)
 		{
-			GetInventory()->OnContainersUpdated.Broadcast();
+			GetInventory()->OnContainerRemoved.Broadcast(container);
 		}
 	}
 }

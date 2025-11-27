@@ -132,7 +132,7 @@ void ABasePlayerController::Craft()
 
 	for (FFullRecipe fr : tableManager->GetRecipes())
 	{
-		// TODO make crafting UI
+
 		/*for (FInputOutputData iod : fr.outputs) {
 			TArray<int32> ids;
 			FInstanceItemData iid;

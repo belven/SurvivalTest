@@ -17,4 +17,6 @@ class SURVIVALTEST_API IInteractable
 public:
 	virtual void Interact(ABasePlayerController* instigator) = 0;
 	virtual void Highlight(bool activate) = 0;
+	virtual void Clear() = 0;
+	virtual UObject* GetContainer() = 0;
 };

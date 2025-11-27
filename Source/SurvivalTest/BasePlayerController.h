@@ -73,6 +73,13 @@ public:
 
 	UFUNCTION()
 	void Build();
+
+	UFUNCTION()
+	UInventoryUI* GetInventoryWidget() const
+	{
+		return inventoryWidget;
+	}
+
 	void CreateBuildingPart(ABuildingPart* bp, EOneDirection direction);
 	FVector MoveVectorByDirection(const FVector& centerLocation, const FRotator& currentRotation, float distance, EOneDirection direction);
 
@@ -145,6 +152,7 @@ private:
 	UPROPERTY()
 	UInventoryUI* inventoryWidget;
 
+private:
 	UPROPERTY()
 	ABaseCharacter* baseCharacter;
 

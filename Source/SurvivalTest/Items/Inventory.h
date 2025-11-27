@@ -3,7 +3,7 @@
 #include "ItemContainer.h"
 #include "Inventory.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnContainersUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnContainerUpdated, UItemContainer*, container);
 
 class ABaseCharacter;
 class UWeapon;
@@ -21,7 +21,9 @@ public:
 	UFUNCTION()
 		void CreateNewItemForInventory(int32 itemID);
 
-	FOnContainersUpdated OnContainersUpdated;
+	FOnContainerUpdated OnContainerAdded;
+	FOnContainerUpdated OnContainerRemoved;
+
 	virtual UWorld* GetWorld() const override;
 
 	void SetEquippedWeapon(UWeapon* weapon);
