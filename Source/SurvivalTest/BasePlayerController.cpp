@@ -23,8 +23,8 @@
 class ABaseCharacter;
 
 ABasePlayerController::ABasePlayerController() : Super(FObjectInitializer::Get()), RotateValue(0), CurveFloatValue(0), TimelineValue(0), performAction(false), useEquipment(false),
-                                                 isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
-                                                 mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr), baseGameInstance(nullptr)
+isReloading(false), reloadTask(nullptr), equipmentSwapTask(nullptr), rangedWeapon(nullptr), leanCurve(nullptr),
+mainHUD(nullptr), inventoryWidget(nullptr), baseCharacter(nullptr), baseGameInstance(nullptr)
 {
 	static ConstructorHelpers::FClassFinder<UUserWidget> inventoryWidgetClassFound(TEXT("WidgetBlueprint'/Game/FirstPerson/Blueprints/UI/InventoryUI_BP.InventoryUI_BP_C'"));
 
@@ -70,14 +70,6 @@ void ABasePlayerController::TimelineFinishedCallback()
 	//leanTimeline->Deactivate();
 }
 
-void ABasePlayerController::ContainersUpdated()
-{
-	// TODO Add method for adding and removing specific containers, to allow the UI to only update them individually
-	if (inventoryWidget && inventoryWidget->IsVisible()) {
-		inventoryWidget->GenerateInventory();
-	}
-}
-
 void ABasePlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -103,7 +95,6 @@ void ABasePlayerController::OnPossess(APawn* aPawn)
 
 	baseCharacter = Cast<ABaseCharacter>(aPawn);
 	baseCharacter->SetIsPlayer(true);
-	//baseCharacter->GetInventory()->OnContainersUpdated.AddUniqueDynamic(this, &ABasePlayerController::ContainersUpdated);
 	baseCharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABasePlayerController::WeaponEquipped);
 	baseCharacter->OnEnemyHit.AddUniqueDynamic(this, &ABasePlayerController::EnemyHit);
 	baseCharacter->OnCharacterDied.AddUniqueDynamic(this, &ABasePlayerController::CharacterDied);
@@ -128,19 +119,7 @@ void ABasePlayerController::OutOfAmmo()
 
 void ABasePlayerController::Craft()
 {
-	UTableManager* tableManager = GetBaseGameInstance()->GetTableManager();
-
-	for (FFullRecipe fr : tableManager->GetRecipes())
-	{
-		// TODO make crafting UI
-		/*for (FInputOutputData iod : fr.outputs) {
-			TArray<int32> ids;
-			FInstanceItemData iid;
-			iid.itemID = iod.inputOutputID;
-			iid.amount = iod.amount;
-			GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
-		}*/
-	}
+	// TODO make crafting UI
 }
 
 void ABasePlayerController::ReloadComplete()
@@ -163,6 +142,7 @@ void ABasePlayerController::WeaponEquipped(UWeapon* oldWeapon)
 
 	if (weapon && weapon->IsProjectileWeapon())
 	{
+		// TODO make it so UWeapons take in a controller and hook themselves into the players actions. This will remove the dependency from the controller 
 		rangedWeapon = Cast<UProjectileWeapon>(weapon);
 		rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABasePlayerController::OutOfAmmo);
 		rangedWeapon->OnReloadComplete.AddUniqueDynamic(this, &ABasePlayerController::ReloadComplete);
@@ -457,7 +437,7 @@ void ABasePlayerController::BeginPlay()
 		inventoryWidget = CreateWidget<UInventoryUI>(this, inventoryWidgetClass);
 		inventoryWidget->SetVisibility(ESlateVisibility::Hidden);
 		inventoryWidget->AddToViewport(1);
-		inventoryWidget->SetupInventory(this, GetBaseGameInstance()) ;
+		inventoryWidget->SetupInventory(this, GetBaseGameInstance());
 	}
 
 	if (mainHUDClass)

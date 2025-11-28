@@ -32,7 +32,7 @@ void URecipeListUI::OnItemUpdated(const FInstanceItemData& inItem, const FInstan
 		{
 			while (CheckInventoryForRecipe(recipe->GetRecipe())) 
 			{
-				Craft_Internal(recipe);
+				// Check for recipes to enable / disable
 			}
 		}
 	}
@@ -105,112 +105,7 @@ bool URecipeListUI::CheckInventoryForRecipe(FFullRecipe recipe)
 			break;
 		}
 	}
-
-	//for (FInputOutputData iod : recipe.outputs)
-	//{
-	//	TArray<FInstanceItemData> freeSpaceItems = inventory->GetExistingItemsWithSpace(iod.inputOutputID);
-
-	//	if (iod.type == EInputOutputType::Item && total < iod.amount)
-	//	{
-	//		UE_LOG(LogTemp, Warning, TEXT("Player missing item %s for recipe %s"), *GetBasePlayerController()->GetBaseGameInstance()->GetTableManager()->GetItemData(iod.inputOutputID).name, *recipe.recipe.name);
-	//		result = false;
-	//		break;
-	//	}
-	//}
 	return result;
-}
-
-
-void URecipeListUI::Craft_Internal(URecipeUI* recipe)
-{
-	if (recipe)
-	{
-		if (CheckInventoryForRecipe(recipe->GetRecipe()))
-		{
-			ConsumeRecipeInputs(recipe);
-
-			if (!GetTimerManager()->IsTimerActive(TimerHandle_ItemCrafted))
-			{
-				mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &URecipeListUI::CraftComplete, recipe->GetRecipe().recipe.craftingTime);
-			}
-
-			inProgressRecipes.Add(recipe);
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No recipe selected"));
-	}
-}
-
-void URecipeListUI::Craft()
-{
-	Craft_Internal(selectedRecipe);
-}
-
-void URecipeListUI::CraftComplete()
-{
-	if (!inProgressRecipes.IsEmpty())
-	{
-		// TODO make better use of pop and top etc.
-		ProduceOutputs(inProgressRecipes[0]);
-
-		inProgressRecipes.RemoveAt(0);
-
-		if (!inProgressRecipes.IsEmpty())
-		{
-			mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &URecipeListUI::CraftComplete, inProgressRecipes[0]->GetRecipe().recipe.craftingTime);
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No recipes left to craft"));
-	}
-}
-
-float URecipeListUI::GetProgress()
-{
-	if (IsInProgress() && !inProgressRecipes.IsEmpty())
-	{
-		return  GetTimerManager()->GetTimerElapsed(TimerHandle_ItemCrafted) / inProgressRecipes[0]->GetRecipe().recipe.craftingTime;
-	}
-
-	return 0;
-}
-
-bool URecipeListUI::IsInProgress()
-{
-	return GetTimerManager()->IsTimerActive(TimerHandle_ItemCrafted);
-}
-
-FTimerManager* URecipeListUI::GetTimerManager()
-{
-	if (timerManager == NULL)
-	{
-		timerManager = &GetBasePlayerController()->GetWorld()->GetTimerManager();
-	}
-	return timerManager;
-}
-
-void URecipeListUI::ConsumeRecipeInputs(URecipeUI* recipe)
-{
-	for (FInputOutputData iod : recipe->GetRecipe().inputs) {
-		FInstanceItemData iid;
-		iid.itemID = iod.inputOutputID;
-		iid.amount = iod.amount;
-		GetBasePlayerController()->GetBaseCharacter()->GetInventory()->RemoveItem(iid);
-	}
-}
-
-void URecipeListUI::ProduceOutputs(URecipeUI* recipe)
-{
-	for (FInputOutputData iod : recipe->GetRecipe().outputs) {
-		TArray<int32> ids;
-		FInstanceItemData iid;
-		iid.itemID = iod.inputOutputID;
-		iid.amount = iod.amount;
-		GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
-	}
 }
 
 FFullRecipe URecipeListUI::GetRecipe(int32 recipeID)
@@ -225,32 +120,4 @@ FFullRecipe URecipeListUI::GetRecipe(int32 recipeID)
 		}
 	}
 	return fr;
-}
-
-void URecipeListUI::CancelCrafting(FFullRecipe cancelledRecipe)
-{
-	if (IsInProgress())
-	{
-		// GetRecipe(FInProgressCrafting.RecipeID)
-		for (FInputOutputData iod : cancelledRecipe.inputs)
-		{
-			if (iod.type == EInputOutputType::Item)
-			{
-				TArray<int32> ids;
-				FInstanceItemData iid;
-				iid.itemID = iod.inputOutputID;
-				iid.amount = iod.amount;
-				// TODO Start with own internal inventory, else add to players inventory
-				GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
-			}
-		}
-
-		GetTimerManager()->ClearTimer(TimerHandle_ItemCrafted);
-		inProgressRecipes.RemoveAt(0);
-
-		if (!inProgressRecipes.IsEmpty())
-		{
-			mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &URecipeListUI::CraftComplete, inProgressRecipes[0]->GetRecipe().recipe.craftingTime);
-		}
-	}
 }

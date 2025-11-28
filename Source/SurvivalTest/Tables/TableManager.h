@@ -105,7 +105,7 @@ public:
 	FItemData GetItemDataByName(const FString& inString);
 
 	UFUNCTION(BlueprintCallable, Category = "Recipe")
-	TArray<FFullRecipe>& GetRecipes();
+	TArray<FFullRecipe> GetRecipes(int32 craftingDeviceID);
 
 
 
@@ -113,7 +113,8 @@ private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
 	TMap<int32, FInstanceBoxData> boxContainers;
-	TArray<FFullRecipe> recipes;
+	TMap<int32, FFullRecipe> recipes;
+	TMap<int32, TArray<FFullRecipe>> craftingDeviceFullRecipes;
 
 	UPROPERTY()
 	UItemDataTable* ItemData;

@@ -276,8 +276,9 @@ FItemData UTableManager::GetItemDataByName(const FString& inString)
 	return {};
 }
 
-TArray<FFullRecipe>& UTableManager::GetRecipes()
+TArray<FFullRecipe> UTableManager::GetRecipes(int32 craftingDeviceID)
 {
+
 	if (recipes.IsEmpty()) {
 		for (FRecipeData recipeData : GetRecipeTableData()->GetData())
 		{
@@ -307,11 +308,25 @@ TArray<FFullRecipe>& UTableManager::GetRecipes()
 				}
 			}
 
-			recipes.Add(fullRecipe);
+			recipes.Add(fullRecipe.recipe.ID, fullRecipe);
 		}
 	}
 
-	return recipes;
+	if (!craftingDeviceFullRecipes.Contains(craftingDeviceID)) 
+	{
+		TArray<FFullRecipe> craftingDeviceRecipes;
+
+		for (FCraftingDeviceRecipes cdr : GetCraftingDeviceRecipesTable()->GetData())
+		{
+			if (cdr.CraftingDeviceID == craftingDeviceID)
+			{
+				craftingDeviceRecipes.Add(recipes.FindChecked(cdr.RecipeID));
+			}
+		}
+		craftingDeviceFullRecipes.Add(craftingDeviceID, craftingDeviceRecipes);
+	}
+
+	return craftingDeviceFullRecipes.FindChecked(craftingDeviceID);
 }
 
 

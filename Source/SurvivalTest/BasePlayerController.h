@@ -47,9 +47,6 @@ public:
 	void TimelineFinishedCallback();
 
 	UFUNCTION()
-		void ContainersUpdated();
-
-	UFUNCTION()
 		void EnemyHit(ABaseCharacter* enemy);
 
 	virtual void PlayerTick(float DeltaTime) override;

@@ -2,7 +2,7 @@
 
 UCraftingDeviceRecipesTable::UCraftingDeviceRecipesTable() : Super()
 {
-	path = CSVT::GetTableFilePath("CraftingDeviceRecipes.csv");
+	path = CSVT::GetTableFilePath("CraftingDeviceRecipe.csv");
 }
 
 void UCraftingDeviceRecipesTable::LoadData(TArray<TArray<FString>> inDataStrings)

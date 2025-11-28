@@ -511,6 +511,19 @@ struct FInProgressCrafting
 {
 	GENERATED_USTRUCT_BODY()
 
+	FInProgressCrafting(): ID(-1), InstanceCraftingDeviceID(0), RecipeID(0), QueuePosition(0), Progress(0)
+	{
+	}
+
+	FInProgressCrafting(int32 inID, int32 inInstanceCraftingDeviceID, int32 inRecipeID, int32 inQueuePosition, float inProgress)
+		: ID(inID),
+		  InstanceCraftingDeviceID(inInstanceCraftingDeviceID),
+		  RecipeID(inRecipeID),
+		  QueuePosition(inQueuePosition),
+		  Progress(inProgress)
+	{
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")
 	int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "InProgressCrafting")

@@ -146,10 +146,6 @@ void ABaseCharacter::BeginPlay()
 	//navInvoker->RegisterWithNavigationSystem(*UNavigationSystemV1::GetCurrent(GetWorld()));
 	game = mGameInstance();
 	GetOverlapsOnSpawn();
-
-	//AddOwnedComponent(taskManager);
-
-//	AddInstanceComponent(taskManager);
 }
 
 /**
@@ -253,10 +249,6 @@ void ABaseCharacter::ChangeHealth(FHealthChange& health_change)
 	if (IsDead())
 	{
 		KillCharacter();
-
-		//if (FVector::Dist(GetActorLocation(), health_change.source->GetActorLocation()) <= interactionRadius) {
-		//	health_change.source->AddInteractable(this);
-		//}
 	}
 
 	health_change.source->EnemyHit(this);
@@ -375,20 +367,6 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
 	if (IsPlayer())
 	{
-		/*ABaseCharacter* other = Cast<ABaseCharacter>(inter);
-
-		if (other != NULL)
-		{
-			if (other->IsAlive())
-			{
-				overlappingInteractables.Remove(inter);
-				other->OnCharacterDied.RemoveAll(this);
-				inter->Highlight(false);
-			}
-		}
-		else
-		{
-		}*/
 		inter->Clear();
 		overlappingInteractables.Remove(inter);
 
