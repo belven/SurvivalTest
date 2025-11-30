@@ -42,7 +42,7 @@ public:
 	void SetItemTypes(const TArray<int32>& inItemTypes) { itemTypes = inItemTypes; }
 
 protected:
-	FInstanceItemData CreateLoot(const FItemData& id);
+	FItemsToAdd CreateLoot(const FItemData& id);
 
 	FTimerHandle TimerHandle_LootboxClear;
 	virtual void BeginPlay() override;

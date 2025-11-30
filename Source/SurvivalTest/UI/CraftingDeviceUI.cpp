@@ -42,21 +42,18 @@ void UCraftingDeviceUI::ProduceOutputs(FFullRecipe recipe)
 {
 	for (FInputOutputData iod : recipe.outputs) {
 		TArray<FInstanceItemData> ids;
-		FInstanceItemData iid;
-		iid.itemID = iod.inputOutputID;
-		iid.amount = iod.amount;
+		FItemsToAdd itemsToAdd(iod.inputOutputID, iod.amount);
 
-
-		GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
+		GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(itemsToAdd, ids);
 
 		UBaseGameInstance* baseGameInstance = GetBasePlayerController()->GetBaseGameInstance();
-		FItemData id = baseGameInstance->GetTableManager()->GetItemData(iid.itemID);
+		FItemData id = baseGameInstance->GetTableManager()->GetItemData(itemsToAdd.itemID);
 
-		if (iid.amount == 0 && id.type == EItemType::Armour)
+		if (itemsToAdd.amount == 0 && id.type == EItemType::Armour)
 		{
 			UArmourCreator::CreateArmourData(baseGameInstance, ids[0], id);
 		}
-		else if (iid.amount == 0 && id.type == EItemType::Weapon)
+		else if (itemsToAdd.amount == 0 && id.type == EItemType::Weapon)
 		{
 			FRangedWeaponData rwd = baseGameInstance->GetRangedWeaponData(id.ID);
 			FProjectileWeaponData pwd = baseGameInstance->GetProjectileWeaponData(rwd.ID);
@@ -113,11 +110,9 @@ void UCraftingDeviceUI::CancelCrafting(FInProgressCrafting cancelledCraft)
 			if (iod.type == EInputOutputType::Item)
 			{
 				TArray<FInstanceItemData> ids;
-				FInstanceItemData iid;
-				iid.itemID = iod.inputOutputID;
-				iid.amount = iod.amount;
+				FItemsToAdd itemsToAdd(iod.inputOutputID, iod.amount);
 				// TODO Start with own internal inventory, else add to players inventory
-				GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
+				GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(itemsToAdd, ids);
 			}
 		}
 

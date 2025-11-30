@@ -3,6 +3,8 @@
 #include "ItemContainer.h"
 #include "Inventory.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(Inventory, Log, All)
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnContainerUpdated, UItemContainer*, container);
 
 class ABaseCharacter;

@@ -33,6 +33,8 @@ public:
 
 	ABaseCharacter* GetCharacterOwner() const { return characterOwner; }
 	void SetOwner(ABaseCharacter* val);
+	void Equip(ABaseCharacter* val);
+	void Unequip();
 
 	void AttackComplete();
 

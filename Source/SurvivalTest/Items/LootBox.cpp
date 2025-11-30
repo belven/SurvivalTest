@@ -122,20 +122,23 @@ void ALootBox::SpawnLoot()
 		{
 			int32 lootItem = mGetRandom(itemTypes, -1);
 			FItemData id = GetGame()->GetItemData(lootItem);
-			FInstanceItemData iid = CreateLoot(id);
+			FItemsToAdd itemsToAdd = CreateLoot(id);
 
-			TArray<FInstanceItemData> ids;
-			FInstanceItemData added = container->AddItem(iid, ids);
+			TArray<FInstanceItemData> newItemInstances;
 
-			if (added.amount == 0 && id.type == EItemType::Armour)
+			container->AddItem(itemsToAdd, newItemInstances);
+
+			if (itemsToAdd.amount == 0 && id.type == EItemType::Armour)
 			{				
-				UArmourCreator::CreateArmourData(GetGame(), ids[0], id);
+				UArmourCreator::CreateArmourData(GetGame(), newItemInstances[0], id);
 			}
-			else if (added.amount == 0 && id.type == EItemType::Weapon)
+			else if (itemsToAdd.amount == 0 && id.type == EItemType::Weapon)
 			{
 				FRangedWeaponData rwd = gameIn->GetRangedWeaponData(id.ID);
 				FProjectileWeaponData pwd = gameIn->GetProjectileWeaponData(rwd.ID);
-				GetGame()->GetTableManager()->CreateNewInstanceWeaponData(ids[0].ID, pwd);
+
+				// TODO move out into WeaponCreator
+				GetGame()->GetTableManager()->CreateNewInstanceWeaponData(newItemInstances[0].ID, pwd);
 			}
 		}
 	}
@@ -170,12 +173,12 @@ void ALootBox::CreateLootboxData()
 	}
 }
 
-FInstanceItemData ALootBox::CreateLoot(const FItemData& id)
+FItemsToAdd ALootBox::CreateLoot(const FItemData& id)
 {
 	if (id.ID != UItemStructs::InvalidInt)
 	{
 		int32 randomAmount = FMath::RandRange(1, id.maxStack);
-		return FInstanceItemData(id.ID, randomAmount);
+		return FItemsToAdd(id.ID, randomAmount);
 	}
 	return {};
 }

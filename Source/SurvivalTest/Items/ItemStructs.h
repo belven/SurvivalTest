@@ -544,6 +544,26 @@ struct FInProgressCrafting
 	float Progress;
 };
 
+
+USTRUCT(BlueprintType)
+struct FItemsToAdd
+{
+	GENERATED_USTRUCT_BODY()
+
+	FItemsToAdd() {}
+
+	FItemsToAdd(int32 inItemID, int32 inAmount)
+		: itemID(inItemID),
+		amount(inAmount)
+	{
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	int32 itemID = UItemStructs::InvalidInt;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	int32 amount = UItemStructs::InvalidInt;
+};
+
 USTRUCT(BlueprintType)
 struct FInstanceItemData
 {
@@ -589,6 +609,13 @@ struct FInstanceItemData
 	}
 
 	void TakeFrom(FInstanceItemData& itemToAdd, int32 stackSize)
+	{
+		int32 space = GetRemainingSpace(stackSize);
+		int32 amountToTake = FMath::Min(itemToAdd.amount, space);
+		amount += amountToTake;
+		itemToAdd.amount -= amountToTake;
+	}
+	void TakeFrom(FItemsToAdd& itemToAdd, int32 stackSize)
 	{
 		int32 space = GetRemainingSpace(stackSize);
 		int32 amountToTake = FMath::Min(itemToAdd.amount, space);

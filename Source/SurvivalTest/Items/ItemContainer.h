@@ -4,6 +4,7 @@
 #include "../BaseGameInstance.h"
 #include "ItemContainer.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(ItemContainer, Log, All)
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FItemUpdated, const FInstanceItemData&, newItem, const FInstanceItemData&, oldItem);
 
 USTRUCT(BlueprintType)
@@ -56,7 +57,7 @@ public:
 	void MoveItemToSlot(UItemContainer* container, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData);
 	//void MoveItemToEmptySlot(UItemContainer* otherContainer, FInstanceItemData& itemToTransfer);
 	void MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemContainer* destContainer, FInstanceItemData& itemToTransfer);
-	void FillExistingItems(FInstanceItemData& itemToTransfer, int32 maxStackSize);
+	void FillExistingItems(FItemsToAdd& iItemsToAdd, FInstanceItemData& itemToTransfer, int32 maxStackSize);
 	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& originalItemData, int32 maxStack, FInstanceItemData& existingItem, EGearType type);
 	void AddUpdateItemData(FInstanceItemData& itemToAddOrUpdate);
 	void UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem);
@@ -81,7 +82,7 @@ public:
 	FInstanceItemData GetInstanceItemAtSlot(int32 slot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	FInstanceItemData& AddItem(FInstanceItemData& itemToAdd, TArray<FInstanceItemData>& newItemInstances);
+	FItemsToAdd& AddItem(FItemsToAdd& itemsToAdd, TArray<FInstanceItemData>& newItemInstances);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData RemoveItem(FInstanceItemData itemToRemove);

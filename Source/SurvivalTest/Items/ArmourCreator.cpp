@@ -1,7 +1,6 @@
 #include "ArmourCreator.h"
 #include "Armour.h"
 #include "ItemContainer.h"
-#include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseGameInstance.h"
 
 
@@ -10,18 +9,17 @@
  * If there is no existing FInstanceArmour, it will create one, otherwise find one
  *
  * @param game The game instance, as we're a static method and can't do GetWorld()
- * @param instanceItemDataID The existing ID of FInstanceItemData, store in the game instance
+ * @param instanceItemData The existing ID of FInstanceItemData, store in the game instance
  *
  * @return A new instance of UArmour, with all the data setup for it
  */
-UArmour* UArmourCreator::GetOrCreateArmour(UBaseGameInstance* game, const FInstanceItemData& instanceItemData)
+UArmour* UArmourCreator::CreateArmour(UBaseGameInstance* game, const FInstanceItemData& instanceItemData)
 {
-	UArmour* armour = NewObject<UArmour>();
+	FInstanceArmourData instanceArmourData = game->GetTableManager()->GetInstanceArmourDataByInstanceItemID(instanceItemData.ID);
 	FItemData itemData = game->GetItemData(instanceItemData.itemID);
+
 	FArmourData armourData;
 	FInstanceContainerData instanceContainerData;
-
-	FInstanceArmourData instanceArmourData = game->GetTableManager()->GetInstanceArmourDataByInstanceItemID(instanceItemData.ID);
 
 	if (instanceArmourData.ID == UItemStructs::InvalidInt)
 	{
@@ -35,6 +33,7 @@ UArmour* UArmourCreator::GetOrCreateArmour(UBaseGameInstance* game, const FInsta
 
 	FContainerData cd = game->GetContainerDataByID(armourData.containerID);
 
+	UArmour* armour = NewObject<UArmour>();
 	armour->SetItemData(itemData);
 	armour->SetData(armourData);
 	armour->SetInstanceContainerData(instanceContainerData);
@@ -63,7 +62,6 @@ void UArmourCreator::CreateArmourData(UBaseGameInstance* game, const FInstanceIt
 	game->GetInstancedContainers().Add(inInstanceContainerData.ID, inInstanceContainerData);
 
 	// Create a new Armour instance based on the container instance
-
 	inInstanceArmourData.ID = game->GetNextInstanceArmourDataID();
 	inInstanceArmourData.armourID = armourData.ID;
 	inInstanceArmourData.containerInstanceID = inInstanceContainerData.ID;

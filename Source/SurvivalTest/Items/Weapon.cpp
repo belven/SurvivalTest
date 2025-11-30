@@ -34,6 +34,19 @@ void UWeapon::SetOwner(ABaseCharacter* val)
 	characterOwner->GetWeaponMeshComp()->SetStaticMesh(GetItemMesh());
 }
 
+
+void UWeapon::Equip(ABaseCharacter* val)
+{
+	SetOwner(val);
+	characterOwner->GetWeaponMeshComp()->SetStaticMesh(GetItemMesh());
+}
+
+void UWeapon::Unequip()
+{
+	characterOwner->GetWeaponMeshComp()->SetStaticMesh(NULL);
+	// TODO delete self
+}
+
 void UWeapon::AttackComplete()
 {
 	canAttack = true;
