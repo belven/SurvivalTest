@@ -1,6 +1,7 @@
 #pragma once
 #include "CoreMinimal.h"
 #include "CSVTable.h"
+#include "Items/InstanceItemDataTable.h"
 #include "SurvivalTest/Items/ItemStructs.h"
 #include "SurvivalTest/Missions/MissionStructs.h"
 #include "TableManager.generated.h"
@@ -65,10 +66,21 @@ public:
 	UInProgressCraftingTable* GetInProgressCraftingTable();
 	UInstanceCraftingDeviceTable* GetInstanceCraftingDeviceTable();
 
+	int32 GetNextInstanceItemDataID();
+	int32 GetNextInstanceLootBoxDataID();
+	int32 GetNextInstanceArmourDataID();
+	FInstanceWeaponData CreateNewInstanceWeaponData(int32 instanceItemID, const FProjectileWeaponData& pwd);
+	int32 GetNextInstanceContainerDataID();
+	int32 GetNextInstanceWeaponDataID();
+
 	void LoadTableData();
 	void LoadTableFromFile(UCSVTable* table);
 	void RemoveContainerData(int32 containerInstanceID);
-	FInstanceBoxData GetInstanceBoxDataByContainerInstance(int32 containerInstanceID);
+
+
+	FInstanceItemData GetInstanceItemDataByID(int32 instanceItemID) { return GetInstanceItemDataTable()->GetInstanceItemDataByID(instanceItemID); }
+
+	FInstanceLootBoxData GetInstanceBoxDataByContainerInstance(int32 containerInstanceID);
 	FInstanceContainerData GetInstanceContainerData(int32 containerInstanceID);
 	void SaveTableToFile(UCSVTable* table);
 	TArray<FString> CleanData(TArray<FString> strings);
@@ -101,20 +113,33 @@ public:
 
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return instancedContainers; }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return armourInstances; }
-	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return boxContainers; }
+	TMap<int32, FInstanceLootBoxData>& GetInstancedLootBoxes() { return instancedLootboxes; }
 	FItemData GetItemDataByName(const FString& inString);
 
 	UFUNCTION(BlueprintCallable, Category = "Recipe")
 	TArray<FFullRecipe> GetRecipes(int32 craftingDeviceID);
 
-
-
 private:
 	TMap<int32, FInstanceContainerData> instancedContainers;
 	TMap<int32, FInstanceArmourData> armourInstances;
-	TMap<int32, FInstanceBoxData> boxContainers;
+	TMap<int32, FInstanceLootBoxData> instancedLootboxes;
 	TMap<int32, FFullRecipe> recipes;
 	TMap<int32, TArray<FFullRecipe>> craftingDeviceFullRecipes;
+
+	FCriticalSection InstanceItemIDLock;
+	int32 LastInstanceItemID = -1;
+
+	FCriticalSection InstanceContainerDataLock;
+	int32 LastInstanceContainerDataID = -1;
+
+	FCriticalSection InstanceWeaponDataLock;
+	int32 LastInstanceWeaponDataID = -1;
+
+	FCriticalSection InstanceArmourDataLock;
+	int32 LastInstanceArmourDataID = -1;
+
+	FCriticalSection InstanceLootBoxDataIDLock;
+	int32 LastInstanceLootBoxDataID = -1;
 
 	UPROPERTY()
 	UItemDataTable* ItemData;

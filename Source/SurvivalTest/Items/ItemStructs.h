@@ -374,15 +374,13 @@ public:
 };
 
 USTRUCT(BlueprintType)
-struct FInstanceBoxData
+struct FInstanceLootBoxData
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	//int32 boxID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
 };
@@ -401,6 +399,16 @@ public:
 	int32 armourID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 instancedItemDataID = UItemStructs::InvalidInt;
+
+	friend bool operator==(const FInstanceArmourData& lhs, const FInstanceArmourData& rhs)
+	{
+		return lhs.ID == rhs.ID;
+	}
+
+	friend bool operator!=(const FInstanceArmourData& lhs, const FInstanceArmourData& rhs)
+	{
+		return !(lhs == rhs);
+	}
 };
 
 
@@ -542,7 +550,6 @@ struct FInstanceItemData
 	GENERATED_USTRUCT_BODY()
 
 	FInstanceItemData() {}
-	FInstanceItemData(int32 inSlot) : slot(inSlot) {}
 	FInstanceItemData(int32 inItemID, int32 newAmount) : itemID(inItemID), amount(newAmount) {}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
@@ -587,6 +594,14 @@ struct FInstanceItemData
 		int32 amountToTake = FMath::Min(itemToAdd.amount, space);
 		amount += amountToTake;
 		itemToAdd.amount -= amountToTake;
+	}
+
+	FInstanceItemData CopySlotAndContainer(const FInstanceItemData& other) const
+	{
+		FInstanceItemData updatedData = *this;
+		updatedData.slot = other.slot;
+		updatedData.containerInstanceID = other.containerInstanceID;
+		return updatedData;
 	}
 
 	static FInstanceItemData CreateEmptyItem(const FInstanceItemData& other)

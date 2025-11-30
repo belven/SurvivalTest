@@ -26,8 +26,8 @@ void USwapEquipmentAction::StartAction()
 	if (idIsValid && ItemsAreDifferent)
 	{
 		FString name = equippedWeapon ? equippedWeapon->GetItemData().name : "Empty";
-
-		UWeapon* weapon = UWeaponCreator::CreateWeapon(iid.itemID, character->GetWorld(), iid.ID);
+		UBaseGameInstance* gameInstance = Cast<UBaseGameInstance>(character->GetGameInstance());
+		UWeapon* weapon = UWeaponCreator::CreateWeapon(gameInstance, iid, gameInstance->GetItemData(iid.itemID));
 
 		UE_LOG(LogTemp, Log, TEXT("Swapping from %s to %s"), *name, *weapon->GetItemData().name);
 		character->GetInventory()->SetEquippedWeapon(weapon);

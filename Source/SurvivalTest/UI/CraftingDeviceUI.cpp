@@ -4,6 +4,9 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/HelperFunctions.h"
+#include "SurvivalTest/Items/Armour.h"
+#include "SurvivalTest/Items/ArmourCreator.h"
+#include "SurvivalTest/Items/WeaponCreator.h"
 
 TSubclassOf<UUserWidget> UCraftingDeviceUI::craftingDeviceUIClass;
 
@@ -38,11 +41,27 @@ void UCraftingDeviceUI::ConsumeRecipeInputs(FFullRecipe recipe)
 void UCraftingDeviceUI::ProduceOutputs(FFullRecipe recipe)
 {
 	for (FInputOutputData iod : recipe.outputs) {
-		TArray<int32> ids;
+		TArray<FInstanceItemData> ids;
 		FInstanceItemData iid;
 		iid.itemID = iod.inputOutputID;
 		iid.amount = iod.amount;
+
+
 		GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
+
+		UBaseGameInstance* baseGameInstance = GetBasePlayerController()->GetBaseGameInstance();
+		FItemData id = baseGameInstance->GetTableManager()->GetItemData(iid.itemID);
+
+		if (iid.amount == 0 && id.type == EItemType::Armour)
+		{
+			UArmourCreator::CreateArmourData(baseGameInstance, ids[0], id);
+		}
+		else if (iid.amount == 0 && id.type == EItemType::Weapon)
+		{
+			FRangedWeaponData rwd = baseGameInstance->GetRangedWeaponData(id.ID);
+			FProjectileWeaponData pwd = baseGameInstance->GetProjectileWeaponData(rwd.ID);
+			baseGameInstance->GetTableManager()->CreateNewInstanceWeaponData(ids[0].ID, pwd);
+		}
 	}
 }
 
@@ -87,30 +106,29 @@ void UCraftingDeviceUI::CraftComplete()
 
 void UCraftingDeviceUI::CancelCrafting(FInProgressCrafting cancelledCraft)
 {
-//	if (IsInProgress())
-//	{
-//		//cancelledCraft.
-//		// GetRecipeByID()
-//		for (FInputOutputData iod : GetRecipeByID(cancelledCraft.RecipeID).inputs)
-//		{
-//			if (iod.type == EInputOutputType::Item)
-//			{
-//				TArray<int32> ids;
-//				FInstanceItemData iid;
-//				iid.itemID = iod.inputOutputID;
-//				iid.amount = iod.amount;
-//				// TODO Start with own internal inventory, else add to players inventory
-//				GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
-//			}
-//		}
-//
-//		GetTimerManager()->ClearTimer(TimerHandle_ItemCrafted);
-//		craftingQueue.RemoveAt(0);
-//
-//		if (!craftingQueue.IsEmpty())
-//		{
-//			mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &UCraftingDeviceUI::CraftComplete, currentCraftingRecipe.recipe.craftingTime);
-//		}
+	if (IsInProgress())
+	{
+		for (FInputOutputData iod : GetRecipeByID(cancelledCraft.RecipeID).inputs)
+		{
+			if (iod.type == EInputOutputType::Item)
+			{
+				TArray<FInstanceItemData> ids;
+				FInstanceItemData iid;
+				iid.itemID = iod.inputOutputID;
+				iid.amount = iod.amount;
+				// TODO Start with own internal inventory, else add to players inventory
+				GetBasePlayerController()->GetBaseCharacter()->GetInventory()->AddItem(iid, ids);
+			}
+		}
+
+		GetTimerManager()->ClearTimer(TimerHandle_ItemCrafted);
+		craftingQueue.RemoveAt(0);
+
+		if (!craftingQueue.IsEmpty())
+		{
+			mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &UCraftingDeviceUI::CraftComplete, currentCraftingRecipe.recipe.craftingTime);
+		}
+	}
 }
 
 FTimerManager* UCraftingDeviceUI::GetTimerManager()

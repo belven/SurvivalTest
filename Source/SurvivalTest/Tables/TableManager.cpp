@@ -50,6 +50,129 @@ void UTableManager::LoadTableData()
 	LoadTableFromFile(GetInstanceCraftingDeviceTable());
 }
 
+
+int32 UTableManager::GetNextInstanceItemDataID()
+{
+	FScopeLock Lock(&InstanceItemIDLock);
+
+	const TMap<int32, FInstanceItemData>& items = GetInstanceItemDataTable()->GetData();
+
+	int32& id = LastInstanceItemID;
+
+	if (id == -1)
+	{
+		for (const auto& Pair : items)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
+	}
+
+	return ++id;
+
+}
+
+int32 UTableManager::GetNextInstanceLootBoxDataID()
+{
+	FScopeLock Lock(&InstanceLootBoxDataIDLock);
+
+	TMap<int32, FInstanceLootBoxData> items = GetInstancedLootBoxes();
+
+	int32& id = LastInstanceLootBoxDataID;
+
+	if (id == -1)
+	{
+		for (const auto& Pair : items)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
+	}
+
+	return ++id;
+}
+
+int32 UTableManager::GetNextInstanceArmourDataID()
+{
+	FScopeLock Lock(&InstanceArmourDataLock);
+
+	TMap<int32, FInstanceArmourData> armour = GetInstancedArmour();
+
+	int32& id = LastInstanceArmourDataID;
+
+	if (id == -1)
+	{
+		for (const auto& Pair : armour)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
+	}
+
+	return ++id;
+}
+
+FInstanceWeaponData UTableManager::CreateNewInstanceWeaponData(int32 instanceItemID, const FProjectileWeaponData& pwd)
+{
+	FInstanceWeaponData iwd;
+	iwd.ID = GetNextInstanceWeaponDataID();
+	iwd.instanceItemID = instanceItemID;
+	iwd.mode = EFireMode::FullAuto;
+	iwd.ammo = pwd.magazineSize;
+	AddUpdateData(iwd);
+	return iwd;
+}
+
+int32 UTableManager::GetNextInstanceContainerDataID()
+{
+	FScopeLock Lock(&InstanceContainerDataLock);
+
+	TMap<int32, FInstanceContainerData> containers = GetInstancedContainers();
+
+	int32& id = LastInstanceContainerDataID;
+
+	if (id == -1)
+	{
+		for (const auto& Pair : containers)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
+	}
+
+	return ++id;
+}
+
+int32 UTableManager::GetNextInstanceWeaponDataID()
+{
+	FScopeLock Lock(&InstanceWeaponDataLock);
+
+	TMap<int32, FInstanceWeaponData> instancedWeapons = GetWeaponInstanceTable()->GetData();
+
+	int32& id = LastInstanceWeaponDataID;
+
+	if (id == -1)
+	{
+		for (const auto& Pair : instancedWeapons)
+		{
+			if (Pair.Value.ID > id)
+			{
+				id = Pair.Value.ID;
+			}
+		}
+	}
+
+	return ++id;
+}
+
 void UTableManager::LoadTableFromFile(UCSVTable* table)
 {
 	const FString path = table->GetPath();
@@ -87,7 +210,7 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 	if (icd.type == EContainerType::Box)
 	{
 		int32 boxID = GetInstanceBoxDataByContainerInstance(containerInstanceID).ID;
-		GetInstancedBoxes().FindAndRemoveChecked(boxID);
+		GetInstancedLootBoxes().FindAndRemoveChecked(boxID);
 
 		// TODO make box container CSVTable
 	}
@@ -99,7 +222,7 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 	else if (icd.type == EContainerType::Armour)
 	{
 		FInstanceArmourData armour = GetInstancedArmourByContainerID(icd.ID);
-		GetInstancedBoxes().FindAndRemoveChecked(armour.ID);
+		GetInstancedLootBoxes().FindAndRemoveChecked(armour.ID);
 	}
 
 	for (FInstanceItemData iid : items)
@@ -110,12 +233,12 @@ void UTableManager::RemoveContainerData(int32 containerInstanceID)
 	instancedContainers.FindAndRemoveChecked(icd.ID);
 }
 
-FInstanceBoxData UTableManager::GetInstanceBoxDataByContainerInstance(int32 containerInstanceID)
+FInstanceLootBoxData UTableManager::GetInstanceBoxDataByContainerInstance(int32 containerInstanceID)
 {
-	TArray<FInstanceBoxData> instancedBoxesFound;
-	boxContainers.GenerateValueArray(instancedBoxesFound);
+	TArray<FInstanceLootBoxData> instancedBoxesFound;
+	instancedLootboxes.GenerateValueArray(instancedBoxesFound);
 
-	for (const FInstanceBoxData ibd : instancedBoxesFound)
+	for (const FInstanceLootBoxData ibd : instancedBoxesFound)
 	{
 		if (ibd.containerInstanceID == containerInstanceID)
 		{
@@ -312,7 +435,7 @@ TArray<FFullRecipe> UTableManager::GetRecipes(int32 craftingDeviceID)
 		}
 	}
 
-	if (!craftingDeviceFullRecipes.Contains(craftingDeviceID)) 
+	if (!craftingDeviceFullRecipes.Contains(craftingDeviceID))
 	{
 		TArray<FFullRecipe> craftingDeviceRecipes;
 

@@ -60,9 +60,9 @@ public:
 	EGearType GetGearTypeForItem(int32 itemID) { return mTable()->GetGearTypeForItem(itemID); }
 
 	int32 GetNextInstanceItemDataID();
-	int32 GetNextBoxID();
-	int32 GetNextInstanceBoxDataID();
+	int32 GetNextInstanceLootBoxDataID();
 	int32 GetNextInstanceArmourDataID();
+	FInstanceWeaponData CreateNewInstanceWeaponData(int32 instanceItemID, const FProjectileWeaponData& pwd);
 	int32 GetNextInstanceContainerDataID();
 	int32 GetNextInstanceWeaponDataID();
 
@@ -91,7 +91,7 @@ public:
 	TMap<int32, FInstanceItemData>& GetInstancedItems() { return mTable()->GetInstanceItemDataTable()->GetData(); }
 	TMap<int32, FInstanceContainerData>& GetInstancedContainers() { return mTable()->GetInstancedContainers(); }
 	TMap<int32, FInstanceArmourData>& GetInstancedArmour() { return mTable()->GetInstancedArmour(); }
-	TMap<int32, FInstanceBoxData>& GetInstancedBoxes() { return mTable()->GetInstancedBoxes(); }
+	TMap<int32, FInstanceLootBoxData>& GetInstancedBoxes() { return mTable()->GetInstancedLootBoxes(); }
 	void SetMainLight(AMainLight* inMainLight) { mainLight = inMainLight; }
 
 	TMap<FString, ABuildingPart*>& GetBuildingParts() { return buildingParts; }
@@ -118,23 +118,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	AObjectInstanceManager* GetObjectInstanceManager();
 
-	FCriticalSection InstanceItemIDLock;
-	int32 LastInstanceItemID = -1;
-
-	FCriticalSection InstanceContainerDataLock;
-	int32 LastInstanceContainerDataID = -1;
-
-	FCriticalSection InstanceWeaponDataLock;
-	int32 LastInstanceWeaponDataID = -1;
-
-	FCriticalSection InstanceArmourDataLock;
-	int32 LastInstanceArmourDataID = -1;
-
-	FCriticalSection BoxIDLock;
-	int32 LastBoxID = -1;
-
-	FCriticalSection BoxDataIDLock;
-	int32 LastBoxDataID = -1;
 
 	UPROPERTY()
 	UMissionManager* missionManager;

@@ -10,10 +10,8 @@ void UInstanceBoxDataTable::LoadData(TArray<TArray<FString>> inDataStrings)
 	for (TArray<FString> row : inDataStrings)
 	{
 		int index = 0;
-		FInstanceBoxData data;
+		FInstanceLootBoxData data;
 		data.ID = GetIntFromString(row[index++]);
-		//data.boxID = TODO Why do we have boxID here?
-		GetIntFromString(row[index++]);
 		data.containerInstanceID = GetIntFromString(row[index++]);
 		instanceBoxData.Add(data);
 	}

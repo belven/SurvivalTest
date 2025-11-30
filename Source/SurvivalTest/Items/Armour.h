@@ -15,8 +15,6 @@ public:
 	FArmourData GetData() const { return data; }
 	void SetData(const FArmourData& inData) { this->data = inData; }
 
-	static UArmour* CreateArmour(int32 itemID, UBaseGameInstance* game, int32 instanceItemDataID);
-
 	FInstanceArmourData GetInstanceArmourData() const { return instanceArmourData; }
 	void SetInstanceArmourData(FInstanceArmourData inContainerData) { this->instanceArmourData = inContainerData; }
 

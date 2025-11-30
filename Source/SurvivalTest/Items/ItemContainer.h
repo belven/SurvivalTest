@@ -28,7 +28,7 @@ public:
 
 	FItemDataPair(const FInstanceItemData& inIid, const FItemData& inID)
 		: id(inID),
-		  iid(inIid)
+		iid(inIid)
 	{
 	}
 
@@ -53,12 +53,12 @@ public:
 	TArray<FInstanceItemData> GetExistingItemsWithSpace(int32 itemID);
 	bool CheckForArmourInventory(FInstanceItemData& itemToTransfer);
 	void SwapItems(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& originalItemData, int32 maxStackSize, FInstanceItemData& existingItem);
-	void MoveItemToSlot(UItemContainer* container, FInstanceItemData& itemToTransfer, const int32 slot, const FInstanceItemData& originalItemData);
+	void MoveItemToSlot(UItemContainer* container, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData);
 	//void MoveItemToEmptySlot(UItemContainer* otherContainer, FInstanceItemData& itemToTransfer);
 	void MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemContainer* destContainer, FInstanceItemData& itemToTransfer);
 	void FillExistingItems(FInstanceItemData& itemToTransfer, int32 maxStackSize);
 	void DropOnExistingItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const int32 droppedSlot, const FInstanceItemData& originalItemData, int32 maxStack, FInstanceItemData& existingItem, EGearType type);
-	void AddUpdateItemData(FInstanceItemData& existingItem);
+	void AddUpdateItemData(FInstanceItemData& itemToAddOrUpdate);
 	void UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem);
 	void RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToDelete);
 	void FillExistingItemsWithDroppedItem(UItemContainer* other, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData, int32 maxStackSize);
@@ -72,7 +72,7 @@ public:
 	FInstanceItemData& TransferItem(UItemContainer* sourceInventory, FInstanceItemData itemToTransfer, const int32 droppedSlot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	TArray<FInstanceItemData> GetItems() { return game->GetInstancedItemsForContainer(instanceContainerData.ID); }
+	TArray<FInstanceItemData> GetItems() { return baseGameInstance->GetInstancedItemsForContainer(instanceContainerData.ID); }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	bool HasSpace(FInstanceItemData item);
@@ -81,8 +81,8 @@ public:
 	FInstanceItemData GetInstanceItemAtSlot(int32 slot);
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-	FInstanceItemData& AddItem(FInstanceItemData& itemToAdd, TArray<int32>& ids);
-	
+	FInstanceItemData& AddItem(FInstanceItemData& itemToAdd, TArray<FInstanceItemData>& newItemInstances);
+
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData RemoveItem(FInstanceItemData itemToRemove);
 
@@ -98,17 +98,17 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetMaxItemCount() { return containerData.slots; }
-	
+
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetNextEmptySlot();
 	int32 GetContainerInstanceID();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	bool SplitItem(FInstanceItemData& itemToSplit);
-	
+
 	UPROPERTY(BlueprintCallable, Category = "Item Container")
-		FItemUpdated OnItemUpdated;
-	
+	FItemUpdated OnItemUpdated;
+
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	int32 GetOwnerID() const { return containerData.ID; }
 
@@ -125,7 +125,7 @@ public:
 	void SetContainerData(FContainerData inContainerData) { this->containerData = inContainerData; }
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
-		UBaseGameInstance* GetGame();
+	UBaseGameInstance* GetGame();
 
 	void AddValidSlot(EGearType type, const int32 slot);
 protected:
@@ -136,7 +136,7 @@ protected:
 	FContainerData containerData;
 
 	UPROPERTY()
-	UBaseGameInstance* game = NULL;
+	UBaseGameInstance* baseGameInstance = NULL;
 
 	UPROPERTY()
 	FInstanceContainerData instanceContainerData;

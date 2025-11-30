@@ -11,7 +11,7 @@ UItemContainer* UItemContainer::CreateItemContainer(const FContainerData& inCont
 	UItemContainer* ic = NewObject<UItemContainer>();
 	ic->SetContainerData(inContainerData);
 	ic->SetInstanceContainerData(inInstanceContainerData);
-	ic->game = inGame;
+	ic->baseGameInstance = inGame;
 	return ic;
 }
 
@@ -37,15 +37,13 @@ bool UItemContainer::HasSpace(FInstanceItemData item)
 
 FInstanceItemData UItemContainer::GetInstanceItemAtSlot(int32 slot)
 {
-	FInstanceItemData id;
-
 	for (FInstanceItemData item : GetItems())
 	{
 		if (item.slot == slot)
 			return item;
 	}
 
-	return id;
+	return FInstanceItemData::CreateEmptyItem(slot, GetContainerInstanceID());
 }
 
 TArray<FInstanceItemData> UItemContainer::GetExistingItemsWithSpace(int32 itemID)
@@ -171,36 +169,30 @@ void UItemContainer::SwapItems(UItemContainer* other, FInstanceItemData& itemToT
 		FInstanceItemData otherItem = itemToTransfer;
 		FInstanceItemData ourItem = existingItem;
 
-		int otherSlot = otherItem.slot;
-
-		otherItem.containerInstanceID = GetContainerInstanceID();
-		otherItem.slot = ourItem.slot;
+		//otherItem.containerInstanceID = existingItem.containerInstanceID;
+		//otherItem.slot = existingItem.slot;
 
 		UpdateItemData(this, otherItem, ourItem);
 
-		ourItem.containerInstanceID = other->GetContainerInstanceID();
-		ourItem.slot = otherSlot;
+		//ourItem.containerInstanceID = itemToTransfer.containerInstanceID;
+		//ourItem.slot = itemToTransfer.slot;
 
-		UpdateItemData(other, ourItem, itemToTransfer);
+		UpdateItemData(other, ourItem, otherItem);
+
 	}
 }
 
-void UItemContainer::MoveItemToSlot(UItemContainer* container, FInstanceItemData& itemToTransfer, const int32 slot, const FInstanceItemData& originalItemData)
+void UItemContainer::MoveItemToSlot(UItemContainer* container, FInstanceItemData& itemToTransfer, const FInstanceItemData& originalItemData)
 {
-	if (slot != UItemStructs::InvalidInt)
-	{
 		// Set the containerInstanceID to this container, this will move the item to belong to us
-		itemToTransfer.containerInstanceID = container->GetContainerInstanceID();
-		itemToTransfer.slot = slot;
-
-		UpdateItemData(container, itemToTransfer, originalItemData);
-	}
+		UpdateItemData(container, itemToTransfer, originalItemData);	
 }
 
 void UItemContainer::MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemContainer* destContainer, FInstanceItemData& itemToTransfer)
 {
 	// Find destination empty slot
 	int32 emptySlot = destContainer->GetNextEmptySlotForItem(itemToTransfer.itemID);
+
 	if (!UItemStructs::IsValidID(emptySlot))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("MoveItemToEmptySlot: No valid empty slot in destination container %d"), destContainer->GetContainerInstanceID());
@@ -208,16 +200,13 @@ void UItemContainer::MoveItemToEmptySlot(UItemContainer* sourceContainer, UItemC
 	}
 
 	// Store the original copy for UI update purposes
-	FInstanceItemData originalItemData = itemToTransfer;
-
-	// Blank data for clearing the old slot in the source
-	FInstanceItemData blankData(originalItemData.slot);
+	FInstanceItemData originalItemData = GetInstanceItemAtSlot(emptySlot);
 
 	// Move the item into destination
-	destContainer->MoveItemToSlot(destContainer, itemToTransfer, emptySlot, originalItemData);
+	destContainer->MoveItemToSlot(destContainer, itemToTransfer,  originalItemData);
 
 	// Clear the original slot in the source
-	sourceContainer->MoveItemToSlot(sourceContainer, blankData, originalItemData.slot, itemToTransfer);
+	sourceContainer->MoveItemToSlot(sourceContainer, originalItemData, itemToTransfer);
 }
 
 void UItemContainer::FillExistingItems(FInstanceItemData& itemToTransfer, int32 maxStackSize)
@@ -257,7 +246,7 @@ void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData
 		SwapItems(other, itemToTransfer, droppedSlot, originalItemData, maxStack, existingItem);
 	}
 	// If the item has no space, then it's a whole stack and should go into the next valid slot, if any
-	// No point adding it to others if it's a whole stack, this also helps dealing with single item stacks of armour and weapons
+	// No point adding it to others if it's a whole stack, this also helps to deal with single item stacks of armour and weapons
 	else if (!HasSpace(itemToTransfer))
 	{
 		//UE_LOG(LogTemp, Log, TEXT("DropOnExistingItem MoveItemToEmptySlot"));
@@ -271,20 +260,22 @@ void UItemContainer::DropOnExistingItem(UItemContainer* other, FInstanceItemData
 	}
 }
 
-void UItemContainer::AddUpdateItemData(FInstanceItemData& existingItem)
+void UItemContainer::AddUpdateItemData(FInstanceItemData& itemToAddOrUpdate)
 {
-	GetGame()->AddUpdateData(existingItem);
+	GetGame()->AddUpdateData(itemToAddOrUpdate);
 }
 
 void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem)
 {
-	AddUpdateItemData(newItem);
 	container->OnItemUpdated.Broadcast(newItem, OldItem);
+	FInstanceItemData updatedItem = newItem;
+	updatedItem.containerInstanceID = OldItem.containerInstanceID;
+	updatedItem.slot = OldItem.slot;
+	AddUpdateItemData(updatedItem);
 }
 
 void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToDelete)
 {
-	// TODO Doesn't always remove the UI item correctly. Likely due to not invalidating the ID
 	GetGame()->GetInstancedItems().Remove(itemToDelete.ID);
 	other->OnItemUpdated.Broadcast(itemToDelete.CreateEmptyCopy(), itemToDelete);
 }
@@ -349,9 +340,8 @@ FInstanceItemData& UItemContainer::TransferItem(UItemContainer* sourceInventory,
 			else if (IsValidForSlot(droppedSlot, type))
 			{
 				//UE_LOG(LogTemp, Log, TEXT("TransferItem Manual Transfer Empty Slot"));
-				MoveItemToSlot(this, itemToTransfer, droppedSlot, existingItem);
-
-				sourceInventory->OnItemUpdated.Broadcast(FInstanceItemData(originalItemData.slot), originalItemData);
+				MoveItemToSlot(this, itemToTransfer, existingItem);
+				sourceInventory->MoveItemToSlot(sourceInventory, existingItem, itemToTransfer);
 			}
 			// If we're here, there's no existing item but the slot we've dropped it onto isn't valid
 			// I.e. you've dropped some food into a weapon / bag only slot
@@ -396,12 +386,12 @@ int32 UItemContainer::GetNextEmptySlotForItem(int32 itemID)
 * Adds an item to the inventory, if it finds an item with less than StackSize it adds the amount
 * else it will create a new item with the remaining amount and set the one found to StackSize
 *
-*@param ids the list of new InstanceItemData ids created in the database
+*@param newItemInstances the list of new InstanceItemData ids created in the database
 *@param itemToAdd the items to add to the inventory, typically only item creation will run this method, for instance, when first creating items from a loot box
 *
 * @return the input item with the amount set to the remainder if any, i.e. if it's not 0 then the inventory was full
 */
-FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<int32>& ids)
+FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<FInstanceItemData>& newItemInstances)
 {
 	//UE_LOG(LogTemp, Log, TEXT("Add Item"));
 
@@ -419,9 +409,9 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 				//UE_LOG(LogTemp, Log, TEXT("Add Item Max Stack"));
 
 				FInstanceItemData newItem = itemToAdd.CopyItem(GetNextInstanceItemDataID(), GetContainerInstanceID(), emptySlot, itemToAdd.amount);
-				UpdateItemData(this, newItem, FInstanceItemData(emptySlot));
+				UpdateItemData(this, newItem, newItem.CreateEmptyCopy());
 
-				ids.Add(newItem.ID);
+				newItemInstances.Add(newItem);
 				itemToAdd.amount = 0;
 			}
 		}
@@ -442,8 +432,8 @@ FInstanceItemData& UItemContainer::AddItem(FInstanceItemData& itemToAdd, TArray<
 					newItem.TakeFrom(itemToAdd, stackSize);
 
 					// Add the new item
-					ids.Add(newItem.ID);
-					UpdateItemData(this, newItem, FInstanceItemData(emptySlot));
+					newItemInstances.Add(newItem);
+					UpdateItemData(this, newItem, newItem.CreateEmptyCopy());
 				}
 				// We found no more valid slots for the item
 				else
@@ -542,7 +532,7 @@ bool UItemContainer::SplitItem(FInstanceItemData& itemToSplit)
 				//newItem.ID, emptySlot,
 				//GetGame()->GetInstancedItems().Contains(newItem.ID) ? TEXT("YES") : TEXT("NO"));
 
-			UpdateItemData(this, newItem, FInstanceItemData(emptySlot));
+			UpdateItemData(this, newItem, newItem.CreateEmptyCopy());
 
 			UpdateDebugItemsList();
 			result = true;
@@ -553,7 +543,7 @@ bool UItemContainer::SplitItem(FInstanceItemData& itemToSplit)
 
 UBaseGameInstance* UItemContainer::GetGame()
 {
-	return game;
+	return baseGameInstance;
 }
 
 void UItemContainer::AddValidSlot(EGearType type, const int32 slot)

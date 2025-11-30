@@ -75,7 +75,7 @@ public:
 	FInstanceItemData GetBlankInstanceItemData(int32 containerSlot);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void UpdateItemUI(const FInstanceItemData& newItem);
+	void UpdateItemUI(const FInstanceItemData& newItem, const FInstanceItemData& oldItem);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	TMap<int32, UItemUI*>& GetItemUIAtSlots()

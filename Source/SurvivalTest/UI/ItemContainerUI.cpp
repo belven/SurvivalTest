@@ -159,26 +159,29 @@ FInstanceItemData UItemContainerUI::GetBlankInstanceItemData(int32 containerSlot
 	return FInstanceItemData::CreateEmptyItem(containerSlot, container->GetContainerInstanceID());
 }
 
-void UItemContainerUI::UpdateItemUI(const FInstanceItemData& newItem)
+void UItemContainerUI::UpdateItemUI(const FInstanceItemData& newItem, const FInstanceItemData& oldItem)
 {
-	UItemUI* itemAtSlot = GetItemAtSlot(newItem.slot);
-	FItemData data = GetBaseGameInstance()->GetItemData(newItem.itemID);
+	UItemUI* itemAtSlot = GetItemAtSlot(oldItem.slot);
 
 	// TODO this only happened due to the UI being removed as we moved around 
 	if (itemAtSlot)
 	{
 		if (newItem.isValid())
 		{
-			itemAtSlot->UpdateItemData(newItem, data, GetItemContainer());
+			FItemData data = GetBaseGameInstance()->GetItemData(newItem.itemID);
+			FInstanceItemData updatedNewItem = newItem;
+			updatedNewItem.slot = oldItem.slot;
+			updatedNewItem.containerInstanceID = GetItemContainer()->GetContainerInstanceID();
+			itemAtSlot->UpdateItemData(updatedNewItem, data, GetItemContainer());
 		}
 		else
 		{
-			itemAtSlot->UpdateItemData(GetBlankInstanceItemData(newItem.slot), data, GetItemContainer());
+			itemAtSlot->UpdateItemData(FInstanceItemData::CreateEmptyItem(oldItem.slot, GetItemContainer()->GetContainerInstanceID()), FItemData(), GetItemContainer());
 		}
 	}
 }
 
 void UItemContainerUI::ItemUpdated(const FInstanceItemData& newItem, const FInstanceItemData& oldItem)
 {
-	UpdateItemUI(newItem);
+	UpdateItemUI(newItem, oldItem);
 }

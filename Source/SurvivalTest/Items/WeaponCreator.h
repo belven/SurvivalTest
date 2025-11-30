@@ -1,5 +1,6 @@
 #pragma once
 #include "CoreMinimal.h"
+#include "SurvivalTest/BaseGameInstance.h"
 #include "WeaponCreator.generated.h"
 
 #define mNewObject(uClass) NewObject<uClass>() 
@@ -10,5 +11,5 @@ class SURVIVALTEST_API UWeaponCreator : public UObject
 {
 	GENERATED_BODY()
 public:
-		static UWeapon* CreateWeapon(const int32 itemID, const UWorld* world, int32 instanceItemID);
+		static UWeapon* CreateWeapon(UBaseGameInstance* gameIn, const FInstanceItemData& inInstanceItemData, const FItemData& inItemData);
 };

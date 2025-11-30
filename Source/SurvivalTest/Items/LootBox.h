@@ -62,7 +62,7 @@ protected:
 	FContainerData containerData;
 
 	FInstanceContainerData icd;
-	FInstanceBoxData ibd;
+	FInstanceLootBoxData ibd;
 
 	bool isHighlighted = false;
 	int32 minTime = 10;

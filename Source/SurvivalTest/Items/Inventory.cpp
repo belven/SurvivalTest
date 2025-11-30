@@ -11,7 +11,7 @@ UInventory* UInventory::CreateInventory(const FContainerData& inContainerData, c
 	UInventory* ic = NewObject<UInventory>();
 	ic->SetContainerData(inContainerData);
 	ic->SetInstanceContainerData(inInstanceContainerData);
-	ic->game = inGame;
+	ic->baseGameInstance = inGame;
 	ic->characterOwner = inCharacterOwner;
 	return ic;
 }
@@ -28,18 +28,18 @@ void UInventory::CreateNewItemForInventory(int32 itemID)
 {
 	if (itemID != UItemStructs::InvalidInt)
 	{
-		FItemData id = game->GetItemData(itemID);
-		TArray<int32> ids;
+		FItemData id = baseGameInstance->GetItemData(itemID);
+		TArray<FInstanceItemData> ids;
 		FInstanceItemData iid(itemID, 1);
 		FInstanceItemData& newItem = AddItem(iid, ids);
 
-		if (newItem.amount == 0)
+		if (newItem.amount == 0 && !ids.IsEmpty())
 		{
-			int32 weaponInstanceItemID = ids.IsEmpty() ? UItemStructs::InvalidInt : ids[0];
+			FInstanceItemData instanceItemCreated = ids[0];
 
 			if (id.type == EItemType::Armour)
 			{
-				EquipArmour(UArmourCreator::CreateArmour(itemID, characterOwner->GetWorld(), ids[0]));
+				EquipArmour(UArmourCreator::GetOrCreateArmour(baseGameInstance, instanceItemCreated));
 			}
 			else if (id.type == EItemType::Weapon)
 			{
@@ -51,6 +51,7 @@ void UInventory::CreateNewItemForInventory(int32 itemID)
 					FProjectileWeaponData pwd = GetGame()->GetProjectileWeaponData(rwd.ID);
 					FItemData ammoData = GetGame()->GetItemData(pwd.ammoID);
 
+					// TODO figure out default ammo spawn system
 					/*for (int i = 0; i < 1; ++i)
 					{*/
 					iid.amount = ammoData.maxStack * 3;
@@ -61,7 +62,7 @@ void UInventory::CreateNewItemForInventory(int32 itemID)
 					//}
 				}
 
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(itemID, characterOwner->GetWorld(), weaponInstanceItemID));
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(baseGameInstance, instanceItemCreated, id));
 			}
 		}
 	}
@@ -153,7 +154,12 @@ void UInventory::SetEquippedWeapon(UWeapon* weapon)
  */
 void UInventory::EquipArmour(UArmour* armour)
 {
-	equippedArmour.FindOrAdd(armour->GetData().slot, armour);
+	if (equippedArmour.Contains(armour->GetData().slot))
+	{
+		equippedArmour.Remove(armour->GetData().slot);
+	}
+
+	equippedArmour.Add(armour->GetData().slot, armour);
 }
 
 
@@ -187,124 +193,128 @@ void UInventory::SetupLoadout(const FLoadoutData& ld)
 	OnItemUpdated.AddUniqueDynamic(this, &UInventory::ItemUpdated);
 }
 
-void UInventory::ItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem)
+void UInventory::GetItemArmourData(int32 instanceItemID, FInstanceArmourData& instanceArmourData, FArmourData& armourData)
 {
-	FItemData id = game->GetItemData(inItem.itemID);
+	instanceArmourData = baseGameInstance->GetTableManager()->GetInstanceArmourDataByInstanceItemID(instanceItemID);
+	armourData = baseGameInstance->GetTableManager()->GetArmourData(instanceArmourData.armourID);
+}
 
-	if (id.type == EItemType::Weapon)
+void UInventory::CheckArmourItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& oldItemData)
+{
+	//UE_LOG(LogTemp, Log, TEXT("Armour moved from %d to %d"), oldInstanceItemData.containerInstanceID, newInstanceItemData.containerInstanceID);
+	FInstanceArmourData newInstanceArmourData;
+	FArmourData newArmourData;
+
+	int32 slot = oldInstanceItemData.slot;
+	GetItemArmourData(newInstanceItemData.ID, newInstanceArmourData, newArmourData);
+
+	FInstanceArmourData oldInstanceArmourData;
+	FArmourData oldArmourData;
+
+	GetItemArmourData(oldInstanceItemData.ID, oldInstanceArmourData, oldArmourData);
+
+	// If both items are armour, replace the old armour with the new
+	if (newItemData.type == EItemType::Armour && oldItemData.type == EItemType::Armour)
 	{
-		bool movedSlot = inItem.slot != oldItem.slot;
-		bool isWeaponSlot = GetSlotForGear(EGearType::Weapon).Contains(inItem.slot) || GetSlotForGear(EGearType::Sidearm).Contains(inItem.slot);
-
-		if (GetEquippedWeapon())
+		if (GetSlotForGear(newArmourData.slot).Contains(slot))
 		{
-			// Have we updated our equipped weapon?
-			if (GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID)
+			EquipArmour(UArmourCreator::GetOrCreateArmour(baseGameInstance, updatedInstanceItem));
+			UE_LOG(LogTemp, Log, TEXT("Armour Swapped from %s to %s"), *oldItemData.name, *newItemData.name);
+		}
+	}
+	// Old slot was blank, so new armour is added
+	else	if (newItemData.type == EItemType::Armour)
+	{
+		if (GetSlotForGear(newArmourData.slot).Contains(slot))
+		{
+			UE_LOG(LogTemp, Log, TEXT("Equipped Armour %s"), *newItemData.name);
+			EquipArmour(UArmourCreator::GetOrCreateArmour(baseGameInstance, updatedInstanceItem));
+		}
+	}
+	// Most likely armour replaced with nothing, i.e.e moved out of valid slot to blank space
+	else if (oldItemData.type == EItemType::Armour)
+	{
+		if (GetSlotForGear(oldArmourData.slot).Contains(slot))
+		{
+			bool equippedArmourContains = equippedArmour.Contains(oldArmourData.slot);
+
+			// Remove existing armour from equippedArmour
+			if (equippedArmourContains && equippedArmour.FindChecked(oldArmourData.slot)->GetInstanceArmourData() == oldInstanceArmourData)
 			{
-				// Has the weapon moved out of an equipped slot?
-				if (movedSlot && !isWeaponSlot)
+				UE_LOG(LogTemp, Log, TEXT("Armour Removed %s"), *oldItemData.name);
+				equippedArmour.Remove(oldArmourData.slot);
+			}
+		}
+	}
+
+
+	UE_LOG(LogTemp, Log, TEXT("Armour Resistance %d"), characterOwner->GetDamageResistance());
+}
+
+void UInventory::CheckWeaponItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& inOldItemData)
+{
+	int32 slot = oldInstanceItemData.slot;
+	bool isWeaponSlot = GetSlotForGear(EGearType::Weapon).Contains(slot) || GetSlotForGear(EGearType::Sidearm).Contains(slot);
+
+	// Have we moved from a weapon slot?
+	if (isWeaponSlot)
+	{
+		// Replaced Weapon with weapon
+		if (newItemData.type == EItemType::Weapon)
+		{
+			if (GetEquippedWeapon() != NULL)
+			{
+				FInstanceItemData equippedWeaponInstanceItemData = GetEquippedWeapon()->GetInstanceItemData();
+
+				bool areDifferentInstances = equippedWeaponInstanceItemData.ID != newInstanceItemData.ID;
+				bool doTheSlotsMatch = equippedWeaponInstanceItemData.slot == slot;
+
+				/*UE_LOG(LogTemp, Log, TEXT("Weapon Equipped %s at slot %d"), *GetEquippedWeapon()->GetItemData().name, equippedWeaponInstanceItemData.slot);
+				UE_LOG(LogTemp, Log, TEXT("areDifferentInstances %d"), areDifferentInstances);
+				UE_LOG(LogTemp, Log, TEXT("doTheSlotsMatch %d"), doTheSlotsMatch);
+				UE_LOG(LogTemp, Log, TEXT("Attempting to swap from %s to %s"), *inOldItemData.name, *newItemData.name);*/
+
+				if (areDifferentInstances && doTheSlotsMatch)
 				{
+					UE_LOG(LogTemp, Log, TEXT("Weapon Swapped from %s to %s"), *inOldItemData.name, *newItemData.name);
+					SetEquippedWeapon(UWeaponCreator::CreateWeapon(baseGameInstance, updatedInstanceItem, newItemData));
+				}
+			}
+			// Nothing is equipped
+			else
+			{
+				UE_LOG(LogTemp, Log, TEXT("Weapon Equipped %s"), *newItemData.name);
+				SetEquippedWeapon(UWeaponCreator::CreateWeapon(baseGameInstance, updatedInstanceItem, newItemData));
+			}
+		}
+		else if (inOldItemData.type == EItemType::Weapon)
+		{
+			if (GetEquippedWeapon() != NULL)
+			{
+				FInstanceItemData iid = baseGameInstance->GetTableManager()->GetInstanceItemDataByID(GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID);
+
+				if (iid.slot == slot)
+				{
+					UE_LOG(LogTemp, Log, TEXT("Weapon Removed %s"), *inOldItemData.name);
 					SetEquippedWeapon(nullptr);
 				}
 			}
-			// Is the new item in a valid weapon slot
-			// If so equip the new weapon
-			else if (isWeaponSlot)
-			{
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, characterOwner->GetWorld(), inItem.ID));
-			}
-		}
-		else if (isWeaponSlot)
-		{
-			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, characterOwner->GetWorld(), inItem.ID));
 		}
 	}
-	else if (id.type == EItemType::Armour)
-	{
-		UArmour* armourFound = nullptr;
-
-		for (auto& a : equippedArmour)
-		{
-			if (a.Value->GetInstanceArmourData().instancedItemDataID == inItem.ID
-				// Has the armour moved out of an equipped slot?
-				&& !GetSlotForGear(a.Value->GetData().slot).Contains(inItem.slot))
-			{
-				armourFound = a.Value;
-				break;
-			}
-		}
-
-		if (armourFound)
-		{
-			equippedArmour.Remove(armourFound->GetData().slot);
-		}
-	}
-	// TODO add ability to display armour container
-	//OnContainersUpdated.Broadcast();
 }
-//
-///**
-// * An event listener for the players inventory that responds to items being added
-// *
-// *@param inItem The item added to the inventory
-// *
-// */
-//void UInventory::ItemAdded(FInstanceItemData inItem)
-//{
-//	FItemData id = game->GetItemData(inItem.itemID);
-//
-//	// If we added armour, then update the Equipped armour
-//	if (id.type == EItemType::Armour)
-//	{
-//		FInstanceArmourData iad = game->GetInstanceArmourDataByInstanceItemID(inItem.ID);
-//		EquipArmour(UArmour::CreateArmour(inItem.itemID, game, inItem.ID));
-//	}
-//	// If we added a weapon and don't have one equipped, then equip it
-//	else if (id.type == EItemType::Weapon)
-//	{
-//		FWeaponData wd = game->GetWeaponData(id.ID);
-//		if (!GetEquippedWeapon() && GetSlotForGear(wd.gearType).Contains(inItem.slot))
-//		{
-//			SetEquippedWeapon(UWeaponCreator::CreateWeapon(inItem.itemID, characterOwner->GetWorld(), inItem.ID));
-//		}
-//	}
-//	OnContainersUpdated.Broadcast();
-//}
-//
-///**
-// * An event listener for the players inventory that responds to items being removed
-// *
-// *@param inItem The item removed from the inventory
-// *
-// */
-//void UInventory::ItemRemoved(FInstanceItemData inItem)
-//{
-//	FItemData id = game->GetItemData(inItem.itemID);
-//
-//	if (id.type == EItemType::Weapon)
-//	{
-//		if (GetEquippedWeapon() && GetEquippedWeapon()->GetInstanceWeaponData().instanceItemID == inItem.ID)
-//		{
-//			SetEquippedWeapon(nullptr);
-//		}
-//	}
-//	else if (id.type == EItemType::Armour)
-//	{
-//		UArmour* armourFound = nullptr;
-//
-//		for (auto& a : equippedArmour)
-//		{
-//			if (a.Value->GetInstanceArmourData().instancedItemDataID == inItem.ID)
-//			{
-//				armourFound = a.Value;
-//				break;
-//			}
-//		}
-//
-//		if (armourFound)
-//		{
-//			equippedArmour.Remove(armourFound->GetData().slot);
-//		}
-//	}
-//	OnContainersUpdated.Broadcast();
-//}
+
+void UInventory::ItemUpdated(const FInstanceItemData& newItem, const FInstanceItemData& oldItem)
+{
+	FItemData newItemData = baseGameInstance->GetItemData(newItem.itemID);
+	FItemData oldItemData = baseGameInstance->GetItemData(oldItem.itemID);
+	FInstanceItemData updatedInstanceItem = newItem.CopySlotAndContainer(oldItem);
+
+	if (newItemData.type == EItemType::Armour || oldItemData.type == EItemType::Armour)
+	{
+		CheckArmourItems(updatedInstanceItem, newItem, oldItem, newItemData, oldItemData);
+	}
+	else	if (newItemData.type == EItemType::Weapon || oldItemData.type == EItemType::Weapon)
+	{
+		CheckWeaponItems(updatedInstanceItem, newItem, oldItem, newItemData, oldItemData);
+	}
+}

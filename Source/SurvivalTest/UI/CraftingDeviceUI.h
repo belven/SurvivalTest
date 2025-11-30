@@ -16,7 +16,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
 	static UCraftingDeviceUI* CreateCraftingDeviceUI(ABasePlayerController* controller, const FCraftingDevice& inCraftingDevice, const FInstanceCraftingDevice& inInstanceCraftingDevice);
 
-	UFUNCTION(BlueprintCallable, Category = "Crafting")
+	UFUNCTION(Category = "Crafting")
 	void OnItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem);
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting")

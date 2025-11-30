@@ -12,7 +12,7 @@ public:
 	UInstanceBoxDataTable();
 	virtual void LoadData(TArray<TArray<FString>> inDataStrings) override;
 
-	TArray<FInstanceBoxData >& GetData() { return instanceBoxData; }
+	TArray<FInstanceLootBoxData >& GetData() { return instanceBoxData; }
 private:
-	TArray<FInstanceBoxData > instanceBoxData;
+	TArray<FInstanceLootBoxData > instanceBoxData;
 };

@@ -289,6 +289,7 @@ int32 ABaseCharacter::GetDamageResistance()
 		}
 	}
 
+	//UE_LOG(LogTemp, Log, TEXT("Resistance %d"), total);
 	return total;
 }
 

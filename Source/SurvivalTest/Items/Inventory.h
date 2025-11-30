@@ -28,9 +28,13 @@ public:
 
 	void SetEquippedWeapon(UWeapon* weapon);
 	void EquipArmour(UArmour* armour);
-	
+
+	void CheckWeaponItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& inOldItemData);
+	void CheckArmourItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& oldItemData);
+	void GetItemArmourData(int32 instanceItemID, FInstanceArmourData& instanceArmourData, FArmourData& armourData);
+
 	UFUNCTION()
-		void ItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem);
+		void ItemUpdated(const FInstanceItemData& newItem, const FInstanceItemData& oldItem);
 
 	TArray<int32> GetSlotForGear(EGearType type);
 	int32 GetPrimaryWeaponSlot();

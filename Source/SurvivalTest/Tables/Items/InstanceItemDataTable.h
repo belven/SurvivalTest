@@ -16,6 +16,15 @@ public:
 
 	virtual TArray<FString> GetDataStrings() override;
 
+	FInstanceItemData GetInstanceItemDataByID(int32 instanceItemID)
+	{
+		if (instanceItems.Contains(instanceItemID))
+		{
+			return instanceItems.FindChecked(instanceItemID);
+		}
+		return {};
+	};
+
 private:
 	TMap<int32, FInstanceItemData> instanceItems;
 };

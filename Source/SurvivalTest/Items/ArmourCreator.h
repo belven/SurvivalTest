@@ -10,6 +10,7 @@ class SURVIVALTEST_API UArmourCreator : public UObject
 {
 	GENERATED_BODY()
 public:
-	static UArmour* CreateArmour(int32 itemID, UWorld* world, int32 instanceItemDataID);
-	static void CreateArmourData(int32 itemID, UBaseGameInstance* game, UArmour* armour, int32 instanceItemDataID);
+	static UArmour* GetOrCreateArmour(UBaseGameInstance* game, const FInstanceItemData& instanceItemData);
+	static void CreateArmourData(UBaseGameInstance* game, const FInstanceItemData& instanceItemData, const FItemData& itemData);
+	static void CreateArmourData(UBaseGameInstance* game, const FInstanceItemData& instanceItemData, const FItemData& itemData, FArmourData& armourData, FInstanceContainerData& inInstanceContainerData, FInstanceArmourData& inInstanceArmourData);
 };

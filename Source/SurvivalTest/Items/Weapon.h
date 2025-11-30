@@ -37,8 +37,11 @@ public:
 	void AttackComplete();
 
 	bool IsProjectileWeapon() { return GetWeaponData().type == EWeaponType::Projectile; };
-
+	FInstanceItemData& GetInstanceItemData() { return  instanceItemData;  }
+	void SetInstanceItemData(const FInstanceItemData& inInstanceItemData) { instanceItemData = inInstanceItemData; }
 protected:
+	FInstanceItemData instanceItemData;
+	FItemData itemData;
 	FWeaponData weaponData;
 	FInstanceWeaponData instanceWeaponData;
 	FVector GunOffset;

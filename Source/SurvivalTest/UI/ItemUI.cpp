@@ -13,8 +13,6 @@ void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemD
 	SetItemData(inItemData);
 	SetInstanceItemData(inInstanceData);
 	SetItemContainer(inItemContainer);
-
-
 	UpdateItemDetails();
 }
 
@@ -93,7 +91,7 @@ FString UItemUI::GetItemAmount()
 
 UTexture2D* UItemUI::GetItemIcon()
 {
-	if (GetItemData().icon.Equals(""))
+	if (GetItemData().icon.IsEmpty())
 		return nullptr;
 
 	return LoadObject<UTexture2D>(this, *GetItemData().icon);
@@ -101,7 +99,7 @@ UTexture2D* UItemUI::GetItemIcon()
 
 void UItemUI::SetImage(UImage* image)
 {
-	if (!GetItemData().icon.Equals(""))
+	if (!GetItemData().icon.IsEmpty())
 	{
 		FSlateBrush imageB;
 		imageB.ImageSize = FVector2D(imageSize);

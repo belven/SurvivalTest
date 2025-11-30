@@ -1,5 +1,6 @@
 #include "LootBox.h"
 #include "Armour.h"
+#include "ArmourCreator.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
 #include "WeaponCreator.h"
@@ -123,16 +124,18 @@ void ALootBox::SpawnLoot()
 			FItemData id = GetGame()->GetItemData(lootItem);
 			FInstanceItemData iid = CreateLoot(id);
 
-			TArray<int32> ids;
+			TArray<FInstanceItemData> ids;
 			FInstanceItemData added = container->AddItem(iid, ids);
 
 			if (added.amount == 0 && id.type == EItemType::Armour)
-			{
-				UArmour::CreateArmour(id.ID, GetGame(), ids[0]);
+			{				
+				UArmourCreator::CreateArmourData(GetGame(), ids[0], id);
 			}
 			else if (added.amount == 0 && id.type == EItemType::Weapon)
 			{
-				UWeaponCreator::CreateWeapon(id.ID, GetWorld(), ids[0]);
+				FRangedWeaponData rwd = gameIn->GetRangedWeaponData(id.ID);
+				FProjectileWeaponData pwd = gameIn->GetProjectileWeaponData(rwd.ID);
+				GetGame()->GetTableManager()->CreateNewInstanceWeaponData(ids[0].ID, pwd);
 			}
 		}
 	}
@@ -149,7 +152,7 @@ void ALootBox::CreateLootboxData()
 	icd.type = EContainerType::Box;
 	GetGame()->GetInstancedContainers().Add(icd.ID, icd);
 
-	ibd.ID = GetGame()->GetNextInstanceBoxDataID();
+	ibd.ID = GetGame()->GetNextInstanceLootBoxDataID();
 	ibd.containerInstanceID = icd.ID;
 	GetGame()->GetInstancedBoxes().Add(ibd.ID, ibd);
 
