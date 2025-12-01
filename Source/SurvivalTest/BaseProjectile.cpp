@@ -3,7 +3,6 @@
 #include "Components/SphereComponent.h"
 #include "BaseCharacter.h"
 #include "BaseGameInstance.h"
-#include "BasePlayerController.h"
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
 #include "Items/Weapon.h"
@@ -22,6 +21,7 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // TODO Fix collision here
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionComp->SetGenerateOverlapEvents(true);
 	RootComponent = CollisionComp;
 
 	// Only visual

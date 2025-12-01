@@ -11,6 +11,7 @@ class SURVIVALTEST_API UEquipmentSwapTask : public UCharacterTask
 {
 	GENERATED_BODY()
 public:
+	UEquipmentSwapTask();
 	virtual void PerformTask(AController* inController) override;
 
 	void SetSlot(int32 newSlot) { slot = newSlot; }

@@ -77,3 +77,9 @@ void UTaskManagerComponent::TaskComplete(const FStatusData& status)
 		currentTask = NULL;
 	}
 }
+
+void UTaskManagerComponent::CancelAllTasks()
+{
+	// TODO finish cancel all tasks code
+	GetCurrentTask()->CancelAction(true);
+}

@@ -5,6 +5,7 @@ UAnimationAction* UAnimationAction::CreateAnimationAction(const FString& animati
 	UAnimationAction* action = NewObject<UAnimationAction>();
 	action->SetAnimation(LoadObject<UAnimMontage>(action, *animationPath));
 	action->character = inCharacter;
+	action->actionName = "Performing Animation";
 	return action;
 }
 

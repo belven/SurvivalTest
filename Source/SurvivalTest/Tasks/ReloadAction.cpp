@@ -29,5 +29,6 @@ UReloadAction* UReloadAction::CreateReloadAction(ABaseCharacter* character)
 	UReloadAction* reloadAction = NewObject<UReloadAction>();
 	reloadAction->character = character;
 	reloadAction->canBeInterrupted = false;
+	reloadAction->actionName = "Reloading";
 	return reloadAction;
 }

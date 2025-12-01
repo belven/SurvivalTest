@@ -39,4 +39,7 @@ public:
 protected:
 	FProjectileWeaponData projectileWeaponData;
 	bool firstShot;
+	float maxRecoil = 1.5;
+	float defaultRecoil = 0.2;
+	float currentRecoil = 0.5;
 };

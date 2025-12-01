@@ -77,9 +77,30 @@ public:
 
 	ABaseCharacter* GetCharacter();
 
+	UFUNCTION(BlueprintCallable, Category = "Tasks")
+	UTaskAction* GetCurrentAction() const
+	{
+		return currentAction;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Tasks")
+	FString GetTaskName() const
+	{
+		return taskName;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Tasks")
+	void SetTaskName(FString inTaskName)
+	{
+		taskName = inTaskName;
+	}
+
 private:
 	UPROPERTY()
 	AController* controller;
+
+	UPROPERTY()
+	FString taskName;
 
 	UPROPERTY()
 	UTaskAction* currentAction;

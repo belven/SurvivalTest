@@ -10,7 +10,8 @@ UWeapon* UWeaponCreator::CreateWeapon(UBaseGameInstance* gameIn, const FInstance
 {
 	UWeapon* weaponOut = NULL;
 
-	if (inItemData.type == EItemType::Weapon) {
+	if (inItemData.type == EItemType::Weapon) 
+	{
 		const FWeaponData w = gameIn->GetWeaponData(inItemData.ID);
 
 		if (w.type == EWeaponType::Projectile)

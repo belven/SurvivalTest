@@ -3,11 +3,16 @@
 #include "AnimationAction.h"
 #include "SwapEquipmentAction.h"
 
+UEquipmentSwapTask::UEquipmentSwapTask() : Super()
+{
+	SetTaskName("Swapping Equipment");
+}
+
 void UEquipmentSwapTask::PerformTask(AController* inController)
 {
 	Super::PerformTask(inController);
 
-	if (!animationAction) {
+	if (animationAction == NULL) {
 		// TODO change to get and use the animation from the weapon
 
 		// UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().animation);
@@ -24,7 +29,7 @@ void UEquipmentSwapTask::PerformTask(AController* inController)
 		swapAction = USwapEquipmentAction::CreateSwapEquipmentAction(GetCharacter(), slot);
 	}
 	else {
-				swapAction->SetSlot(slot);
+		swapAction->SetSlot(slot);
 	}
 
 	AddAction(animationAction);

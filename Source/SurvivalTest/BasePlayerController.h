@@ -1,6 +1,5 @@
 #pragma once
 #include "CoreMinimal.h"
-#include "BaseBuilding/BuildingPart.h"
 #include "GameFramework/PlayerController.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TimelineComponent.h"
@@ -8,29 +7,12 @@
 #include "Items/Weapon.h"
 #include "BasePlayerController.generated.h"
 
-class UEquipmentSwapTask;
-class UReloadTask;
-class UProjectileWeapon;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
 
 class UInventoryUI;
 class ABaseCharacter;
 class UTimelineComponent;
 class UHUDUI;
-
-UENUM(BlueprintType)
-enum class EOneDirection : uint8
-{
-	North,
-	NorthEast,
-	NorthWest,
-	East,
-	West,
-	South,
-	SouthEast,
-	SouthWest,
-	End
-};
 
 UCLASS()
 class SURVIVALTEST_API ABasePlayerController : public APlayerController
@@ -52,24 +34,10 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 	virtual void OnPossess(APawn* aPawn) override;
 
-	UFUNCTION()
-	void OutOfAmmo();
 	void Craft();
 
 	UFUNCTION()
-	void ReloadComplete();
-
-	UFUNCTION()
-		void WeaponEquipped(UWeapon* oldWeapon);
-
-	UFUNCTION()
-	void Reload();
-
-	UFUNCTION()
 	void Sprint();
-
-	UFUNCTION()
-	void Build();
 
 	UFUNCTION()
 	UInventoryUI* GetInventoryWidget() const
@@ -77,21 +45,12 @@ public:
 		return inventoryWidget;
 	}
 
-	void CreateBuildingPart(ABuildingPart* bp, EOneDirection direction);
-	FVector MoveVectorByDirection(const FVector& centerLocation, const FRotator& currentRotation, float distance, EOneDirection direction);
-
-	void OnPrimaryActionReleased();
-	void OnPrimaryWeapon();
-	void OnSecondaryWeapon();
-	void OnSidearm();
-	void EquipWeaponAtSlot(int32 slot, EGearType type);
 	void LeanRight();
 	void LeanLeft();
 	void LeanCenter();
 
 	virtual void SetupInputComponent() override;
 	void ShowCursor();
-	void OnPrimaryAction();
 	void MoveForward(float Val);
 	void MoveRight(float Val);
 	void OpenInventory();
@@ -100,34 +59,22 @@ public:
 
 	ABaseCharacter* GetBaseCharacter() const { return baseCharacter; }
 	void SetBaseCharacter(ABaseCharacter* inBaseCharacter) { this->baseCharacter = inBaseCharacter; }
+	UBaseGameInstance* GetBaseGameInstance();
 
 	UPROPERTY()
 	FOnUseItem OnUseItem;
 
 	virtual void BeginPlay() override;
 
-	UBaseGameInstance* GetBaseGameInstance();
 
 private:
 	float RotateValue;
 	float CurveFloatValue;
 	float TimelineValue;
 	int32 leanDirection = 0;
-	bool performAction;
-	bool useEquipment;
-	bool isReloading;
-
-	UPROPERTY()
-	UReloadTask* reloadTask;
-
-	UPROPERTY()
-	UEquipmentSwapTask* equipmentSwapTask;
 
 	UFUNCTION()
 	void CharacterDied(ABaseCharacter* deadCharacter);
-
-	UPROPERTY()
-	UProjectileWeapon* rangedWeapon;
 
 	//UPROPERTY()
 	//UTimelineComponent* leanTimeline;
@@ -149,7 +96,6 @@ private:
 	UPROPERTY()
 	UInventoryUI* inventoryWidget;
 
-private:
 	UPROPERTY()
 	ABaseCharacter* baseCharacter;
 

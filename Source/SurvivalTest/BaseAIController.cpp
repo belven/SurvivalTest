@@ -8,20 +8,19 @@
 #include "BaseGameInstance.h"
 #include "HelperFunctions.h"
 #include "NavigationSystem.h"
+#include "Components/CombatComponent.h"
 #include "Components/SplineComponent.h"
 #include "EnvironmentQuery/EnvQuery.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Items/ProjectileWeapon.h"
 #include "Items/Weapon.h"
-#include "Items/WeaponCreator.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Missions/PatrolPath.h"
 #include "Navigation/CrowdFollowingComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Perception/AISenseConfig_Sight.h"
 #include "Tasks/EquipmentSwapTask.h"
-#include "Tasks/ReloadTask.h"
 #include "Tasks/TaskManagerComponent.h"
 
 
@@ -110,32 +109,6 @@ bool ABaseAIController::HasRangedWeapon()
 	return projectileWeapon != NULL;
 }
 
-void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
-{
-	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
-
-	if (oldWeapon) {
-		oldWeapon->OnWeaponReady.RemoveAll(this);
-
-		if (HasRangedWeapon())
-		{
-			projectileWeapon->OnOutOfAmmo.RemoveAll(this);
-			projectileWeapon->OnReloadComplete.RemoveAll(this);
-		}
-	}
-
-	if (weapon)
-	{
-		weapon->OnWeaponReady.AddUniqueDynamic(this, &ABaseAIController::WeaponReady);
-
-		if (weapon->IsProjectileWeapon())
-		{
-			projectileWeapon = Cast<UProjectileWeapon>(weapon);
-			projectileWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
-			projectileWeapon->OnReloadComplete.AddUniqueDynamic(this, &ABaseAIController::ReloadComplete);
-		}
-	}
-}
 
 void ABaseAIController::NavDone(ANavigationData* inNavData)
 {
@@ -146,13 +119,9 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 	AICharacter = mAsBaseCharacter(aPawn);
-	AICharacter->OnWeaponEquipped.AddUniqueDynamic(this, &ABaseAIController::WeaponEquipped);
 	AICharacter->OnCharacterDied.AddUniqueDynamic(this, &ABaseAIController::CharacterDied);
 
 	UNavigationSystemV1::GetCurrent(GetWorld())->OnNavigationGenerationFinishedDelegate.AddUniqueDynamic(this, &ABaseAIController::NavDone);
-
-	reloadTask = NewObject<UReloadTask>();
-
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
 	constexpr int32 range = 13000;
 
@@ -176,6 +145,8 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 
 	isInactive = true;
 	DetermineNextAction();
+
+	AddInstanceComponent(UCombatComponent::CreateCombatComponent(this, AICharacter));
 }
 
 // ReSharper disable once CppPassValueParameterByConstReference
@@ -390,7 +361,9 @@ void ABaseAIController::AttackWithWeapon()
 				SolveBallisticArc(mActorLocation, targetLoc, pw.bulletVelocity, gravity, rotation);
 			}
 
-			AttackWithWeapon(rotation);
+			if (!isAttacking) {
+				SetIsAttacking(true);
+			}
 		}
 		// Otherwise move towards the targets current location
 		else
@@ -398,10 +371,12 @@ void ABaseAIController::AttackWithWeapon()
 			// We updated the lastKnowLocation here, as we can still see the target and simply need to move forwards to attack again
 			lastKnowLocation = target->asActor()->GetActorLocation();
 			MoveToCombatLocation();
+			SetIsAttacking(false);
 		}
 	}
 	else
 	{
+		SetIsAttacking(false);
 		// We have no weapon
 		EquipKnife();
 		CalculateCombat();
@@ -446,6 +421,8 @@ void ABaseAIController::CalculateCombat()
 	// We can't see the target, make sure we're not already trying to move to the target
 	else
 	{
+		SetIsAttacking(false);
+
 		// Move to the last known location
 		LookAt(lastKnowLocation);
 
@@ -473,13 +450,7 @@ bool ABaseAIController::HasAmmoForWeapon()
 
 void ABaseAIController::Reload()
 {
-	if (HasRangedWeapon())
-	{
-		if (!GetBaseCharacter()->GetTaskManager()->PerformTask(reloadTask, false))
-		{
-			DetermineNextAction();
-		}
-	}
+	OnReload.Broadcast();
 }
 
 FVector ABaseAIController::GetPredictedLocation(AActor* actor)
@@ -621,12 +592,8 @@ void ABaseAIController::GetAmmo()
 void ABaseAIController::Inactive()
 {
 	isInactive = true;
+	SetIsAttacking(false);
 	DetermineNextAction();
-}
-
-void ABaseAIController::AttackWithWeapon(const FRotator& FireDirection)
-{
-	mCurrentWeapon()->UseWeapon(FireDirection);
 }
 
 void ABaseAIController::FindNewTarget()
@@ -690,6 +657,7 @@ void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 		{
 			// clear sight
 			canSee = false;
+			SetIsAttacking(false);
 
 			// Try to find a new target
 			FindNewTarget();

@@ -3,6 +3,7 @@
 #include "ItemContainer.h"
 #include "Inventory.generated.h"
 
+class UEquipmentSwapTask;
 DECLARE_LOG_CATEGORY_EXTERN(Inventory, Log, All)
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnContainerUpdated, UItemContainer*, container);
@@ -26,12 +27,11 @@ public:
 	FOnContainerUpdated OnContainerAdded;
 	FOnContainerUpdated OnContainerRemoved;
 
-	virtual UWorld* GetWorld() const override;
-
 	void SetEquippedWeapon(UWeapon* weapon);
 	void EquipArmour(UArmour* armour);
 
-	void CheckWeaponItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& inOldItemData);
+	void CheckWeaponItems(const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& inOldItemData);
+	void PerformWeaponSwap(int32 slot);
 	void CheckArmourItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& oldItemData);
 	void GetItemArmourData(int32 instanceItemID, FInstanceArmourData& instanceArmourData, FArmourData& armourData);
 
@@ -54,6 +54,9 @@ public:
 private:
 	UPROPERTY()
 	ABaseCharacter* characterOwner;
+
+	UPROPERTY()
+	UEquipmentSwapTask* equipmentSwapTask;
 
 	UPROPERTY()
 		UWeapon* equippedWeapon;

@@ -4,6 +4,11 @@
 #include "SurvivalTest/Items/ProjectileWeapon.h"
 #include "SurvivalTest/Items/Weapon.h"
 
+UReloadTask::UReloadTask() : Super()
+{
+	SetTaskName("Reloading");
+}
+
 bool UReloadTask::CheckForReload()
 {
 	bool result = false;

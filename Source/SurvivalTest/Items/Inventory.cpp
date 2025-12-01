@@ -5,6 +5,8 @@
 #include "Weapon.h"
 #include "WeaponCreator.h"
 #include "SurvivalTest/BaseCharacter.h"
+#include "SurvivalTest/Tasks/EquipmentSwapTask.h"
+#include "SurvivalTest/Tasks/TaskManagerComponent.h"
 
 DEFINE_LOG_CATEGORY(Inventory)
 
@@ -122,11 +124,6 @@ int32 UInventory::GetSidearmWeaponSlot()
 	return GetSlotForGear(EGearType::Sidearm)[0];
 }
 
-UWorld* UInventory::GetWorld() const
-{
-	return characterOwner->GetWorld();
-}
-
 /**
  * Equips a weapon the character, setting the owner as well
  *
@@ -134,6 +131,8 @@ UWorld* UInventory::GetWorld() const
  */
 void UInventory::SetEquippedWeapon(UWeapon* weapon)
 {
+	FString oldName = equippedWeapon ? equippedWeapon->GetItemData().name : "Empty";
+	FString newName = weapon ? weapon->GetItemData().name : "Empty";
 	UWeapon* oldWeapon = equippedWeapon;
 
 	if (oldWeapon != NULL)
@@ -149,6 +148,7 @@ void UInventory::SetEquippedWeapon(UWeapon* weapon)
 	}
 
 	characterOwner->OnWeaponEquipped.Broadcast(oldWeapon);
+	UE_LOG(LogTemp, Log, TEXT("Swapping from %s to %s"), *oldName, *newName);
 }
 
 /**
@@ -206,7 +206,6 @@ void UInventory::GetItemArmourData(int32 instanceItemID, FInstanceArmourData& in
 
 void UInventory::CheckArmourItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& oldItemData)
 {
-	//UE_LOG(Inventory, Log, TEXT("Armour moved from %d to %d"), oldInstanceItemData.containerInstanceID, newInstanceItemData.containerInstanceID);
 	FInstanceArmourData newInstanceArmourData;
 	FArmourData newArmourData;
 
@@ -253,7 +252,7 @@ void UInventory::CheckArmourItems(const FInstanceItemData& updatedInstanceItem, 
 	}
 }
 
-void UInventory::CheckWeaponItems(const FInstanceItemData& updatedInstanceItem, const FInstanceItemData& newInstanceItemData, const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& inOldItemData)
+void UInventory::CheckWeaponItems(const FInstanceItemData& oldInstanceItemData, const FItemData& newItemData, const FItemData& inOldItemData)
 {
 	int32 slot = oldInstanceItemData.slot;
 	bool isWeaponSlot = GetSlotForGear(EGearType::Weapon).Contains(slot) || GetSlotForGear(EGearType::Sidearm).Contains(slot);
@@ -268,22 +267,24 @@ void UInventory::CheckWeaponItems(const FInstanceItemData& updatedInstanceItem, 
 			{
 				FInstanceItemData equippedWeaponInstanceItemData = GetEquippedWeapon()->GetInstanceItemData();
 
-				//bool areDifferentInstances = equippedWeaponInstanceItemData.ID != newInstanceItemData.ID;
 				bool doTheSlotsMatch = equippedWeaponInstanceItemData.slot == slot;
 
+				// If the slots match, then we've replaced our equipped weapon, with a new one, so swap them over.
+				// Otherwise, we've place a weapon in a weapon slot, but it's not an equipped one
 				if (doTheSlotsMatch)
 				{
 					UE_LOG(Inventory, Log, TEXT("Weapon Swapped from %s to %s"), *inOldItemData.name, *newItemData.name);
-					SetEquippedWeapon(UWeaponCreator::CreateWeapon(baseGameInstance, updatedInstanceItem, newItemData));
+					PerformWeaponSwap(slot);
 				}
 			}
 			// Nothing is equipped
 			else
 			{
 				UE_LOG(Inventory, Log, TEXT("Weapon Equipped %s"), *newItemData.name);
-				SetEquippedWeapon(UWeaponCreator::CreateWeapon(baseGameInstance, updatedInstanceItem, newItemData));
+				PerformWeaponSwap(slot);
 			}
 		}
+		// If only the old item is a weapon, then we've removed the weapon, so unequip it
 		else if (inOldItemData.type == EItemType::Weapon)
 		{
 			if (GetEquippedWeapon() != NULL)
@@ -293,13 +294,33 @@ void UInventory::CheckWeaponItems(const FInstanceItemData& updatedInstanceItem, 
 				if (equippedWeaponInstanceItemData.slot == slot)
 				{
 					UE_LOG(Inventory, Log, TEXT("Weapon Removed %s"), *inOldItemData.name);
-					SetEquippedWeapon(nullptr);
+					PerformWeaponSwap(slot);
 				}
 			}
 		}
 	}
 }
 
+void UInventory::PerformWeaponSwap(int32 slot)
+{
+	if (!equipmentSwapTask)
+	{
+		equipmentSwapTask = NewObject<UEquipmentSwapTask>();
+	}
+
+	equipmentSwapTask->SetSlot(slot);
+
+	if (characterOwner->IsAlive()) {
+		characterOwner->GetTaskManager()->PerformTask(equipmentSwapTask, false);
+	}
+}
+
+/**
+ * ItemUpdated This method is run when the characters inventory changes state, typically when the player moves items around. WE need to use this, to check if the weapons or armour has changed, so we can equip / unequip them correctly.
+ * 
+ * @param newItem The item that is being placed into the slot of the Old Item
+ * @param oldItem The item that is being replaced, either with a new item or a blank item. I.e. you've removed your weapon or armour, opposed to replacing it
+ */
 void UInventory::ItemUpdated(const FInstanceItemData& newItem, const FInstanceItemData& oldItem)
 {
 	FItemData newItemData = baseGameInstance->GetItemData(newItem.itemID);
@@ -312,6 +333,6 @@ void UInventory::ItemUpdated(const FInstanceItemData& newItem, const FInstanceIt
 	}
 	else	if (newItemData.type == EItemType::Weapon || oldItemData.type == EItemType::Weapon)
 	{
-		CheckWeaponItems(updatedInstanceItem, newItem, oldItem, newItemData, oldItemData);
+		CheckWeaponItems(oldItem, newItemData, oldItemData);
 	}
 }

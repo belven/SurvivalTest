@@ -68,7 +68,8 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 	const FVector gunLocation = startLoc + GunOffset;
 	FRotator rot = FireRotation;
 
-	if (!firstShot) {
+	if (!firstShot)
+	{
 		double angle = 360 * (1 - GetRangedWeaponData().accuracy);
 		rot = UKismetMathLibrary::RandomUnitVectorInConeInDegrees(FireRotation.Vector(), angle).Rotation();
 	}
@@ -77,8 +78,10 @@ void UProjectileWeapon::SpawnProjectile(const FRotator& FireRotation)
 		firstShot = false;
 	}
 
-	GetCharacterOwner()->AddControllerPitchInput(rot.Pitch);
-	GetCharacterOwner()->AddControllerYawInput(rot.Yaw);
+	GetCharacterOwner()->AddControllerPitchInput(FMath::RandRange(-currentRecoil, 0.f));
+	GetCharacterOwner()->AddControllerYawInput(FMath::RandRange(-currentRecoil, currentRecoil));
+
+	currentRecoil = FMath::Clamp(currentRecoil + 0.1, defaultRecoil, maxRecoil);
 
 	ABaseProjectile* proj = SpawnProjectile(gunLocation, rot, ABaseProjectile::StaticClass());
 	FVector velocity = FVector(1.f, 0.f, 0.f).GetSafeNormal() * GetProjectileWeaponData().bulletVelocity;
@@ -95,12 +98,13 @@ void UProjectileWeapon::Reload()
 
 void UProjectileWeapon::ReloadExpired()
 {
-		canAttack = true;
-		OnWeaponReady.Broadcast();
-		OnReloadComplete.Broadcast();
+	canAttack = true;
+	OnWeaponReady.Broadcast();
+	OnReloadComplete.Broadcast();
 }
 
 void UProjectileWeapon::RecoilReset()
 {
 	firstShot = true;
+	currentRecoil = defaultRecoil;
 }

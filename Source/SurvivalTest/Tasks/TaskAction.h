@@ -30,8 +30,21 @@ public:
 	virtual void CancelAction();
 	virtual void ActionComplete(FStatusData data);
 
+	UFUNCTION(BlueprintCallable, Category = "Tasks")
+	FString GetActionName() const
+	{
+		return actionName;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Tasks")
+	void SetActionName(FString inName)
+	{
+		actionName = inName;
+	}
+
 protected:
 	bool canBeInterrupted;
+	FString actionName;
 
 	UPROPERTY()
 	AController* controller;

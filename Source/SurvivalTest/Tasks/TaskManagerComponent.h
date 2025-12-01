@@ -23,6 +23,15 @@ public:
 	UFUNCTION()
 	void TaskComplete(const FStatusData& status);
 
+	UFUNCTION(BlueprintCallable, Category = "Tasks")
+	UCharacterTask* GetCurrentTask() const
+	{
+		return currentTask;
+	}
+
+	UFUNCTION()
+	void CancelAllTasks();
+
 protected:
 	UPROPERTY()
 	AController* controller;

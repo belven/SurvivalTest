@@ -192,6 +192,8 @@ void ABaseCharacter::KillCharacter()
 	//GetMesh()->bPauseAnims = true;
 	//GetMesh()->bNoSkeletonUpdate = true;
 
+	GetTaskManager()->CancelAllTasks();
+
 	// If you're inside ACharacter, disable capsule collision so ragdoll drives collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 

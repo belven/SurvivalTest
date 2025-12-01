@@ -1,7 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "CharacterTask.h"
 #include "ReloadTask.generated.h"
@@ -13,6 +10,11 @@ UCLASS()
 class SURVIVALTEST_API UReloadTask : public UCharacterTask
 {
 	GENERATED_BODY()
+
+public:
+	virtual void PerformTask(AController* inController) override;
+	UReloadTask();
+
 private:
 	bool CheckForReload();
 
@@ -22,6 +24,4 @@ private:
 	UPROPERTY()
 	UAnimationAction* animationAction;
 
-public:
-	virtual void PerformTask(AController* inController) override;
 };

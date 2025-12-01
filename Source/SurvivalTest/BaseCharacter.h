@@ -46,6 +46,7 @@ public:
 	static const FVector rightLean;
 	static float interactionRadius;
 
+	UFUNCTION(BlueprintCallable, Category="Tasks")
 	UTaskManagerComponent* GetTaskManager() const
 	{
 		return taskManager;

@@ -18,6 +18,10 @@ class UEnvQuery;
 class APatrolPath;
 class UProjectileWeapon;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUseTool);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStopUsingTool);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReload);
+
 #define mAsBaseCharacter(character) Cast<ABaseCharacter>(character)
 
 UCLASS()
@@ -40,28 +44,48 @@ public:
 	TArray<ABaseCharacter*> alliesSeen;
 	bool isInactive;
 
+	UPROPERTY()
+	FUseTool OnUseTool;
+
+	UPROPERTY()
+	FStopUsingTool OnStopUsingTool;
+
+	UPROPERTY()
+	FOnReload OnReload;
+
+	UFUNCTION()
+	void ReloadComplete();
+
+	UFUNCTION()
+	void WeaponReady();
+
+	UFUNCTION()
+	void Reload();
 protected:
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 	void DetermineNextAction();
 	void MoveToCombatLocation();
-	void GetNearbyAmmo();
 	void StartSprinting();
-	bool FindAllyWithAmmo();
 	void EquipKnife();
 	void EquipWeaponAtSlot(int32 slot, EGearType type);
 
-	void GetAmmo();
-	void Inactive();
-	void GetPatrolPath();
-	void Patrol();
 	bool IsInWeaponsRange(float dist);
 	void AttackWithWeapon();
 	void CalculateCombat();
-	FVector IncreaseVectorHeight(const FVector& location, int32 increase);
+
+
 	bool HasAmmoForWeapon();
-	void Reload();
+	void GetAmmo();
+	void OutOfAmmo();
+	bool FindAllyWithAmmo();
+	void GetNearbyAmmo();
+	bool HasAmmo(ABaseCharacter* other);
+
+	void Inactive();
+	void GetPatrolPath();
+	void Patrol();
+	FVector IncreaseVectorHeight(const FVector& location, int32 increase);
 	FVector GetPredictedLocation(AActor* actor);
-	void AttackWithWeapon(const FRotator& FireDirection);
 	void LookAt(const FVector& lookAtLocation);
 	virtual void BeginPlay() override;
 
@@ -69,18 +93,7 @@ protected:
 	void CharacterDied(ABaseCharacter* deadCharacter);
 
 	UFUNCTION()
-	void OutOfAmmo();
-
-	UFUNCTION()
-	void WeaponReady();
-
-	bool HasAmmo(ABaseCharacter* other);
-
-	UFUNCTION()
-	void ReloadComplete();
 	bool HasRangedWeapon();
-
-	UFUNCTION()
 	void WeaponEquipped(UWeapon* oldWeapon);
 
 	UFUNCTION()
@@ -106,10 +119,28 @@ private:
 	FTimerHandle TimerHandle_Inactive;
 	FTimerHandle TimerHandle_DetermineAction;
 	float inactiveTimerDuration;
+	bool isAttacking = false;
 
-	UPROPERTY()
-	UReloadTask* reloadTask;
+public:
+	bool IsIsAttacking() const
+	{
+		return isAttacking;
+	}
 
+	void SetIsAttacking(bool inIsAttacking)
+	{
+		isAttacking = inIsAttacking;
+
+		if (isAttacking)
+		{
+			OnUseTool.Broadcast();
+		} else
+		{
+			
+		}
+	}
+
+private:
 	FPathFollowingResult lastMoveResult;
 
 	UPROPERTY()
