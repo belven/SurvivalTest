@@ -9,9 +9,7 @@
 #include "SurvivalTest/Items/LootBox.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/HelperFunctions.h"
-#include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/Tables/LoadoutTableData.h"
-#include "SurvivalTest/Tables/Items/ItemDataTable.h"
 #include "SurvivalTest/Tables/Mission/MissionLoadoutTable.h"
 
 AMission::AMission()

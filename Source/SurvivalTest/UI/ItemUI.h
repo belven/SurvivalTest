@@ -61,22 +61,25 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Item")
 	bool IsItemValid();
+
 private:
 	UPROPERTY()
 	UItemContainer* itemContainer;
 	FItemData itemData;
 	int32 imageSize = 100;
 	FInstanceItemData instanceItemData;
-	bool disabled;
+	bool itemDisabled;
 
 public:
-	bool IsDisabled() const
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	bool IsItemDisabled() const
 	{
-		return disabled;
+		return itemDisabled;
 	}
 
-	void SetDisabled(bool inDisabled)
+	UFUNCTION(BlueprintCallable, Category = "Item")
+	void SetItemDisabled(bool inDisabled)
 	{
-		disabled = inDisabled;
+		itemDisabled = inDisabled;
 	}
 };

@@ -22,6 +22,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting")
 	UPanelWidget* GetRecipeUIPanelWidget();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Crafting")
+	UPanelWidget* GetInProgressRecipeUIPanelWidget();
+
 	UFUNCTION(BlueprintCallable, Category = "Crafting")
 	float GetProgress();
 
@@ -55,6 +58,9 @@ protected:
 
 	UPROPERTY()
 	URecipeListUI* recipeListUI;
+
+	UPROPERTY()
+	URecipeListUI* inProgressRecipeListUI;
 
 	UPROPERTY()
 	FCraftingDevice craftingDeviceData;

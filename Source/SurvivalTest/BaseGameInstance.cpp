@@ -8,6 +8,7 @@
 // ReSharper disable once CppUnusedIncludeDirective Required for GetSingletonObject
 #include "FactionManager.h"
 #include "HelperFunctions.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "ObjectInstanceManager.h"
 
 #define GetLastMapItem(type, values) UHelperFunctions::GetLastMapItem<int32, type>(values)

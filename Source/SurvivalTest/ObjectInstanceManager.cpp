@@ -10,7 +10,7 @@ AObjectInstanceManager::AObjectInstanceManager()
 int32 AObjectInstanceManager::CreateStaticMesh(UStaticMesh* mesh, const FTransform& Transform, bool applyCustomStencilDepth)
 {
 	int32 ID = -1;
-	UInstancedStaticMeshComponent* comp = NULL;
+	UInstancedStaticMeshComponent* comp;
 
 	if (!existing_points.Contains(Transform.GetLocation()))
 	{

@@ -1,5 +1,4 @@
 #include "TaskManagerComponent.h"
-#include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/HelperFunctions.h"
 
 UTaskManagerComponent::UTaskManagerComponent() : controller(nullptr), currentTask(nullptr)
@@ -12,11 +11,6 @@ void UTaskManagerComponent::BeginPlay()
 	Super::BeginPlay();
 	GetController();
 }
-
-// void UTaskManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-// {
-// 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-// }
 
 bool UTaskManagerComponent::PerformTask(UCharacterTask* newTask, bool force)
 {
@@ -81,5 +75,8 @@ void UTaskManagerComponent::TaskComplete(const FStatusData& status)
 void UTaskManagerComponent::CancelAllTasks()
 {
 	// TODO finish cancel all tasks code
-	GetCurrentTask()->CancelAction(true);
+	if (GetCurrentTask() != NULL) 
+	{
+		GetCurrentTask()->CancelAction(true);
+	}
 }

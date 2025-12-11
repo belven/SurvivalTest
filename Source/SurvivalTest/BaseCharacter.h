@@ -91,7 +91,7 @@ public:
 	FCharacterStats GetCurrentStats() const { return currentStats; }
 	FCharacterStats GetMaxStats() const { return maxStats; }
 
-	void Consume(EConsumableType type, int32 value);
+	void RestoreStat(EConsumableType type, int32 value);
 #pragma endregion Stats
 
 #pragma region Interactables

@@ -1,7 +1,7 @@
 #include "HUDUI.h"
-#include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/Items/ProjectileWeapon.h"
 #include "SurvivalTest/Items/Weapon.h"
+#include "SurvivalTest/BaseCharacter.h"
 
 float UHUDUI::GetHealthProgress()
 {
@@ -26,8 +26,6 @@ int32 UHUDUI::GetWeaponMaxAmmo()
 	{
 		maxAmmo = Cast<UProjectileWeapon>(equippedWeapon)->GetProjectileWeaponData().magazineSize;
 	}
-
-
 	return maxAmmo;
 }
 

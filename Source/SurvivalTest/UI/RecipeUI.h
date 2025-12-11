@@ -16,6 +16,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
 	void UpdateRecpie();
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Recipes")
+	void HideInputs();
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Recipe")
 	UHorizontalBox* GetRecipeInputContainer();
 
@@ -42,6 +45,21 @@ public:
 
 	FRecipeSelectionChanged OnRecipeSelectionChanged;
 
+	UFUNCTION(BlueprintCallable, Category = "Recipe")
+	void UpdateRecipeEnabled(bool enabledState);
+
+	UFUNCTION(BlueprintCallable, Category = "Recipe")
+	bool IsRecipeEnabled() const
+	{
+		return recipeEnabled;
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "Recipe")
+	void SetRecipeEnabled(bool inRecipeEnabled)
+	{
+		recipeEnabled = inRecipeEnabled;
+	}
+
 protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
@@ -63,4 +81,6 @@ protected:
 	UPROPERTY()
 	TSubclassOf<UUserWidget> itemUIClass;
 
+	UPROPERTY(BlueprintReadWrite)
+	bool recipeEnabled; 
 };

@@ -8,6 +8,7 @@
 #include "BasePlayerController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItem);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnUIChangedState, bool, state);
 
 class UInventoryUI;
 class ABaseCharacter;
@@ -53,6 +54,7 @@ public:
 	void ShowCursor();
 	void MoveForward(float Val);
 	void MoveRight(float Val);
+	void BroadcastUIUpdate();
 	void OpenInventory();
 	void CloseInventory();
 	void LoadInventories();
@@ -64,8 +66,10 @@ public:
 	UPROPERTY()
 	FOnUseItem OnUseItem;
 
-	virtual void BeginPlay() override;
+	UPROPERTY()
+	FOnUIChangedState OnUIChangedState;
 
+	virtual void BeginPlay() override;
 
 private:
 	float RotateValue;

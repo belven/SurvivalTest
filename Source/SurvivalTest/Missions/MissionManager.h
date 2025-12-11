@@ -24,6 +24,7 @@ public:
 	int32 GetRandomMissionAmount();
 
 private:
+	UPROPERTY()
 	TArray<AMission*> missions;
 
 	UPROPERTY()

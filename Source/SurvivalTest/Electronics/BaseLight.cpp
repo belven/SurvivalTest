@@ -2,7 +2,7 @@
 
 #include "SurvivalTest/BaseGameInstance.h"
 
-ABaseLight::ABaseLight()
+ABaseLight::ABaseLight(): bound(false), startingLightLevel(0), game(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }

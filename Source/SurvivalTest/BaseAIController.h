@@ -94,7 +94,6 @@ protected:
 
 	UFUNCTION()
 	bool HasRangedWeapon();
-	void WeaponEquipped(UWeapon* oldWeapon);
 
 	UFUNCTION()
 	void NavDone(ANavigationData* inNavData);

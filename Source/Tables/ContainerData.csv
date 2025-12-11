@@ -2,7 +2,7 @@
 "1","5","Five base",""
 "2","10","Ten base",""
 "3","25","Character Inventory",""
-"4","20","Supplies Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Crate.Crate'"
+"4","40","Supplies Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Crate.Crate'"
 "5","5","Medical Case","StaticMesh'/Game/FirstPerson/LootBoxes/Medical_Case.Medical_Case'"
 "6","15","Medical Supplies","StaticMesh'/Game/FirstPerson/LootBoxes/Medical_Supplies.Medical_Supplies'"
 "7","15","Military Crate","StaticMesh'/Game/FirstPerson/LootBoxes/Military_Crate.Military_Crate'"

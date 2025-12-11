@@ -186,6 +186,9 @@ UStaticMesh* ABaseCharacter::GetItemMesh(const FItemData& data)
 }
 
 
+/**
+ * Clear out and stop everything we can, to allow the character to persist but stop processing, until later to be deleted
+ */
 void ABaseCharacter::KillCharacter()
 {
 	// Stop any animation driving the bones
@@ -290,8 +293,6 @@ int32 ABaseCharacter::GetDamageResistance()
 			total += a.Value->GetData().resistance;
 		}
 	}
-
-	//UE_LOG(LogTemp, Log, TEXT("Resistance %d"), total);
 	return total;
 }
 
@@ -382,7 +383,14 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 	}
 }
 
-void ABaseCharacter::Consume(EConsumableType type, int32 value)
+
+/**
+ * Increases the characters stats, based on the given type and value
+ * 
+ * @param type The type of value the consumable provides
+ * @param value The amount the consumable provides
+ */
+void ABaseCharacter::RestoreStat(EConsumableType type, int32 value)
 {
 	switch (type)
 	{
@@ -454,7 +462,7 @@ void ABaseCharacter::DrainStat(float& stat, float drainRate, float healthDamage,
 /**
  * This occurs when the character is taken over by a controller.
  * We use this to determine if the character is a player or not.
- * If they are a player, we can setup the listeners for the Overlap of the interactionSphere.
+ * If they are a player, we can set up the listeners for the Overlap of the interactionSphere.
  * Otherwise, we remove it entirely
  *
  */
@@ -471,6 +479,12 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 	}
 }
 
+
+/**
+ * Calculates stamina consumption and growth of stamina, based on sprint state, using stamina until it runs out or increases stamina when not sprinting
+ * 
+ * @param DeltaSeconds The amount of time that has passed
+ */
 void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 {
 	// Check if we're moving more than a low speed
@@ -484,7 +498,7 @@ void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 		timeMoved = 0;
 	}
 
-	// If we're sprinting and we've been moving for more than a third of a second, start sprinting speed
+	// If we're sprinting, but we've been moving for more than a third of a second, start sprinting speed
 	if (isRequestingSprint && timeMoved > 0.33)
 	{
 		// Consume Stamina
@@ -511,11 +525,24 @@ void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 	FMath::Clamp(currentStats.stamina, 0, maxStats.stamina);
 }
 
+
+/**
+ * Used by the player controller, to display a hit marker when the player hits an enemy.
+ * 
+ * @param inActor The enemy this character has hit
+ */
 void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
 {
 	OnEnemyHit.Broadcast(inActor);
 }
 
+
+/**
+ * When a nearby Character is within interaction range, we bind to their OnCharacterDied, so we can add them to the interactables list on death. 
+ * This is so the UI can be updated and hte body highlighted
+ * 
+ * @param character The character that died
+ */
 void ABaseCharacter::OtherCharacterDied(ABaseCharacter* character)
 {
 	AddInteractable(character);

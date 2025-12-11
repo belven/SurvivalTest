@@ -5,7 +5,7 @@
 #include "SurvivalTest/BaseGameInstance.h"
 #include "SurvivalTest/BaseBuilding/BuildingPart.h"
 
-UPlayerBuildingComponent::UPlayerBuildingComponent()
+UPlayerBuildingComponent::UPlayerBuildingComponent(): baseCharacter(nullptr), baseGameInstance(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }

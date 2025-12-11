@@ -457,8 +457,6 @@ FVector ABaseAIController::GetPredictedLocation(AActor* actor)
 {
 	float lead;
 
-	UWeapon* weapon = GetBaseCharacter()->GetEquippedWeapon();
-
 	if (HasRangedWeapon())
 	{
 		lead = projectileWeapon->GetProjectileWeaponData().bulletVelocity;

@@ -29,7 +29,6 @@ void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 
 		FVector startLoc = actorLocation + (actorForwardVector * scaledCapsuleRadius);
 		FVector endLoc = startLoc + (actorForwardVector * GetWeaponData().range);
-		float dist = FVector::Dist(endLoc, startLoc);
 		double radius = scaledCapsuleRadius * 1.5;
 		mSphereTraceMultiWeapon(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
 		

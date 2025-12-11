@@ -3,11 +3,11 @@
 #include "ArmourCreator.h"
 #include "SurvivalTest/BaseGameInstance.h"
 #include "ItemContainer.h"
-#include "WeaponCreator.h"
 #include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/Tables/ContainerTableData.h"
 #include "SurvivalTest/HelperFunctions.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "SurvivalTest/ObjectInstanceManager.h"
 
 ALootBox::ALootBox()

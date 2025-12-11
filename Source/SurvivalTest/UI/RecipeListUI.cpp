@@ -26,16 +26,19 @@ ABasePlayerController* URecipeListUI::GetBasePlayerController()
 
 void URecipeListUI::OnItemUpdated(const FInstanceItemData& inItem, const FInstanceItemData& oldItem)
 {
-	for (URecipeUI* recipe : GetRecipes())
-	{
-		if (recipe->GetRecipe().recipe.type == ERecipeType::Automatic)
-		{
-			while (CheckInventoryForRecipe(recipe->GetRecipe())) 
-			{
-				// Check for recipes to enable / disable
-			}
-		}
-	}
+	CheckInventory(oldItem.itemID);
+	CheckInventory(inItem.itemID);
+
+	//for (URecipeUI* recipe : GetRecipes())
+	//{
+	//	if (recipe->GetRecipe().recipe.type == ERecipeType::Automatic)
+	//	{
+	//		while (CheckInventoryForRecipe(recipe->GetRecipe())) 
+	//		{
+	//			// Check for recipes to enable / disable
+	//		}
+	//	}
+	//}
 }
 
 URecipeListUI* URecipeListUI::CreateRecipeList(ABasePlayerController* controller, TArray<FFullRecipe> recipesToAdd)
@@ -47,45 +50,61 @@ URecipeListUI* URecipeListUI::CreateRecipeList(ABasePlayerController* controller
 	}
 
 	URecipeListUI* recipeListUI = CreateWidget<URecipeListUI>(controller, recipeListUIClass);
-
 	controller->GetBaseCharacter()->GetInventory()->OnItemUpdated.AddUniqueDynamic(recipeListUI, &URecipeListUI::OnItemUpdated);
 
 	if (recipeListUI->GetRecipeListContainer())
 	{
 		for (FFullRecipe fr : recipesToAdd)
 		{
-			URecipeUI* recipeUI = CreateWidget<URecipeUI>(controller, recipeUIClass);
-			recipeUI->SetRecipe(fr);
-			recipeUI->OnRecipeSelectionChanged.AddUniqueDynamic(recipeListUI, &URecipeListUI::RecipeSelectionChanged);
-			recipeListUI->GetRecipeListContainer()->AddChildToVerticalBox(recipeUI);
-			recipeListUI->recipes.Add(recipeUI);
-
-			UInventory* inventory = controller->GetBaseCharacter()->GetInventory();
-
-			for (FInputOutputData iod : recipeUI->GetRecipe().inputs)
-			{
-				if (iod.type == EInputOutputType::Item && inventory->GetItemAmount(iod.inputOutputID) >= iod.amount)
-				{
-					// Set recipe enabled...
-				}
-			}
+			recipeListUI->CreateRecipeUI(controller, fr);
 		}
 	}
 	return recipeListUI;
 }
 
+URecipeUI* URecipeListUI::CreateRecipeUI(ABasePlayerController* controller, FFullRecipe fr)
+{
+	URecipeUI* recipeUI = CreateWidget<URecipeUI>(controller, recipeUIClass);
+	recipeUI->SetRecipe(fr);
+	recipeUI->OnRecipeSelectionChanged.AddUniqueDynamic(this, &URecipeListUI::RecipeSelectionChanged);
+	GetRecipeListContainer()->AddChildToVerticalBox(recipeUI);
+	recipes.Add(recipeUI);
+	DetermineRecipeEnabledState(controller->GetBaseCharacter()->GetInventory(), recipeUI);
+	return recipeUI;
+}
+
+// ReSharper disable once IdentifierTypo
+void URecipeListUI::DetermineRecipeEnabledState(UInventory* inventory, URecipeUI* recipe, int32 itemChanged)
+{
+	if (itemChanged != -1) 
+	{
+		bool enabled = true;
+		for (FInputOutputData iod : recipe->GetRecipe().inputs)
+		{
+			if (iod.type == EInputOutputType::Item)
+			{
+				if (inventory->GetItemAmount(iod.inputOutputID) < iod.amount)
+				{
+					enabled = false;
+					break;
+				}
+			}
+		}
+
+		if (recipe->IsRecipeEnabled() != enabled) 
+		{
+			recipe->UpdateRecipeEnabled(enabled);
+		}
+	}
+}
+
 void URecipeListUI::CheckInventory(int32 itemChanged)
 {
 	UInventory* inventory = GetBasePlayerController()->GetBaseCharacter()->GetInventory();
+
 	for (URecipeUI* recipe : GetRecipes())
 	{
-		for (FInputOutputData iod : recipe->GetRecipe().inputs)
-		{
-			if (iod.type == EInputOutputType::Item && iod.inputOutputID == itemChanged && inventory->GetItemAmount(iod.inputOutputID) >= iod.amount)
-			{
-				// Set recipe enabled...
-			}
-		}
+		DetermineRecipeEnabledState(inventory, recipe, itemChanged);
 	}
 }
 
@@ -100,7 +119,7 @@ bool URecipeListUI::CheckInventoryForRecipe(FFullRecipe recipe)
 
 		if (iod.type == EInputOutputType::Item && total < iod.amount)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Player missing item %s for recipe %s"), *GetBasePlayerController()->GetBaseGameInstance()->GetTableManager()->GetItemData(iod.inputOutputID).name, *recipe.recipe.name);
+			UE_LOG(LogTemp, Warning, TEXT("Player missing item %s for recipe %s"), *GetBasePlayerController()->GetBaseGameInstance()->GetItemData(iod.inputOutputID).name, *recipe.recipe.name);
 			result = false;
 			break;
 		}
@@ -112,9 +131,9 @@ FFullRecipe URecipeListUI::GetRecipe(int32 recipeID)
 {
 	FFullRecipe fr;
 
-	for (URecipeUI* recipe : recipes) 
+	for (URecipeUI* recipe : recipes)
 	{
-		if (recipe->GetRecipe().recipe.ID == recipeID) 
+		if (recipe->GetRecipe().recipe.ID == recipeID)
 		{
 			fr = recipe->GetRecipe();
 		}

@@ -4,9 +4,7 @@
 #include "SurvivalTest/BaseCharacter.h"
 #include "SurvivalTest/BasePlayerController.h"
 #include "SurvivalTest/HelperFunctions.h"
-#include "SurvivalTest/Items/Armour.h"
 #include "SurvivalTest/Items/ArmourCreator.h"
-#include "SurvivalTest/Items/WeaponCreator.h"
 
 TSubclassOf<UUserWidget> UCraftingDeviceUI::craftingDeviceUIClass;
 
@@ -23,7 +21,14 @@ UCraftingDeviceUI* UCraftingDeviceUI::CreateCraftingDeviceUI(ABasePlayerControll
 	craftingDeviceUI->instanceCraftingDevice = inInstanceCraftingDevice;
 	craftingDeviceUI->deviceRecipes = controller->GetBaseGameInstance()->GetTableManager()->GetRecipes(inCraftingDevice.ID);
 	craftingDeviceUI->recipeListUI = URecipeListUI::CreateRecipeList(controller, craftingDeviceUI->deviceRecipes);
-	craftingDeviceUI->GetRecipeUIPanelWidget()->AddChild(craftingDeviceUI->recipeListUI);
+	craftingDeviceUI->inProgressRecipeListUI = URecipeListUI::CreateRecipeList(controller, {});
+
+	if (craftingDeviceUI->GetRecipeUIPanelWidget() != NULL)
+	{
+		craftingDeviceUI->GetRecipeUIPanelWidget()->AddChild(craftingDeviceUI->recipeListUI);
+		craftingDeviceUI->GetRecipeUIPanelWidget()->AddChild(craftingDeviceUI->inProgressRecipeListUI);
+	}
+
 	controller->GetBaseCharacter()->GetInventory()->OnItemUpdated.AddUniqueDynamic(craftingDeviceUI, &UCraftingDeviceUI::OnItemUpdated);
 	return craftingDeviceUI;
 }
@@ -225,16 +230,15 @@ void UCraftingDeviceUI::Craft()
 
 void UCraftingDeviceUI::Craft_Internal(const FFullRecipe& fullRecipe)
 {
-	if (CheckInventoryForRecipe(fullRecipe))
+	ConsumeRecipeInputs(fullRecipe);
+
+	if (!IsInProgress())
 	{
-		ConsumeRecipeInputs(fullRecipe);
-
-		if (!IsInProgress())
-		{
-			currentCraftingRecipe = fullRecipe;
-			mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &UCraftingDeviceUI::CraftComplete, fullRecipe.recipe.craftingTime);
-		}
-
-		craftingQueue.Add(FInProgressCrafting(-1, instanceCraftingDevice.ID, fullRecipe.recipe.ID, GetQueuePosition(), 0));
+		currentCraftingRecipe = fullRecipe;
+		mSetTimerWorld(GetBasePlayerController()->GetWorld(), TimerHandle_ItemCrafted, &UCraftingDeviceUI::CraftComplete, fullRecipe.recipe.craftingTime);
 	}
+
+	craftingQueue.Add(FInProgressCrafting(-1, instanceCraftingDevice.ID, fullRecipe.recipe.ID, GetQueuePosition(), 0));
+
+	inProgressRecipeListUI->CreateRecipeUI(GetBasePlayerController(), fullRecipe)->HideInputs();
 }

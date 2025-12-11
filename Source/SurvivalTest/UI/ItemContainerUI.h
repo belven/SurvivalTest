@@ -39,10 +39,10 @@ public:
 	void GenerateInventory();
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 GetColumn(int32 index);
+	static int32 GetColumn(int32 index);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	int32 GetRow(int32 index);
+	static int32 GetRow(int32 index);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UItemContainer* GetItemContainer() const { return container; }
@@ -66,7 +66,7 @@ public:
 	UItemContainer* GetItemContainerForArmour(FInstanceItemData data);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool IsArmour(FItemData id);
+	static bool IsArmour(FItemData id);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	UItemUI* GetItemAtSlot(int32 itemSlot);

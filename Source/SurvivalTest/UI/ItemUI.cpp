@@ -18,7 +18,7 @@ void UItemUI::UpdateItemData(FInstanceItemData inInstanceData, FItemData inItemD
 
 FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (!disabled) {
+	if (!itemDisabled) {
 		if (InMouseEvent.GetPressedButtons().Contains(EKeys::RightMouseButton))
 		{
 			if (itemData.type == EItemType::Consumable && GetInstanceItemData().amount > 0)
@@ -27,7 +27,7 @@ FReply UItemUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 				FConsumableData cd = baseGameInstance->GetConsumableData(itemData.ID);
 				ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(GetOwningPlayer());
 
-				basePlayerController->GetBaseCharacter()->Consume(cd.consumableType, cd.value);
+				basePlayerController->GetBaseCharacter()->RestoreStat(cd.consumableType, cd.value);
 
 				FInstanceItemData oldData = GetInstanceItemData();
 				instanceItemData.amount--;

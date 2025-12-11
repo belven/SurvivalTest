@@ -15,7 +15,8 @@ UCLASS()
 class SURVIVALTEST_API UBaseEvent : public UObject
 {
 	GENERATED_BODY()
-private:
+
+	UPROPERTY()
 	UObject* EventOwner;
 	EEventType EventType;
 

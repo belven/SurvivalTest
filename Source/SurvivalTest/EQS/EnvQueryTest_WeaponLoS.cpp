@@ -13,7 +13,7 @@ UEnvQueryTest_WeaponLoS::UEnvQueryTest_WeaponLoS(const FObjectInitializer& Objec
 	// Set our ItemType to a vector, as the items (grid points) we're looking for, are locations in the world
 	ValidItemType = UEnvQueryItemType_VectorBase::StaticClass();
 
-	// Set Filter Type to range, this will then be a curve of values which allows us to have scores from 0 - 1. I need to look into this more to understand it better
+	// Set Filter Type to range, this will then be a curve of values which allows us to have scores from 0 to 1. I need to look into this more to understand it better
 	FilterType = EEnvTestFilterType::Range;
 
 	// If we're filtering only, then we can only pass or fail locations, and scoring only just manipulates the current scores of items.
@@ -87,7 +87,7 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 					// Did we hit something?
 					if (hit.bBlockingHit)
 					{
-						// If we hit something that's not are target FIRST, then there's something else in the way and we should invalidate that location
+						// If we hit something that's not are target FIRST, then there's something else in the way, and we should invalidate that location
 						if (hit.GetActor() != Cast<AActor>(con->GetTarget()))
 						{
 							canSee = false;

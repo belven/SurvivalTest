@@ -30,6 +30,9 @@ public:
 	static UCombatComponent* CreateCombatComponent(AController* controller, ABaseCharacter* character);
 
 	UFUNCTION()
+	void OnUIStateChanged(bool state);
+
+	UFUNCTION()
 	void OutOfAmmo();
 
 	UFUNCTION()
@@ -60,6 +63,16 @@ public:
 	ABaseCharacter* GetBaseCharacter() const { return baseCharacter; }
 	void SetBaseCharacter(ABaseCharacter* inBaseCharacter) { this->baseCharacter = inBaseCharacter; }
 
+	bool IsUIOpen() const
+	{
+		return uiState;
+	}
+
+	void SetUIState(bool inUIState)
+	{
+		uiState = inUIState;
+	}
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -71,6 +84,7 @@ private:
 	UPROPERTY()
 	UReloadTask* reloadTask;
 
+	bool uiState = false;
 	float RotateValue;
 	bool performAction;
 	bool useEquipment;

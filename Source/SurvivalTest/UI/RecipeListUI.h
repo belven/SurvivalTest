@@ -2,6 +2,7 @@
 #include "CoreMinimal.h"
 #include "RecipeUI.h"
 #include "Blueprint/UserWidget.h"
+#include "SurvivalTest/Items/Inventory.h"
 #include "RecipeListUI.generated.h"
 
 class UVerticalBox;
@@ -26,6 +27,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Recipes")
 	static URecipeListUI* CreateRecipeList(ABasePlayerController* controller, TArray<FFullRecipe> recipesToAdd);
+	static void DetermineRecipeEnabledState(UInventory* inventory, URecipeUI* recipe, int32 itemChanged = -1);
 	void CheckInventory(int32 itemChanged);
 	bool CheckInventoryForRecipe(FFullRecipe recipe);
 
@@ -41,6 +43,9 @@ public:
 	{
 		return selectedRecipe;
 	}
+
+	UFUNCTION(BlueprintCallable, Category = "Recipes")
+	URecipeUI* CreateRecipeUI(ABasePlayerController* controller, FFullRecipe fr);
 
 protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Recipe")

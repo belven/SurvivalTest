@@ -3,7 +3,6 @@
 #include "ProjectileWeapon.h"
 #include "RangedWeapon.h"
 #include "Weapon.h"
-#include "Kismet/GameplayStatics.h"
 #include "../BaseGameInstance.h"
 
 UWeapon* UWeaponCreator::CreateWeapon(UBaseGameInstance* gameIn, const FInstanceItemData& inInstanceItemData, const FItemData& inItemData)

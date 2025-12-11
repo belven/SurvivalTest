@@ -68,6 +68,14 @@ void ABasePlayerController::PlayerTick(float DeltaTime)
 	//leanTimeline.TickTimeline(DeltaTime);
 }
 
+
+/**
+ * Triggers when a player hits another character, so we can display a hit marker.
+ *
+ * TODO Add more complex hit information, so we can change the colour based on where we hit etc.
+ *
+ * @param enemy The character we hit
+ */
 void ABasePlayerController::EnemyHit(ABaseCharacter* enemy)
 {
 	if (mainHUD)
@@ -200,6 +208,15 @@ UBaseGameInstance* ABasePlayerController::GetBaseGameInstance()
 	return baseGameInstance;
 }
 
+
+/**
+ * This is used so we can clear up any UI and active states.
+ *
+ * TODO Later we'll need to add different controls and UI to give the player options after death, as well as stats etc. about their death.
+ * Also, might want to update UI when a teammate dies etc.
+ *
+ * @param deadCharacter The character that died, not used here, as we only check when the controlled character died right now.
+ */
 void ABasePlayerController::CharacterDied(ABaseCharacter* deadCharacter)
 {
 	// TODO might need to stop drag actions here
@@ -234,6 +251,11 @@ void ABasePlayerController::MoveRight(float Val)
 	}
 }
 
+void ABasePlayerController::BroadcastUIUpdate()
+{
+	OnUIChangedState.Broadcast(inventoryWidget->GetVisibility() == ESlateVisibility::Visible);
+}
+
 void ABasePlayerController::OpenInventory()
 {
 	if (inventoryWidget->GetVisibility() == ESlateVisibility::Hidden)
@@ -250,6 +272,8 @@ void ABasePlayerController::OpenInventory()
 		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(this, inventoryWidget);
 		bShowMouseCursor = true;
 	}
+
+	BroadcastUIUpdate();
 }
 
 void ABasePlayerController::CloseInventory()
@@ -260,6 +284,7 @@ void ABasePlayerController::CloseInventory()
 		UWidgetBlueprintLibrary::SetInputMode_GameOnly(this);
 		bShowMouseCursor = false;
 	}
+	BroadcastUIUpdate();
 }
 
 void ABasePlayerController::LoadInventories()

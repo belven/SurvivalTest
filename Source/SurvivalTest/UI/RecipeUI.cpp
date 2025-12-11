@@ -1,5 +1,4 @@
 #include "RecipeUI.h"
-
 #include "ItemUI.h"
 #include "Kismet/GameplayStatics.h"
 #include "SurvivalTest/BaseGameInstance.h"
@@ -24,7 +23,7 @@ void URecipeUI::AddItemToBox(FInputOutputData iod, UHorizontalBox* box)
 	iid.ID = 30000;
 	UItemUI* itemUI = CreateWidget<UItemUI>(this, itemUIClass);
 	itemUI->UpdateItemData(iid, id, nullptr);
-	itemUI->SetDisabled(true);
+	itemUI->SetItemDisabled(true);
 	box->AddChildToHorizontalBox(itemUI);
 }
 
@@ -62,19 +61,40 @@ void URecipeUI::SetSelected(bool selectedState)
 
 	if (selected)
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe selected"));
 		Select();
 	}
 	else
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe deselected"));
 		Deselect();
 	}
 
 	OnRecipeSelectionChanged.Broadcast(this);
 }
 
+void URecipeUI::UpdateRecipeEnabled(bool enabledState)
+{
+	recipeEnabled = enabledState;
+
+	if (recipeEnabled) 
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe Enabled"));
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe Disabled"));
+
+		if (selected)
+		{
+			SetSelected(false);
+		}
+	}
+}
+
 FReply URecipeUI::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-	if (InMouseEvent.GetPressedButtons().Contains(EKeys::LeftMouseButton))
+	if (InMouseEvent.GetPressedButtons().Contains(EKeys::LeftMouseButton) && recipeEnabled)
 	{
 		SetSelected(!selected);
 	}

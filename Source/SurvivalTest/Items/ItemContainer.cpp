@@ -268,11 +268,11 @@ void UItemContainer::AddUpdateItemData(FInstanceItemData& itemsToAddOrUpdate)
 
 void UItemContainer::UpdateItemData(UItemContainer* container, FInstanceItemData& newItem, const FInstanceItemData& OldItem)
 {
-	container->OnItemUpdated.Broadcast(newItem, OldItem);
 	FInstanceItemData updatedItem = newItem;
 	updatedItem.containerInstanceID = OldItem.containerInstanceID;
 	updatedItem.slot = OldItem.slot;
 	AddUpdateItemData(updatedItem);
+	container->OnItemUpdated.Broadcast(newItem, OldItem);
 }
 
 void UItemContainer::RemoveInstanceItem(UItemContainer* other, FInstanceItemData& itemToDelete)
@@ -626,6 +626,7 @@ void UItemContainer::UpdateDebugItemsList()
 {
 	const bool updateDebug = false;
 
+	// ReSharper disable once CppUnreachableCode
 	if (updateDebug) {
 		TArray<FInstanceItemData> data = GetGame()->GetInstancedItemsForContainer(instanceContainerData.ID);
 		lastUpdatedItems.Empty();

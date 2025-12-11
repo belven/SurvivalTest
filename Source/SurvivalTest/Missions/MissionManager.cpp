@@ -54,17 +54,13 @@ void UMissionManager::StartPlay()
 
 int32 UMissionManager::GetRandomMissionAmount()
 {
-	int32 amount = 0;
+	int32 amount = 1;
 	float missionsNum = missions.Num();
 
-	if(missionsNum == 1)
+	if(missionsNum != 1) 
 	{
-		amount = 1;
-	}
-	else {
 		amount = FMath::Min(1, FMath::RoundHalfToEven(missionsNum / 2));
 	}
 
 	return amount;
 }
-

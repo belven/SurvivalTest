@@ -40,6 +40,11 @@ UCombatComponent* UCombatComponent::CreateCombatComponent(AController* controlle
 	}
 	else 
 	{
+		if (ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(controller))
+		{
+			basePlayerController->OnUIChangedState.AddUniqueDynamic(combatComponent, &UCombatComponent::OnUIStateChanged);
+		}
+
 		inputComponent->BindAction("PrimaryWeapon", IE_Pressed, combatComponent, &UCombatComponent::OnPrimaryWeapon);
 		inputComponent->BindAction("SecondaryWeapon", IE_Pressed, combatComponent, &UCombatComponent::OnSecondaryWeapon);
 		inputComponent->BindAction("Sidearm", IE_Pressed, combatComponent, &UCombatComponent::OnSidearm);
@@ -50,6 +55,17 @@ UCombatComponent* UCombatComponent::CreateCombatComponent(AController* controlle
 
 	combatComponent->RegisterComponent();
 	return combatComponent;
+}
+
+void UCombatComponent::OnUIStateChanged(bool state)
+{
+	uiState = state;
+
+	if (IsUIOpen())
+	{
+		performAction = false;
+		useEquipment = false;
+	}
 }
 
 void UCombatComponent::OutOfAmmo()
@@ -115,8 +131,11 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::OnPrimaryActionReleased()
 {
-	performAction = false;
-	useEquipment = false;
+	if (!IsUIOpen())
+	{
+		performAction = false;
+		useEquipment = false;
+	}
 }
 
 void UCombatComponent::OnPrimaryWeapon()
@@ -136,8 +155,11 @@ void UCombatComponent::OnSidearm()
 
 void UCombatComponent::OnPrimaryAction()
 {
-	performAction = true;
-	useEquipment = true;
+	if (!IsUIOpen())
+	{
+		performAction = true;
+		useEquipment = true;
+	}
 }
 
 void UCombatComponent::EquipWeaponAtSlot(int32 slot, EGearType type)
