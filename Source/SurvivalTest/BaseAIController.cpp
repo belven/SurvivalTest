@@ -23,9 +23,19 @@
 #include "Tasks/EquipmentSwapTask.h"
 #include "Tasks/TaskManagerComponent.h"
 
+DEFINE_LOG_CATEGORY(AIError)
+DEFINE_LOG_CATEGORY(AIIssue)
+DEFINE_LOG_CATEGORY(AILog)
+
+int32 ABaseAIController::KNIFE_ITEM_ID = UItemStructs::InvalidInt;
 
 ABaseAIController::ABaseAIController() : Super(FObjectInitializer::Get())
 {
+	constexpr int32 range = 13000;
+	isInactive = true;
+	currentPath = nullptr;
+	currentPathPoint = 0;
+
 	// Initialize pointers to nullptr for safety
 	PerceptionComponent = nullptr;
 	sightConfig = nullptr;
@@ -35,25 +45,33 @@ ABaseAIController::ABaseAIController() : Super(FObjectInitializer::Get())
 	PerceptionComponent = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerceptionComponent"));
 	sightConfig = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("SightConfig"));
 
-	if (PerceptionComponent && sightConfig)
-	{
-		PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
-		PerceptionComponent->ConfigureSense(*sightConfig);
-		PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAIController::TargetPerceptionUpdated);
-	}
+	// Set up sight config for AI perception
+	sightConfig->SightRadius = range * 0.9;
+	sightConfig->LoseSightRadius = range;
+	sightConfig->PeripheralVisionAngleDegrees = 100.0f;
+
+	// This section is important, as without setting at least bDetectNeutrals to true, the AI will never perceive anything
+	// Still not tried to set this up correctly at all
+	sightConfig->DetectionByAffiliation.bDetectEnemies = true;
+	sightConfig->DetectionByAffiliation.bDetectFriendlies = true;
+	sightConfig->DetectionByAffiliation.bDetectNeutrals = true;
+
+	PerceptionComponent->SetDominantSense(sightConfig->GetSenseImplementation());
+	PerceptionComponent->ConfigureSense(*sightConfig);
+	PerceptionComponent->OnTargetPerceptionUpdated.AddDynamic(this, &ABaseAIController::TargetPerceptionUpdated);
 
 	static ConstructorHelpers::FObjectFinder<UEnvQuery> PlayerLocationQueryObj(TEXT("EnvQuery'/Game/FirstPerson/EQS_FindPlayer.EQS_FindPlayer'"));
 	if (PlayerLocationQueryObj.Succeeded())
 	{
 		FindWeaponLocationQuery = PlayerLocationQueryObj.Object;
+
+		// Set up our EQS query 
+		FindViableCombatLocationRequest = FEnvQueryRequest(FindWeaponLocationQuery, this);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Failed to find EQS_FindPlayer EnvQuery asset."));
+		UE_LOG(AIError, Error, TEXT("Failed to find EQS_FindPlayer EnvQuery asset."));
 	}
-
-	currentPath = nullptr;
-	currentPathPoint = 0;
 }
 
 void ABaseAIController::LookAt(const FVector& lookAtLocation)
@@ -109,7 +127,6 @@ bool ABaseAIController::HasRangedWeapon()
 	return projectileWeapon != NULL;
 }
 
-
 void ABaseAIController::NavDone(ANavigationData* inNavData)
 {
 	DetermineNextAction();
@@ -123,30 +140,13 @@ void ABaseAIController::OnPossess(APawn* aPawn)
 
 	UNavigationSystemV1::GetCurrent(GetWorld())->OnNavigationGenerationFinishedDelegate.AddUniqueDynamic(this, &ABaseAIController::NavDone);
 	mGameInstance()->GetEventManager()->OnEventTriggered.AddUniqueDynamic(this, &ABaseAIController::EventTriggered);
-	constexpr int32 range = 13000;
-
-	// Set up sight config for AI perception
-	sightConfig->SightRadius = range * 0.9;
-	sightConfig->LoseSightRadius = range;
-	sightConfig->PeripheralVisionAngleDegrees = 100.0f;
-
-	// This section is important, as without setting at least bDetectNeutrals to true, the AI will never perceive anything
-	// Still not tried to set this up correctly at all
-	sightConfig->DetectionByAffiliation.bDetectEnemies = true;
-	sightConfig->DetectionByAffiliation.bDetectFriendlies = true;
-	sightConfig->DetectionByAffiliation.bDetectNeutrals = true;
-	PerceptionComponent->ConfigureSense(*sightConfig);
 
 	// Add the AIs character to things that can be perceived by this sight config.
 	UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), aPawn);
 
-	// Set up our EQS query 
-	FindViableCombatLocationRequest = FEnvQueryRequest(FindWeaponLocationQuery, this);
-
-	isInactive = true;
-	DetermineNextAction();
-
 	AddInstanceComponent(UCombatComponent::CreateCombatComponent(this, AICharacter));
+
+	DetermineNextAction();
 }
 
 // ReSharper disable once CppPassValueParameterByConstReference
@@ -190,9 +190,11 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 				target = Cast<IDamagable>(Actor);
 				canSee = true;
 				DetermineNextAction();
+				UE_LOG(AILog, Log, TEXT("AI %s found a hostile target"), *AICharacter->GetCharacterName());
 			}
 			else if (!alliesSeen.Contains(Actor))
 			{
+				UE_LOG(AILog, Log, TEXT("AI %s found an ally"), *AICharacter->GetCharacterName());
 				alliesSeen.Add(Cast<ABaseCharacter>(Actor));
 			}
 		}
@@ -205,7 +207,7 @@ void ABaseAIController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollo
 
 	if (!Result.IsSuccess() && (Result.Code == EPathFollowingResult::Invalid || Result.Code == EPathFollowingResult::Blocked))
 	{
-		//UE_LOG(LogTemp, Log, TEXT("OnMoveCompleted Failed"));
+		UE_LOG(AIIssue, Warning, TEXT("OnMoveCompleted Failed"));
 	}
 
 	mSetTimer(TimerHandle_DetermineAction, &ABaseAIController::DetermineNextAction, 1.0f);
@@ -230,7 +232,8 @@ void ABaseAIController::DetermineNextAction()
 {
 	if (GetBaseCharacter())
 	{
-		if (GetBaseCharacter()->IsAlive()) {
+		if (GetBaseCharacter()->IsAlive()) 
+		{
 			inactiveTimerDuration = 5.0f;
 
 			if (needsAmmo)
@@ -270,25 +273,26 @@ void ABaseAIController::GetPatrolPath()
 	// Do we already have a patrol path
 	if (currentPath == NULL)
 	{
-		auto gi = GameInstance(GetWorld());
+		UBaseGameInstance* gi = GetBaseCharacter()->GetGame();
 
 		if (!gi->paths.IsEmpty())
 		{
 			// Get the first patrol path from the game instance
 			currentPath = gi->paths[0];
 
+			int32 numberOfSplinePoints = currentPath->GetSpline()->GetNumberOfSplinePoints();
+
 			// Check if the path is valid
-			if (currentPath != NULL && currentPath->GetSpline()->GetNumberOfSplinePoints() < 1)
+			if (currentPath != NULL && numberOfSplinePoints < 1)
 			{
 				currentPath = NULL;
 
-				// Set path point to -1, as there aren't any valid patrol paths and we don't keep checking every tick
+				// Set path point to -1, as there aren't any valid patrol paths, and we don't keep checking every tick
 				currentPathPoint = -1;
 			}
 			else
 			{
-				const USplineComponent* spline = currentPath->GetSpline();
-				currentPathPoint = FMath::RandRange(0, spline->GetNumberOfSplinePoints() - 1);
+				currentPathPoint = FMath::RandRange(0, numberOfSplinePoints - 1);
 			}
 		}
 	}
@@ -296,7 +300,7 @@ void ABaseAIController::GetPatrolPath()
 
 void ABaseAIController::Patrol()
 {
-	// Check if we aren't moving or we have an invalid Path
+	// Check if we aren't moving, or we have an invalid Path
 	// (the currentPathPoint is set to -1 when we didn't find any patrol paths in the world)
 	if (currentPathPoint > -1)
 	{
@@ -350,18 +354,18 @@ void ABaseAIController::AttackWithWeapon()
 		{
 			StopMovement();
 			GetBaseCharacter()->StopSprinting();
-			FVector targetLoc = IncreaseVectorHeight(GetPredictedLocation(target->asActor()), 70);
-
-			FRotator rotation = GetBaseCharacter()->GetActorRotation();
 
 			if (HasRangedWeapon())
 			{
+				FVector targetLoc = IncreaseVectorHeight(GetPredictedLocation(target->asActor()), 70);
+				FRotator rotation = GetBaseCharacter()->GetActorRotation();
 				FProjectileWeaponData pw = projectileWeapon->GetProjectileWeaponData();
 				float gravity = pw.gravity * GetWorld()->GetGravityZ();
 				SolveBallisticArc(mActorLocation, targetLoc, pw.bulletVelocity, gravity, rotation);
 			}
 
-			if (!isAttacking) {
+			if (!isAttacking)
+			{
 				SetIsAttacking(true);
 			}
 		}
@@ -374,10 +378,10 @@ void ABaseAIController::AttackWithWeapon()
 			SetIsAttacking(false);
 		}
 	}
+	// We have no weapon so equip a knife
 	else
 	{
 		SetIsAttacking(false);
-		// We have no weapon
 		EquipKnife();
 		CalculateCombat();
 	}
@@ -455,22 +459,19 @@ void ABaseAIController::Reload()
 
 FVector ABaseAIController::GetPredictedLocation(AActor* actor)
 {
-	float lead;
+	float lead = 1;
+	FVector actorLocation = actor->GetActorLocation();
 
 	if (HasRangedWeapon())
 	{
 		lead = projectileWeapon->GetProjectileWeaponData().bulletVelocity;
 	}
-	else // This would account for melee weapons, dunno if I need lead at all.
-	{
-		lead = 1;
-	}
 
 	// TODO Do we create an AI accuracy stat to use here?
-	//time = FMath::RandRange(time * 0.9f, time * 1.1f);
+	// time = FMath::RandRange(time * 0.9f, time * 1.1f);
 
-	float time = FVector::Dist(GetBaseCharacter()->GetActorLocation(), actor->GetActorLocation()) / lead;
-	return actor->GetActorLocation() + (actor->GetVelocity() * time);
+	float time = FVector::Dist(GetBaseCharacter()->GetActorLocation(), actorLocation) / lead;
+	return actorLocation + (actor->GetVelocity() * time);
 }
 
 void ABaseAIController::MoveToCombatLocation()
@@ -479,6 +480,9 @@ void ABaseAIController::MoveToCombatLocation()
 	StartSprinting();
 }
 
+/**
+ * The AI will check the inventories of nearby dead characters, to try and get ammo from them.
+ */
 void ABaseAIController::GetNearbyAmmo()
 {
 	for (IInteractable* inter : GetBaseCharacter()->GetOverlappingInteractables())
@@ -489,16 +493,23 @@ void ABaseAIController::GetNearbyAmmo()
 		{
 			for (auto iid : other->GetInventory()->GetItems())
 			{
-				if (HasRangedWeapon() && iid.itemID == projectileWeapon->GetProjectileWeaponData().ammoID)
+				bool isAmmoForWeapon = iid.itemID == projectileWeapon->GetProjectileWeaponData().ammoID;
+
+				if (HasRangedWeapon() && isAmmoForWeapon)
 				{
+					UE_LOG(AILog, Log, TEXT("AI %s found ammo from a body"), *AICharacter->GetCharacterName());
 					GetBaseCharacter()->GetInventory()->TransferItem(other->GetInventory(), iid, UItemStructs::InvalidInt);
 					needsAmmo = false;
+					break;
 				}
 			}
 		}
 	}
 }
 
+/**
+ * Starts the AI sprinting, if it's not already sprinting
+ */
 void ABaseAIController::StartSprinting()
 {
 	if (!GetBaseCharacter()->IsSprinting())
@@ -507,6 +518,11 @@ void ABaseAIController::StartSprinting()
 	}
 }
 
+/**
+ * Looks through all the seen allies, trying to find replacement ammo and weapons from any that are dead.
+ *
+ * @return True, if an ally with any ammo or weapons we can use
+ */
 bool ABaseAIController::FindAllyWithAmmo()
 {
 	bool result = false;
@@ -515,6 +531,7 @@ bool ABaseAIController::FindAllyWithAmmo()
 	{
 		if (ally && ally->IsDead() && HasAmmo(ally) && FVector::Dist(mActorLocation, ally->GetActorLocation()) < 10000)
 		{
+			UE_LOG(AILog, Log, TEXT("AI %s found ammo on ally %s"), *AICharacter->GetCharacterName(), *ally->GetCharacterName());
 			MoveToLocation(ally->GetActorLocation(), ABaseCharacter::interactionRadius * 0.7);
 			StartSprinting();
 			result = true;
@@ -523,28 +540,38 @@ bool ABaseAIController::FindAllyWithAmmo()
 	return result;
 }
 
+/**
+ * Equips the AI with a knife in their inventory, assuming they have one
+ */
 void ABaseAIController::EquipKnife()
 {
 	needsAmmo = false;
 	bool knifeEquipped = false;
-	UBaseGameInstance* game = GetBaseCharacter()->GetGame();
 
-	// Get the AIs inventory items
-	for (auto iid : GetBaseCharacter()->GetInventory()->GetItems())
+	// Find the ID for the knife. It might change, so we'll search by name. Once set, we don't find it again
+	if (KNIFE_ITEM_ID == UItemStructs::InvalidInt)
 	{
-		FItemData id = game->GetItemData(iid.itemID);
+		FItemData id = GetBaseCharacter()->GetGame()->GetItemDataByName("Knife");
 
-		// Find the knife, all AI should have one by default
-		if (id.name.Equals("Knife"))
+		if (id.ID != UItemStructs::InvalidInt)
 		{
-			//	UWeapon* weapon = UWeaponCreator::CreateWeapon(id.ID, GetBaseCharacter()->GetWorld(), iid.ID);
-			//	GetBaseCharacter()->GetInventory()->SetEquippedWeapon(weapon);
+			KNIFE_ITEM_ID = id.ID;
+		}
+	}
 
-			EquipWeaponAtSlot(iid.slot, EGearType::Weapon);
-
-			knifeEquipped = true;
-			DetermineNextAction();
-			break;
+	if (KNIFE_ITEM_ID != UItemStructs::InvalidInt)
+	{
+		// Get the AIs inventory items
+		for (auto iid : GetBaseCharacter()->GetInventory()->GetItems())
+		{
+			// Find the knife, all AI should have one by default
+			if (iid.itemID == KNIFE_ITEM_ID)
+			{
+				EquipWeaponAtSlot(iid.slot, EGearType::Weapon);
+				knifeEquipped = true;
+				DetermineNextAction();
+				break;
+			}
 		}
 	}
 
@@ -648,6 +675,7 @@ void ABaseAIController::EventTriggered(UBaseEvent* inEvent)
 				DetermineNextAction();
 			}
 		}
+		// Check if our target has died and if we therefore need a new one
 		// Check if the change is damage
 		// Check if the change is against our target
 		// Check if our target is dead
@@ -668,7 +696,6 @@ FPathFollowingRequestResult ABaseAIController::MoveTo(const FAIMoveRequest& Move
 	//FPathFollowingRequestResult res = Super::MoveTo(MoveRequest, OutPath);
 	//inactiveTimerDuration = OutPath->Get()->GetLength() / (GetBaseCharacter()->GetMovementComponent()->GetMaxSpeed() * 1.2);
 	//return res;
-
 	// TODO figure out inactive timer based on travel time
 	inactiveTimerDuration = 15.0f;
 	return Super::MoveTo(MoveRequest, OutPath);

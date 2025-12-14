@@ -20,6 +20,8 @@ public:
 	void SpawnProjectile(const FRotator& FireRotation);
 	void Reload();
 
+	virtual FString GetWeaponHUDText() override;
+
 	bool NeedsReloading() { return GetCurrentAmmo() < GetProjectileWeaponData().magazineSize;  }
 
 	virtual ABaseProjectile* SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) override;

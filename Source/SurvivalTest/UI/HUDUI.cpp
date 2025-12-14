@@ -1,6 +1,8 @@
 #include "HUDUI.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "SurvivalTest/Items/ProjectileWeapon.h"
 #include "SurvivalTest/Items/Weapon.h"
+// ReSharper disable once CppUnusedIncludeDirective
 #include "SurvivalTest/BaseCharacter.h"
 
 float UHUDUI::GetHealthProgress()
@@ -18,36 +20,9 @@ float UHUDUI::GetFoodProgress()
 	return (GetPlayer()->GetCurrentStats().hunger / GetPlayer()->GetMaxStats().hunger);
 }
 
-int32 UHUDUI::GetWeaponMaxAmmo()
-{
-	int32 maxAmmo = -1;
-	UWeapon* equippedWeapon = GetPlayer()->GetEquippedWeapon();
-	if (equippedWeapon && equippedWeapon->GetWeaponData().type == EWeaponType::Projectile)
-	{
-		maxAmmo = Cast<UProjectileWeapon>(equippedWeapon)->GetProjectileWeaponData().magazineSize;
-	}
-	return maxAmmo;
-}
-
 FString UHUDUI::GetWeaponText()
 {
-	FString text = "";
-
-	text += GetPlayer()->GetEquippedWeapon() ? GetPlayer()->GetEquippedWeapon()->GetItemData().name : "None";
-
-	int32 ammo = GetWeaponCurrentAmmo();
-
-	if (ammo != -1)
-	{
-		text += " " + FString::FromInt(ammo) + "/" + FString::FromInt(GetWeaponMaxAmmo());
-	}
-
-	return text;
-}
-
-int32 UHUDUI::GetWeaponCurrentAmmo()
-{
-	return GetPlayer()->GetEquippedWeapon() ? GetPlayer()->GetEquippedWeapon()->GetInstanceWeaponData().ammo : -1;
+	return GetPlayer()->GetEquippedWeapon() ? GetPlayer()->GetEquippedWeapon()->GetWeaponHUDText() : "None";
 }
 
 float UHUDUI::GetRestProgress()

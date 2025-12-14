@@ -23,36 +23,35 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	}
 }
 
-UCombatComponent* UCombatComponent::CreateCombatComponent(AController* controller, ABaseCharacter* character)
-{	
+UCombatComponent* UCombatComponent::CreateCombatComponent(ABaseAIController* controller, ABaseCharacter* character)
+{
+	UCombatComponent* combatComponent = CreateCombatComponent_INTERNAL(controller, character);
+	controller->OnUseTool.AddUniqueDynamic(combatComponent, &UCombatComponent::OnPrimaryAction);
+	controller->OnStopUsingTool.AddUniqueDynamic(combatComponent, &UCombatComponent::OnPrimaryActionReleased);
+	controller->OnReload.AddUniqueDynamic(combatComponent, &UCombatComponent::Reload);
+	return combatComponent;
+}
+
+UCombatComponent* UCombatComponent::CreateCombatComponent(ABasePlayerController* controller, ABaseCharacter* character)
+{
+	UCombatComponent* combatComponent = CreateCombatComponent_INTERNAL(controller, character);
+	TObjectPtr<UInputComponent> inputComponent = combatComponent->GetOwner()->InputComponent;
+	controller->OnUIChangedState.AddUniqueDynamic(combatComponent, &UCombatComponent::OnUIStateChanged);
+
+	inputComponent->BindAction("PrimaryWeapon", IE_Pressed, combatComponent, &UCombatComponent::OnPrimaryWeapon);
+	inputComponent->BindAction("SecondaryWeapon", IE_Pressed, combatComponent, &UCombatComponent::OnSecondaryWeapon);
+	inputComponent->BindAction("Sidearm", IE_Pressed, combatComponent, &UCombatComponent::OnSidearm);
+	inputComponent->BindAction("Reload", IE_Pressed, combatComponent, &UCombatComponent::Reload);
+	inputComponent->BindAction("PrimaryAction", IE_Pressed, combatComponent, &UCombatComponent::OnPrimaryAction);
+	inputComponent->BindAction("PrimaryAction", IE_Released, combatComponent, &UCombatComponent::OnPrimaryActionReleased);
+	return combatComponent;
+}
+
+UCombatComponent* UCombatComponent::CreateCombatComponent_INTERNAL(AController* controller, ABaseCharacter* character)
+{
 	UCombatComponent* combatComponent = NewObject<UCombatComponent>(controller);
 	combatComponent->SetBaseCharacter(character);
-
 	character->OnWeaponEquipped.AddUniqueDynamic(combatComponent, &UCombatComponent::WeaponEquipped);
-
-	TObjectPtr<UInputComponent> inputComponent = combatComponent->GetOwner()->InputComponent;
-
-	if (ABaseAIController* aiController = Cast<ABaseAIController>(controller))
-	{
-		aiController->OnUseTool.AddUniqueDynamic(combatComponent, &UCombatComponent::OnPrimaryAction);
-		aiController->OnStopUsingTool.AddUniqueDynamic(combatComponent, &UCombatComponent::OnPrimaryActionReleased);
-		aiController->OnReload.AddUniqueDynamic(combatComponent, &UCombatComponent::Reload);
-	}
-	else 
-	{
-		if (ABasePlayerController* basePlayerController = Cast<ABasePlayerController>(controller))
-		{
-			basePlayerController->OnUIChangedState.AddUniqueDynamic(combatComponent, &UCombatComponent::OnUIStateChanged);
-		}
-
-		inputComponent->BindAction("PrimaryWeapon", IE_Pressed, combatComponent, &UCombatComponent::OnPrimaryWeapon);
-		inputComponent->BindAction("SecondaryWeapon", IE_Pressed, combatComponent, &UCombatComponent::OnSecondaryWeapon);
-		inputComponent->BindAction("Sidearm", IE_Pressed, combatComponent, &UCombatComponent::OnSidearm);
-		inputComponent->BindAction("Reload", IE_Pressed, combatComponent, &UCombatComponent::Reload);
-		inputComponent->BindAction("PrimaryAction", IE_Pressed, combatComponent, &UCombatComponent::OnPrimaryAction);
-		inputComponent->BindAction("PrimaryAction", IE_Released, combatComponent, &UCombatComponent::OnPrimaryActionReleased);
-	}
-
 	combatComponent->RegisterComponent();
 	return combatComponent;
 }
@@ -83,14 +82,14 @@ void UCombatComponent::ReloadComplete()
 void UCombatComponent::WeaponEquipped(UWeapon* oldWeapon)
 {
 	ABaseAIController* aiController = Cast<ABaseAIController>(GetBaseCharacter()->GetController());
-		
+
 	if (oldWeapon && oldWeapon->IsProjectileWeapon())
 	{
 		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
 		pw->OnOutOfAmmo.RemoveAll(this);
 		pw->OnReloadComplete.RemoveAll(this);
 
-		if (aiController) 
+		if (aiController)
 		{
 			pw->OnReloadComplete.RemoveAll(aiController);
 			pw->OnWeaponReady.RemoveAll(aiController);
@@ -105,7 +104,7 @@ void UCombatComponent::WeaponEquipped(UWeapon* oldWeapon)
 		rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &UCombatComponent::OutOfAmmo);
 		rangedWeapon->OnReloadComplete.AddUniqueDynamic(this, &UCombatComponent::ReloadComplete);
 
-		if (aiController) 
+		if (aiController)
 		{
 			rangedWeapon->OnReloadComplete.AddUniqueDynamic(aiController, &ABaseAIController::ReloadComplete);
 			rangedWeapon->OnWeaponReady.AddUniqueDynamic(aiController, &ABaseAIController::WeaponReady);

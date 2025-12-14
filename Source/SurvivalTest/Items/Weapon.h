@@ -5,7 +5,7 @@
 #include "Engine/EngineTypes.h"
 #include "Weapon.generated.h"
 
-#define mSpawnProjectile(projectileClass) GetCharacterOwner()->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
+#define mSpawnProjectile(projectileClass, gunLocation, FireRotation) GetCharacterOwner()->GetWorld()->SpawnActor<ABaseProjectile>(projectileClass, gunLocation, FireRotation)
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FWeaponReady);
@@ -35,6 +35,7 @@ public:
 	void SetOwner(ABaseCharacter* val);
 	void Equip(ABaseCharacter* val);
 	void Unequip();
+	virtual FString GetWeaponHUDText();
 
 	void AttackComplete();
 

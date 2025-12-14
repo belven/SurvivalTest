@@ -139,6 +139,8 @@ public:
 	bool IsPlayer() { return isPlayer; }
 	void SetIsPlayer(bool newIsPlayer) { isPlayer = newIsPlayer; }
 
+	FString GetCharacterName() { return characterName;  }
+
 protected:
 	float timeMoved;
 	bool inCombat;

@@ -8,6 +8,8 @@
 #include "CombatComponent.generated.h"
 
 
+class ABasePlayerController;
+class ABaseAIController;
 class UWeapon;
 class UReloadTask;
 class UProjectileWeapon;
@@ -27,7 +29,8 @@ public:
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	static UCombatComponent* CreateCombatComponent(AController* controller, ABaseCharacter* character);
+	static UCombatComponent* CreateCombatComponent(ABaseAIController* controller, ABaseCharacter* character);
+	static UCombatComponent* CreateCombatComponent(ABasePlayerController* controller, ABaseCharacter* character);
 
 	UFUNCTION()
 	void OnUIStateChanged(bool state);
@@ -78,6 +81,8 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	static UCombatComponent* CreateCombatComponent_INTERNAL(AController* controller, ABaseCharacter* character);
+
 	UPROPERTY()
 	UEquipmentSwapTask* equipmentSwapTask;
 

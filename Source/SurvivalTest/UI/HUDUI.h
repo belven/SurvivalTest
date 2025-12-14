@@ -3,6 +3,8 @@
 #include "Blueprint/UserWidget.h"
 #include "HUDUI.generated.h"
 
+class ABaseCharacter;
+
 UCLASS()
 class SURVIVALTEST_API UHUDUI : public UUserWidget
 {
@@ -19,13 +21,7 @@ public:
 	float GetFoodProgress();
 
 	UFUNCTION(BlueprintCallable)
-	int32 GetWeaponMaxAmmo();
-
-	UFUNCTION(BlueprintCallable)
 	FString GetWeaponText();
-
-	UFUNCTION(BlueprintCallable)
-	int32 GetWeaponCurrentAmmo();
 
 	UFUNCTION(BlueprintCallable)
 	float GetRestProgress();

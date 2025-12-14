@@ -24,6 +24,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReload);
 
 #define mAsBaseCharacter(character) Cast<ABaseCharacter>(character)
 
+DECLARE_LOG_CATEGORY_EXTERN(AIError, Error, All)
+DECLARE_LOG_CATEGORY_EXTERN(AILog, Log, All)
+DECLARE_LOG_CATEGORY_EXTERN(AIIssue, Warning, All)
+
 UCLASS()
 class SURVIVALTEST_API ABaseAIController : public AAIController, public IEventListener
 {
@@ -73,7 +77,6 @@ protected:
 	void AttackWithWeapon();
 	void CalculateCombat();
 
-
 	bool HasAmmoForWeapon();
 	void GetAmmo();
 	void OutOfAmmo();
@@ -119,6 +122,7 @@ private:
 	FTimerHandle TimerHandle_DetermineAction;
 	float inactiveTimerDuration;
 	bool isAttacking = false;
+	static int32 KNIFE_ITEM_ID;
 
 public:
 	bool IsIsAttacking() const
@@ -133,9 +137,10 @@ public:
 		if (isAttacking)
 		{
 			OnUseTool.Broadcast();
-		} else
+		}
+		else
 		{
-			
+			OnStopUsingTool.Broadcast();
 		}
 	}
 

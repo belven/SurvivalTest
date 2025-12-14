@@ -47,6 +47,11 @@ void UWeapon::Unequip()
 	// TODO delete self
 }
 
+FString UWeapon::GetWeaponHUDText()
+{
+	return GetItemData().name;
+}
+
 void UWeapon::AttackComplete()
 {
 	canAttack = true;

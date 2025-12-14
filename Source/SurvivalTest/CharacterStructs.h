@@ -14,7 +14,14 @@ USTRUCT(BlueprintType)
 struct FHealthChange
 {
 	GENERATED_USTRUCT_BODY()
-public:
+	FHealthChange() {}
+	FHealthChange(float inChangeAmount, bool inHeals, ABaseCharacter* inSource)
+		: changeAmount(inChangeAmount),
+		  heals(inHeals),
+		  source(inSource)
+	{
+	}
+
 	float changeAmount = 0;
 	bool heals = false;
 

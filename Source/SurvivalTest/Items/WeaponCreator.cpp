@@ -9,7 +9,7 @@ UWeapon* UWeaponCreator::CreateWeapon(UBaseGameInstance* gameIn, const FInstance
 {
 	UWeapon* weaponOut = NULL;
 
-	if (inItemData.type == EItemType::Weapon) 
+	if (inItemData.type == EItemType::Weapon)
 	{
 		const FWeaponData w = gameIn->GetWeaponData(inItemData.ID);
 
@@ -19,7 +19,7 @@ UWeapon* UWeaponCreator::CreateWeapon(UBaseGameInstance* gameIn, const FInstance
 			FRangedWeaponData rwd = gameIn->GetRangedWeaponData(w.ID);
 			FProjectileWeaponData pwd = gameIn->GetProjectileWeaponData(rwd.ID);
 			FInstanceWeaponData iwd = gameIn->GetInstanceWeaponDataByInstanceItemID(inInstanceItemData.ID);
-						
+
 			if (iwd.ID == UItemStructs::InvalidInt) {
 				iwd = gameIn->CreateNewInstanceWeaponData(inInstanceItemData.ID, pwd);
 			}
@@ -32,7 +32,7 @@ UWeapon* UWeaponCreator::CreateWeapon(UBaseGameInstance* gameIn, const FInstance
 			pw->SetInstanceWeaponData(iwd);
 			weaponOut = pw;
 		}
-		else if (w.type == EWeaponType::Melee) 
+		else if (w.type == EWeaponType::Melee)
 		{
 			UMeleeWeapon* mw = mNewObject(UMeleeWeapon);
 			mw->SetItemData(inItemData);

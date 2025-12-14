@@ -26,12 +26,8 @@ void UProjectileWeapon::UseWeapon(const FRotator& LookAtRotation)
 }
 
 ABaseProjectile* UProjectileWeapon::SpawnProjectile(FVector gunLocation, FRotator FireRotation, UClass* projectileClass) {
-	ABaseProjectile* projectile = mSpawnProjectile(projectileClass);
-	FHealthChange hc;
-	hc.changeAmount = weaponData.healthChange;
-	hc.source = GetCharacterOwner();
-	hc.heals = weaponData.heals;
-	projectile->SetHealthChange(hc);
+	ABaseProjectile* projectile = mSpawnProjectile(projectileClass, gunLocation, FireRotation);
+	projectile->SetHealthChange(FHealthChange(weaponData.healthChange, weaponData.heals, GetCharacterOwner()));
 	projectile->SetWeaponUsed(this);
 	projectile->GetProjectileMovement()->ProjectileGravityScale = GetProjectileWeaponData().gravity;
 	return projectile;
@@ -94,6 +90,12 @@ void UProjectileWeapon::Reload()
 {
 	canAttack = false;
 	RecoilReset();
+}
+
+FString UProjectileWeapon::GetWeaponHUDText()
+{
+	const FString magazineSize = FString::FromInt(GetProjectileWeaponData().magazineSize);
+	return Super::GetWeaponHUDText() += " " + FString::FromInt(GetInstanceWeaponData().ammo) + "/" + magazineSize;
 }
 
 void UProjectileWeapon::ReloadExpired()

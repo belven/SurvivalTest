@@ -47,12 +47,10 @@ void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 
 		for (IDamagable* hit : hitTargets)
 		{
-			if (hit->IsAlive()) {
-				FHealthChange change;
-				change.changeAmount = GetWeaponData().healthChange;
-				change.source = GetCharacterOwner();
-				change.heals = GetWeaponData().heals;
-				hit->ChangeHealth(change);
+			if (hit->IsAlive()) 
+			{
+				FHealthChange hc(GetWeaponData().healthChange, GetWeaponData().heals, GetCharacterOwner());
+				hit->ChangeHealth(hc);
 			}
 		}
 	}
