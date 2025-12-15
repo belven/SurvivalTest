@@ -57,7 +57,7 @@ void UInventory::CreateNewItemForInventory(int32 itemID)
 					// TODO figure out default ammo spawn system
 					/*for (int i = 0; i < 1; ++i)
 					{*/
-					itemsToAdd = FItemsToAdd(pwd.ammoID, ammoData.maxStack * 3);
+					itemsToAdd = FItemsToAdd(pwd.ammoID, ammoData.maxStack * 1);
 					newItemInstances.Empty();
 					AddItem(itemsToAdd, newItemInstances);
 					//}
@@ -122,6 +122,11 @@ int32 UInventory::GetSecondaryWeaponSlot()
 int32 UInventory::GetSidearmWeaponSlot()
 {
 	return GetSlotForGear(EGearType::Sidearm)[0];
+}
+
+FString UInventory::GetContainerName()
+{
+	return characterOwner->GetCharacterName() + ": " + Super::GetContainerName();
 }
 
 /**

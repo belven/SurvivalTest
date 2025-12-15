@@ -100,6 +100,11 @@ public:
 		}
 	}
 
+	static FString BoolToString(bool value)
+	{
+		return value ? "True" : "False";
+	}
+
 	template <class T>
 	static T GetRandomEnum(T end)
 	{

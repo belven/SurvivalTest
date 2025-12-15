@@ -17,8 +17,7 @@ struct FMissionData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		EMissionType type;
@@ -29,8 +28,7 @@ struct FMissionContainerData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 	int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 	EMissionType type;
@@ -43,8 +41,7 @@ struct FMissionItemData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		EMissionType type;
@@ -57,8 +54,7 @@ struct FMissionLoadoutData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		int32 ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mission")
 		int32 loadoutID;

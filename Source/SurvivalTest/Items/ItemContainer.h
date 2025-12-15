@@ -12,8 +12,7 @@ struct FValidSlots
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	TArray<EGearType> validGear;
 };
 
@@ -22,8 +21,7 @@ struct FItemDataPair
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	FItemDataPair()
+FItemDataPair()
 	{
 	}
 
@@ -68,6 +66,8 @@ public:
 	bool IsValidForSlot(const int32 slot, const EGearType inType);
 	int32 FindNextEmptyValidSlot(EGearType inType);
 	void UpdateDebugItemsList();
+
+	virtual FString GetContainerName();
 
 	UFUNCTION(BlueprintCallable, Category = "Item Container")
 	FInstanceItemData& TransferItem(UItemContainer* sourceInventory, FInstanceItemData itemToTransfer, const int32 droppedSlot);

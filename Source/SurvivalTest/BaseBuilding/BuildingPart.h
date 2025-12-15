@@ -10,8 +10,7 @@ struct FBuildingPartData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Part")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Part")
 	int32 ID;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Building Part")

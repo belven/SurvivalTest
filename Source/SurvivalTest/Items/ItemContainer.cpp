@@ -638,6 +638,11 @@ void UItemContainer::UpdateDebugItemsList()
 	}
 }
 
+FString UItemContainer::GetContainerName()
+{
+	return GetContainerData().name;
+}
+
 /**
  *This will reduce the an items amount by the given item if found
  *

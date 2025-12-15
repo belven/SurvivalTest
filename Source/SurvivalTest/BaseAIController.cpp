@@ -23,7 +23,7 @@
 #include "Tasks/EquipmentSwapTask.h"
 #include "Tasks/TaskManagerComponent.h"
 
-DEFINE_LOG_CATEGORY(AIError)
+DEFINE_LOG_CATEGORY(AIErrorLog)
 DEFINE_LOG_CATEGORY(AIIssue)
 DEFINE_LOG_CATEGORY(AILog)
 
@@ -70,7 +70,7 @@ ABaseAIController::ABaseAIController() : Super(FObjectInitializer::Get())
 	}
 	else
 	{
-		UE_LOG(AIError, Error, TEXT("Failed to find EQS_FindPlayer EnvQuery asset."));
+		UE_LOG(AIErrorLog, Error, TEXT("Failed to find EQS_FindPlayer EnvQuery asset."));
 	}
 }
 
@@ -95,19 +95,52 @@ void ABaseAIController::CharacterDied(ABaseCharacter* deadCharacter)
 	SetActorTickEnabled(false);
 	deadCharacter->GetGame()->GetEventManager()->OnEventTriggered.RemoveAll(this);
 	PerceptionComponent->OnTargetPerceptionUpdated.RemoveAll(this);
+	OnStopUsingTool.Broadcast();
 	UnPossess();
 }
 
 void ABaseAIController::OutOfAmmo()
 {
-	if (HasAmmoForWeapon())
+	if (!HasAmmoForWeapon())
 	{
-		Reload();
+		UE_LOG(AILog, Log, TEXT("AI %s OutOfAmmo"), *AICharacter->GetCharacterName());
+		needsAmmo = true;
+		GetAmmo();
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseAIController OnOutOfAmmo No Ammo"));
 	}
 	else
 	{
-		needsAmmo = true;
-		GetAmmo();
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseAIController OnOutOfAmmo Has Ammo"));
+	}
+}
+
+void ABaseAIController::WeaponEquipped(UWeapon* oldWeapon)
+{
+	UWeapon* weapon = oldWeapon;
+
+	if (weapon)
+	{
+		weapon->OnWeaponReady.RemoveAll(this);
+
+		if (weapon->IsProjectileWeapon())
+		{
+			UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
+			pw->OnOutOfAmmo.RemoveAll(this);
+		}
+	}
+
+	weapon = mCurrentWeapon();
+
+	if (weapon)
+	{
+		weapon->OnWeaponReady.AddUniqueDynamic(this, &ABaseAIController::WeaponReady);
+
+		if (weapon->IsProjectileWeapon())
+		{
+			UProjectileWeapon* pw = Cast<UProjectileWeapon>(weapon);
+			pw->OnOutOfAmmo.AddUniqueDynamic(this, &ABaseAIController::OutOfAmmo);
+			projectileWeapon = pw;
+		}
 	}
 }
 
@@ -115,11 +148,6 @@ bool ABaseAIController::HasAmmo(ABaseCharacter* other)
 {
 	int32 ammoID = projectileWeapon->GetProjectileWeaponData().ammoID;
 	return projectileWeapon && other->GetInventory()->GetItemAmount(ammoID) > 0;
-}
-
-void ABaseAIController::ReloadComplete()
-{
-	DetermineNextAction();
 }
 
 bool ABaseAIController::HasRangedWeapon()
@@ -184,15 +212,18 @@ void ABaseAIController::TargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimu
 		if (otherTeam != NULL)
 		{
 			// Are we enemies with the perceived actor?
-			if (target == NULL && AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Enemy)
+			if (AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Enemy)
 			{
-				// Update our target and set that we can see them, we can assume that, if the actor is a team, it's also damagable
-				target = Cast<IDamagable>(Actor);
-				canSee = true;
-				DetermineNextAction();
-				UE_LOG(AILog, Log, TEXT("AI %s found a hostile target"), *AICharacter->GetCharacterName());
+				if (target == NULL)
+				{
+					// Update our target and set that we can see them, we can assume that, if the actor is a team, it's also damagable
+					target = Cast<IDamagable>(Actor);
+					canSee = true;
+					DetermineNextAction();
+					UE_LOG(AILog, Log, TEXT("AI %s found a hostile target"), *AICharacter->GetCharacterName());
+				}
 			}
-			else if (!alliesSeen.Contains(Actor))
+			else if (!alliesSeen.Contains(Actor) && AICharacter->GetRelationship(otherTeam, mGameInstance()) == ERelationshipType::Ally)
 			{
 				UE_LOG(AILog, Log, TEXT("AI %s found an ally"), *AICharacter->GetCharacterName());
 				alliesSeen.Add(Cast<ABaseCharacter>(Actor));
@@ -225,19 +256,24 @@ void ABaseAIController::WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> 
 		// Move to the location found
 		MoveToLocation(loc, acceptanceRadius);
 	}
+	else
+	{
+		DetermineNextAction();
+		UE_LOG(AIIssue, Warning, TEXT("WeaponLocationQueryFinished Failed"));
+	}
 }
-
 
 void ABaseAIController::DetermineNextAction()
 {
 	if (GetBaseCharacter())
 	{
-		if (GetBaseCharacter()->IsAlive()) 
+		if (GetBaseCharacter()->IsAlive())
 		{
 			inactiveTimerDuration = 5.0f;
 
 			if (needsAmmo)
 			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseAIController needsAmmo"));
 				GetAmmo();
 				isInactive = false;
 			}
@@ -265,6 +301,7 @@ void ABaseAIController::DetermineNextAction()
 
 void ABaseAIController::WeaponReady()
 {
+	//UE_LOG(AILog, Log, TEXT("AI %s WeaponReady"), *AICharacter->GetCharacterName());
 	DetermineNextAction();
 }
 
@@ -341,14 +378,18 @@ bool ABaseAIController::IsInWeaponsRange(float dist)
 
 void ABaseAIController::AttackWithWeapon()
 {
-	const FVector targetLocation = IncreaseVectorHeight(target->asActor()->GetActorLocation(), 50);
 	UWeapon* weapon = mCurrentWeapon();
-
-	LookAt(targetLocation);
 
 	// if we have a valid weapon, attack the target
 	if (weapon != NULL)
 	{
+		const FVector predictedLoc = GetPredictedLocation(target->asActor());
+
+		float increase = target->asActor()->GetSimpleCollisionHalfHeight() / 2;
+		const FVector targetLocation = IncreaseVectorHeight(predictedLoc, increase);
+
+		//LookAt(targetLocation);
+
 		// Check we're in range of the target
 		if (IsInWeaponsRange(FVector::Dist(mActorLocation, targetLocation)))
 		{
@@ -357,11 +398,12 @@ void ABaseAIController::AttackWithWeapon()
 
 			if (HasRangedWeapon())
 			{
-				FVector targetLoc = IncreaseVectorHeight(GetPredictedLocation(target->asActor()), 70);
-				FRotator rotation = GetBaseCharacter()->GetActorRotation();
 				FProjectileWeaponData pw = projectileWeapon->GetProjectileWeaponData();
 				float gravity = pw.gravity * GetWorld()->GetGravityZ();
-				SolveBallisticArc(mActorLocation, targetLoc, pw.bulletVelocity, gravity, rotation);
+				SolveBallisticArc(mActorLocation, targetLocation, pw.bulletVelocity, gravity, aimRotation);
+				//GetCharacter()->FaceRotation(rotation);
+				//SetControlRotation(rotation);
+				SetFocalPoint(targetLocation);
 			}
 
 			if (!isAttacking)
@@ -438,18 +480,25 @@ void ABaseAIController::CalculateCombat()
 
 FVector ABaseAIController::IncreaseVectorHeight(const FVector& location, int32 increase)
 {
-	return FVector(location.X, location.Y, location.Z + increase);
+	FVector newVec;
+	newVec.X = location.X;
+	newVec.Y = location.Y;
+	newVec.Z = location.Z + increase;
+	return newVec;
 }
 
 bool ABaseAIController::HasAmmoForWeapon()
 {
-	if (HasRangedWeapon() && !projectileWeapon->HasAmmo())
+	bool result = false;
+
+	if (HasRangedWeapon())
 	{
 		int32 ammoID = projectileWeapon->GetProjectileWeaponData().ammoID;
 		int32 ammoQuantity = GetBaseCharacter()->GetInventory()->GetItemAmount(ammoID);
-		return ammoQuantity > 0;
+		result = ammoQuantity > 0;
 	}
-	return true;
+
+	return result;
 }
 
 void ABaseAIController::Reload()
@@ -556,6 +605,10 @@ void ABaseAIController::EquipKnife()
 		if (id.ID != UItemStructs::InvalidInt)
 		{
 			KNIFE_ITEM_ID = id.ID;
+		}
+		else
+		{
+			UE_LOG(AIErrorLog, Error, TEXT("Knife ID not found"));
 		}
 	}
 
@@ -699,4 +752,10 @@ FPathFollowingRequestResult ABaseAIController::MoveTo(const FAIMoveRequest& Move
 	// TODO figure out inactive timer based on travel time
 	inactiveTimerDuration = 15.0f;
 	return Super::MoveTo(MoveRequest, OutPath);
+}
+
+FRotator ABaseAIController::GetControlRotation() const
+{
+	// TODO this breaks ai facing, move to controller for combat control etc.
+	return aimRotation;
 }

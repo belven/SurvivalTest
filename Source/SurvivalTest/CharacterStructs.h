@@ -33,7 +33,6 @@ USTRUCT(BlueprintType)
 struct FCombatStateChange
 {
 	GENERATED_USTRUCT_BODY()
-public:
 	bool oldState = false;
 	bool newState = true;
 
@@ -56,8 +55,7 @@ struct FCharacterStats
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	void CopyStats(FCharacterStats other)
+void CopyStats(FCharacterStats other)
 	{
 		health = other.health;
 		water = other.water;

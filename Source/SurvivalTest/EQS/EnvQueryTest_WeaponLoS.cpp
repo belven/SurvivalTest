@@ -94,7 +94,7 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 							break;
 						}
 						// If this is the case, we hit our target first, so stop checking line of sight
-						break;
+						//break;
 					}
 				}
 

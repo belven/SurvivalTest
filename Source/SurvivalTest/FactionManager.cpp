@@ -2,9 +2,7 @@
 
 UFactionManager::UFactionManager()
 {
-	CreateRelationship(EFaction::Synths, EFaction::Bandits, ERelationshipType::Enemy);
-	CreateRelationship(EFaction::Synths, EFaction::Guardians, ERelationshipType::Ally);
-	CreateRelationship(EFaction::Bandits, EFaction::Guardians, ERelationshipType::Neutral);	
+	CreateRelationship(EFaction::A, EFaction::A, ERelationshipType::Enemy);
 }
 
 void UFactionManager::CreateRelationship(EFaction factionA, EFaction factionB, ERelationshipType type)

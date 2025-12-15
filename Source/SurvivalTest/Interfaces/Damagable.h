@@ -37,6 +37,7 @@ public:
 		return !(lhs == rhs);
 	}
 
+	// ReSharper disable once CppNonExplicitConversionOperator
 	operator AActor*() 
 	{
 		return asActor();

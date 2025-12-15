@@ -43,8 +43,11 @@ protected:
 	FTimerHandle TimerHandle_CheckNoPlayers;
 	bool spawnMission = true;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	bool missionSpawned = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
+	bool drawDebugBox;
 
 	UPROPERTY()
 	TArray<FContainerData> cds;
@@ -64,27 +67,27 @@ protected:
 	UFUNCTION()
 	void CharacterDied(ABaseCharacter* character);
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	int32 boxSize;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	EMissionType missionType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	int32 boxHeight;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	bool missionComplete = false;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	TMap<AMissionArea*, int32> players;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	TArray<ABaseCharacter*> aiSpawned;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	TArray<ABaseCharacter*> aiAlive;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stats, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Mission", meta = (AllowPrivateAccess = "true"))
 	TArray<AMissionArea*> missionArea;
 };

@@ -14,9 +14,7 @@ enum class  ERelationshipType : uint8 {
 
 UENUM(BlueprintType)
 enum class  EFaction : uint8 {
-	Synths,
-	Bandits,
-	Guardians,
+	A,
 	End
 };
 
@@ -33,5 +31,5 @@ class SURVIVALTEST_API ITeam
 	GENERATED_BODY()
 public:
 	virtual ERelationshipType GetRelationship(ITeam* other, UBaseGameInstance* instance);
-	virtual EFaction GetFaction() { return EFaction::Synths;  }
+	virtual EFaction GetFaction() { return EFaction::A;  }
 };

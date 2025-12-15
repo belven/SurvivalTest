@@ -8,6 +8,7 @@
 #include "Items/Armour.h"
 #include "Perception/AIPerceptionSystem.h"
 #include "BasePlayerController.h"
+#include "HelperFunctions.h"
 #include "Tasks/TaskManagerComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -64,6 +65,7 @@ ABaseCharacter::ABaseCharacter()
 	interactionSphere->InitSphereRadius(interactionRadius);
 	interactionSphere->SetupAttachment(GetCapsuleComponent());
 	interactionSphere->SetCollisionProfileName("Interaction");
+	interactionSphere->SetCollisionEnabled(ECollisionEnabled::Type::QueryOnly);
 	interactionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseCharacter::BeginOverlap);
 	interactionSphere->OnComponentEndOverlap.AddDynamic(this, &ABaseCharacter::EndOverlap);
 
@@ -157,13 +159,14 @@ void ABaseCharacter::BeginPlay()
 void ABaseCharacter::SetupLoadout(const FString& loadoutName)
 {
 	const FLoadoutData ld = game->GetLoadoutData(loadoutName);
-	int32 instanceContainerDataID = game->GetNextInstanceContainerDataID();
 	FContainerData cd = game->GetContainerDataName("Character Inventory");
 
 	characterName = loadoutName;
 
+	//faction = UHelperFunctions::GetRandomEnum(EFaction::End);
+
 	FInstanceContainerData icd;
-	icd.ID = instanceContainerDataID;
+	icd.ID = game->GetNextInstanceContainerDataID();
 	icd.containerID = cd.ID;
 	icd.type = EContainerType::Player;
 	icd.name = cd.name;
@@ -198,7 +201,7 @@ void ABaseCharacter::KillCharacter()
 	GetTaskManager()->CancelAllTasks();
 
 	// If you're inside ACharacter, disable capsule collision so ragdoll drives collision
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
 	// Make sure collision is enabled so the ragdoll reacts with world
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
@@ -215,7 +218,7 @@ void ABaseCharacter::KillCharacter()
 
 	// ReSharper disable once StringLiteralTypo
 	//SetActorEnableCollision(false);
-	UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
+	//UAIPerceptionSystem::GetCurrent(this)->UnregisterSource(*this, nullptr);
 
 	OnCharacterDied.Broadcast(this);
 }
@@ -325,41 +328,57 @@ void ABaseCharacter::GetOverlapsOnSpawn()
  */
 void ABaseCharacter::AddInteractable(IInteractable* interractable)
 {
-	if (IsPlayer() && interractable != this)
+	if (interractable != this)
 	{
 		bool shouldAdd = false;
 
 		ABaseCharacter* character = Cast<ABaseCharacter>(interractable);
 
 		// If the other is not a Character, then it's a regular container, so add it regardless.
-		// OR the character is dead so show it
+		// OR
 		// TODO - This is where we should check for loot permissions in teams
-		if (character == NULL || character->IsDead())
+		if (character == NULL)
 		{
 			shouldAdd = true;
 		}
-		// Otherwise it's a character that is still alive
+		//  The character is dead and within our interaction radius, so show it
 		else
 		{
-			character->OnCharacterDied.AddUniqueDynamic(this, &ABaseCharacter::OtherCharacterDied);
+			double dist = FVector::Dist(character->GetActorLocation(), GetActorLocation());
+			bool isInRadius = dist <= interactionRadius * 2;
+
+			if (character->IsDead() && isInRadius)
+			{
+				shouldAdd = true;
+			}
+			// Otherwise it's a character that is still alive, so keep track of it to add it later
+			else if (character->IsAlive())
+			{
+				character->OnCharacterDied.AddUniqueDynamic(this, &ABaseCharacter::OtherCharacterDied);
+			}
 		}
 
 		if (shouldAdd)
 		{
-			interractable->Highlight(true);
-
-			overlappingInteractables.AddUnique(interractable);
-
-			UItemContainer* container = Cast<UItemContainer>(interractable->GetContainer());
-
-			if (container)
+			if(IsPlayer()) 
 			{
-				GetInventory()->OnContainerAdded.Broadcast(container);
+				interractable->Highlight(true);
+
+				UItemContainer* container = Cast<UItemContainer>(interractable->GetContainer());
+
+				if (container)
+				{
+					GetInventory()->OnContainerAdded.Broadcast(container);
+				}
+			}
+
+			if (!overlappingInteractables.Contains(interractable)) 
+			{
+				overlappingInteractables.Add(interractable);
 			}
 		}
 	}
 }
-
 
 /**
  * Removes a given IInteractable from our interactable list
@@ -369,10 +388,18 @@ void ABaseCharacter::AddInteractable(IInteractable* interractable)
  */
 void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 {
+	overlappingInteractables.Remove(inter);
+
+	ABaseCharacter* character = Cast<ABaseCharacter>(inter);
+
+	if (character)
+	{
+		character->OnCharacterDied.RemoveAll(this);		
+	}
+
 	if (IsPlayer())
 	{
 		inter->Clear();
-		overlappingInteractables.Remove(inter);
 
 		UItemContainer* container = Cast<UItemContainer>(inter->GetContainer());
 
@@ -386,7 +413,7 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 
 /**
  * Increases the characters stats, based on the given type and value
- * 
+ *
  * @param type The type of value the consumable provides
  * @param value The amount the consumable provides
  */
@@ -482,7 +509,7 @@ void ABaseCharacter::PossessedBy(AController* NewController)
 
 /**
  * Calculates stamina consumption and growth of stamina, based on sprint state, using stamina until it runs out or increases stamina when not sprinting
- * 
+ *
  * @param DeltaSeconds The amount of time that has passed
  */
 void ABaseCharacter::CalculateSprint(float DeltaSeconds)
@@ -528,7 +555,7 @@ void ABaseCharacter::CalculateSprint(float DeltaSeconds)
 
 /**
  * Used by the player controller, to display a hit marker when the player hits an enemy.
- * 
+ *
  * @param inActor The enemy this character has hit
  */
 void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
@@ -538,9 +565,9 @@ void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
 
 
 /**
- * When a nearby Character is within interaction range, we bind to their OnCharacterDied, so we can add them to the interactables list on death. 
+ * When a nearby Character is within interaction range, we bind to their OnCharacterDied, so we can add them to the interactables list on death.
  * This is so the UI can be updated and hte body highlighted
- * 
+ *
  * @param character The character that died
  */
 void ABaseCharacter::OtherCharacterDied(ABaseCharacter* character)

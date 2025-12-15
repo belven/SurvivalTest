@@ -24,7 +24,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnReload);
 
 #define mAsBaseCharacter(character) Cast<ABaseCharacter>(character)
 
-DECLARE_LOG_CATEGORY_EXTERN(AIError, Error, All)
+DECLARE_LOG_CATEGORY_EXTERN(AIErrorLog, Error, All)
 DECLARE_LOG_CATEGORY_EXTERN(AILog, Log, All)
 DECLARE_LOG_CATEGORY_EXTERN(AIIssue, Warning, All)
 
@@ -58,13 +58,16 @@ public:
 	FOnReload OnReload;
 
 	UFUNCTION()
-	void ReloadComplete();
-
-	UFUNCTION()
 	void WeaponReady();
 
 	UFUNCTION()
 	void Reload();
+
+	UFUNCTION()
+	void OutOfAmmo();
+
+	UFUNCTION()
+	void WeaponEquipped(UWeapon* oldWeapon);
 protected:
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 	void DetermineNextAction();
@@ -79,7 +82,6 @@ protected:
 
 	bool HasAmmoForWeapon();
 	void GetAmmo();
-	void OutOfAmmo();
 	bool FindAllyWithAmmo();
 	void GetNearbyAmmo();
 	bool HasAmmo(ABaseCharacter* other);
@@ -123,8 +125,11 @@ private:
 	float inactiveTimerDuration;
 	bool isAttacking = false;
 	static int32 KNIFE_ITEM_ID;
+	FRotator aimRotation;
 
 public:
+	virtual FRotator GetControlRotation() const override;
+
 	bool IsIsAttacking() const
 	{
 		return isAttacking;
@@ -166,5 +171,5 @@ private:
 	APatrolPath* currentPath;
 
 	int32 currentPathPoint;
-	int acceptanceRadius = 400;
+	int acceptanceRadius = 30;
 };

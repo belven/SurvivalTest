@@ -11,7 +11,6 @@ USTRUCT(BlueprintType)
 struct FListeners
 {
 	GENERATED_USTRUCT_BODY()
-public:
 	TArray<IEventListener*>  listeners;
 };
 

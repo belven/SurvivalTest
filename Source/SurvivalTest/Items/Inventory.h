@@ -27,6 +27,8 @@ public:
 	FOnContainerUpdated OnContainerAdded;
 	FOnContainerUpdated OnContainerRemoved;
 
+	virtual FString GetContainerName() override;
+
 	void SetEquippedWeapon(UWeapon* weapon);
 	void EquipArmour(UArmour* armour);
 

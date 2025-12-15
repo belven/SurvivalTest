@@ -51,8 +51,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Recipe")
 	TArray<URecipeUI*> recipes;
 
-protected:
-	static	TSubclassOf<UUserWidget> recipeListUIClass;
+static	TSubclassOf<UUserWidget> recipeListUIClass;
 	static	TSubclassOf<UUserWidget> recipeUIClass;
 
 	UPROPERTY(BlueprintReadWrite, Category = "Recipe")

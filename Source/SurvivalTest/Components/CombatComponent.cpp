@@ -8,6 +8,8 @@
 #include "SurvivalTest/Tasks/ReloadTask.h"
 #include "SurvivalTest/Tasks/TaskManagerComponent.h"
 
+DEFINE_LOG_CATEGORY(CombatComponentLog)
+
 UCombatComponent::UCombatComponent() : Super(FObjectInitializer::Get()), equipmentSwapTask(nullptr), reloadTask(nullptr), RotateValue(0), performAction(false), useEquipment(false), isReloading(false), rangedWeapon(nullptr), baseCharacter(nullptr), baseGameInstance(nullptr)
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -29,6 +31,7 @@ UCombatComponent* UCombatComponent::CreateCombatComponent(ABaseAIController* con
 	controller->OnUseTool.AddUniqueDynamic(combatComponent, &UCombatComponent::OnPrimaryAction);
 	controller->OnStopUsingTool.AddUniqueDynamic(combatComponent, &UCombatComponent::OnPrimaryActionReleased);
 	controller->OnReload.AddUniqueDynamic(combatComponent, &UCombatComponent::Reload);
+	character->OnWeaponEquipped.AddUniqueDynamic(controller, &ABaseAIController::WeaponEquipped);
 	return combatComponent;
 }
 
@@ -70,9 +73,10 @@ void UCombatComponent::OnUIStateChanged(bool state)
 void UCombatComponent::OutOfAmmo()
 {
 	Reload();
+	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("UCombatComponent OnOutOfAmmo"));
 }
 
-void UCombatComponent::ReloadComplete()
+void UCombatComponent::WeaponReady()
 {
 	if (performAction) {
 		useEquipment = true;
@@ -81,33 +85,25 @@ void UCombatComponent::ReloadComplete()
 
 void UCombatComponent::WeaponEquipped(UWeapon* oldWeapon)
 {
-	ABaseAIController* aiController = Cast<ABaseAIController>(GetBaseCharacter()->GetController());
+	UWeapon* weapon = mCurrentWeapon();
 
-	if (oldWeapon && oldWeapon->IsProjectileWeapon())
+	if (oldWeapon)
 	{
-		UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
-		pw->OnOutOfAmmo.RemoveAll(this);
-		pw->OnReloadComplete.RemoveAll(this);
+		oldWeapon->OnWeaponReady.RemoveAll(this);
 
-		if (aiController)
+		if (oldWeapon->IsProjectileWeapon())
 		{
-			pw->OnReloadComplete.RemoveAll(aiController);
-			pw->OnWeaponReady.RemoveAll(aiController);
+			UProjectileWeapon* pw = Cast<UProjectileWeapon>(oldWeapon);
+			pw->OnOutOfAmmo.RemoveAll(this);
 		}
 	}
 
-	UWeapon* weapon = mCurrentWeapon();
-
-	if (weapon && weapon->IsProjectileWeapon())
+	if (weapon)
 	{
-		rangedWeapon = Cast<UProjectileWeapon>(weapon);
-		rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &UCombatComponent::OutOfAmmo);
-		rangedWeapon->OnReloadComplete.AddUniqueDynamic(this, &UCombatComponent::ReloadComplete);
-
-		if (aiController)
+		if (weapon->IsProjectileWeapon())
 		{
-			rangedWeapon->OnReloadComplete.AddUniqueDynamic(aiController, &ABaseAIController::ReloadComplete);
-			rangedWeapon->OnWeaponReady.AddUniqueDynamic(aiController, &ABaseAIController::WeaponReady);
+			rangedWeapon = Cast<UProjectileWeapon>(weapon);
+			rangedWeapon->OnOutOfAmmo.AddUniqueDynamic(this, &UCombatComponent::OutOfAmmo);
 		}
 	}
 
@@ -121,9 +117,15 @@ void UCombatComponent::Reload()
 {
 	if (rangedWeapon)
 	{
+		useEquipment = false;
+
 		if (GetBaseCharacter()->GetTaskManager()->PerformTask(reloadTask, false))
 		{
-			useEquipment = false;
+			UE_LOG(CombatComponentLog, Log, TEXT("Character %s Reloading"), *baseCharacter->GetCharacterName());
+		}
+		else
+		{
+			UE_LOG(CombatComponentLog, Warning, TEXT("Character %s Failed Reloading"), *baseCharacter->GetCharacterName());
 		}
 	}
 }

@@ -16,8 +16,7 @@ public:
 	UBoxComponent* GetBox() const	{		return box;	}
 protected:
 	virtual void BeginPlay() override;
-	
-protected:
-	UPROPERTY()
+
+UPROPERTY()
 	UBoxComponent* box;
 };

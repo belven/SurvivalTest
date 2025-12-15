@@ -208,7 +208,6 @@ UBaseGameInstance* ABasePlayerController::GetBaseGameInstance()
 	return baseGameInstance;
 }
 
-
 /**
  * This is used so we can clear up any UI and active states.
  *

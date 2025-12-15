@@ -15,7 +15,8 @@ bool UReloadTask::CheckForReload()
 
 	ABaseCharacter* character = GetCharacter();
 
-	if (character) {
+	if (character) 
+	{
 		UWeapon* equippedWeapon = character->GetEquippedWeapon();
 
 		if (equippedWeapon && equippedWeapon->IsProjectileWeapon())
@@ -50,19 +51,22 @@ void UReloadTask::PerformTask(AController* inController)
 		UWeapon* equippedWeapon = character->GetEquippedWeapon();
 		UProjectileWeapon* weapon = Cast<UProjectileWeapon>(equippedWeapon);
 
-		if (!animationAction) {
+		if (!animationAction) 
+		{
 			// TODO change to get and use the animation from the weapon
 
 			// UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().animation);
 			// animationAction = UAnimationAction::CreateAnimationAction(weapon->GetRangedWeaponData().animation, GetCharacter());
 			animationAction = UAnimationAction::CreateAnimationActionTemp(GetCharacter(), weapon->GetProjectileWeaponData().reloadSpeed);
 		}
-		else {
+		else 
+		{
 			//UAnimMontage* anim = LoadObject<UAnimMontage>(weapon->GetRangedWeaponData().animation);
 			animationAction->SetAnimationLength(weapon->GetProjectileWeaponData().reloadSpeed);
 		}
 
-		if (!reloadAction) {
+		if (!reloadAction) 
+		{
 			reloadAction = UReloadAction::CreateReloadAction(character);
 		}
 

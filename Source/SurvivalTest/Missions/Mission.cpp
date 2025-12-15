@@ -127,7 +127,10 @@ void AMission::SpawnBox(const FVector& location)
 
 	area->GetBox()->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMission::BeginOverlap);
 	area->GetBox()->OnComponentEndOverlap.AddUniqueDynamic(this, &AMission::EndOverlap);
-	DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
+
+	if (drawDebugBox) {
+		DrawDebugBox(GetWorld(), location, extent, FColor::Blue, true);
+	}
 }
 
 void AMission::EndOverlap(UPrimitiveComponent* overlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 otherBodyIndex)
@@ -159,6 +162,7 @@ void AMission::SpawnAI()
 	params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	UNavigationSystemV1* nav = UNavigationSystemV1::GetCurrent(GetWorld());
+	EFaction faction = UHelperFunctions::GetRandomEnum(EFaction::End);
 
 	for (auto& mld : mlt->GetData())
 	{
@@ -173,6 +177,7 @@ void AMission::SpawnAI()
 			if (character)
 			{
 				character->SetupLoadout(ld.name);
+				character->SetFaction(faction);
 				aiSpawned.Add(character);
 				character->OnCharacterDied.AddUniqueDynamic(this, &AMission::CharacterDied);
 			}

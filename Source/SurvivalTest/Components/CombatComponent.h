@@ -1,12 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
-
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "SurvivalTest/Items/ItemStructs.h"
 #include "CombatComponent.generated.h"
-
 
 class ABasePlayerController;
 class ABaseAIController;
@@ -17,8 +13,11 @@ class UEquipmentSwapTask;
 class UBaseGameInstance;
 class ABaseCharacter;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnWeaponEquipped, UWeapon*, oldWeapon, UWeapon*, newWeapon);
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+DECLARE_LOG_CATEGORY_EXTERN(CombatComponentLog, Warning, All)
+
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class SURVIVALTEST_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -39,7 +38,7 @@ public:
 	void OutOfAmmo();
 
 	UFUNCTION()
-	void ReloadComplete();
+	void WeaponReady();
 
 	UFUNCTION()
 	void WeaponEquipped(UWeapon* oldWeapon);
@@ -75,6 +74,9 @@ public:
 	{
 		uiState = inUIState;
 	}
+
+	UPROPERTY()
+	FOnWeaponEquipped OnWeaponEquipped;
 
 protected:
 	// Called when the game starts

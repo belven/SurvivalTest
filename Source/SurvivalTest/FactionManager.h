@@ -7,10 +7,9 @@ USTRUCT(BlueprintType)
 struct FFactionRelationship
 {
 	GENERATED_USTRUCT_BODY()
-public:
 	FFactionRelationship()
 	{
-		faction = EFaction::Synths;
+		faction = EFaction::A;
 		relationship = ERelationshipType::Neutral;
 	}
 

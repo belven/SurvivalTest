@@ -49,7 +49,6 @@ struct FLoadoutData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
 	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Loadout")
@@ -77,7 +76,6 @@ struct FItemData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -110,8 +108,7 @@ struct FWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 itemID = -1;
@@ -143,8 +140,7 @@ struct FInstanceWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 		int32 instanceItemID = -1;
@@ -159,8 +155,7 @@ struct FMeleeWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 weaponID = -1;
@@ -173,8 +168,7 @@ struct FProjectileWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 rangedWeaponID = -1;
@@ -195,8 +189,7 @@ struct FRangedWeaponData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 ID = -1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon")
 	int32 weaponID = -1;
@@ -288,8 +281,7 @@ struct FArmourData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Armour")
 	int32 itemID = UItemStructs::InvalidInt;
@@ -306,8 +298,7 @@ struct FContainerData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
 	int32 slots = UItemStructs::InvalidInt;
@@ -322,8 +313,7 @@ struct FContainerItemData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Container")
 	int32 containerID = UItemStructs::InvalidInt;
@@ -336,8 +326,7 @@ struct FConsumableData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Consumable")
 	int32 itemID = UItemStructs::InvalidInt;
@@ -352,8 +341,7 @@ struct FInstanceContainerData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerID = UItemStructs::InvalidInt;
@@ -378,8 +366,7 @@ struct FInstanceLootBoxData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
@@ -390,8 +377,7 @@ struct FInstanceArmourData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
 	int32 containerInstanceID = UItemStructs::InvalidInt;
@@ -418,8 +404,7 @@ struct FRecipeData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	FString name = "";
@@ -434,8 +419,7 @@ struct FRecipeInputOutputData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	int32 recipeID = UItemStructs::InvalidInt;
@@ -448,8 +432,7 @@ struct FInputOutputData
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	int32 ID = UItemStructs::InvalidInt;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	int32 inputOutputID = UItemStructs::InvalidInt;
@@ -466,8 +449,7 @@ struct FFullRecipe
 {
 	GENERATED_USTRUCT_BODY()
 
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
+UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	FRecipeData recipe;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Recipe")
 	TArray<FInputOutputData> inputs;

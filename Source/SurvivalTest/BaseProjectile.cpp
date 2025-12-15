@@ -64,22 +64,37 @@ float ABaseProjectile::CalculateDamageFalloff()
 void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor != this && OtherActor != healthChange.source)
+	// Did we hit something
+	if (OtherActor)
 	{
-		if (OtherActor->Implements<UDamagable>() && healthChange.source)
+		// Can the actor we hit be damaged?
+		if (OtherActor->Implements<UDamagable>())
 		{
-			ITeam* hitTeam = Cast<ITeam>(OtherActor);
-			if (hitTeam && hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy)
-			{
-				IDamagable* hitTarget = Cast<IDamagable>(OtherActor);
+			IDamagable* hitTarget = Cast<IDamagable>(OtherActor);
 
-				if (hitTarget->IsAlive()) {
-					healthChange.changeAmount = CalculateDamageFalloff();
-					hitTarget->ChangeHealth(healthChange);
-				}
+			// Is it something that's alive and isn't our owner character?
+			if (OtherActor != healthChange.source && hitTarget->IsAlive())
+			{
+					ITeam* hitTeam = Cast<ITeam>(OtherActor);
+
+					// Did we hit something from the other team?
+					if (hitTeam && hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy)
+					{
+						healthChange.changeAmount = CalculateDamageFalloff();
+						hitTarget->ChangeHealth(healthChange);
+						Destroy();
+					}				
 			}
 		}
-		Destroy();
+		else
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseProjectile OtherActor Not damagable"));
+			Destroy();
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseProjectile OtherActor NULL"));
 	}
 }
 

@@ -106,7 +106,7 @@ FString UItemContainerUI::GetContainerName()
 {
 	if (name.IsEmpty() && container != NULL)
 	{
-		name = container->GetInstanceContainerData().name;
+		name = container->GetContainerName();
 	}
 	return name;
 }

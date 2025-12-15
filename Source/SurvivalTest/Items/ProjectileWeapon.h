@@ -4,7 +4,6 @@
 #include "ProjectileWeapon.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfAmmo);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FReloadComplete);
 
 UCLASS()
 class SURVIVALTEST_API UProjectileWeapon : public URangedWeapon
@@ -32,7 +31,6 @@ public:
 	}
 
 	FOutOfAmmo OnOutOfAmmo;
-	FReloadComplete OnReloadComplete;
 
 	FTimerHandle TimerHandle_ReloadExpired;
 	FTimerHandle TimerHandle_RecoilReset;

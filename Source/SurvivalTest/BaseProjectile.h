@@ -35,9 +35,8 @@ public:
 protected:
 	FHealthChange healthChange = FHealthChange(0,  false, NULL);
 	FVector startLoc = FVector::ZeroVector;
-	
-protected:
-	UPROPERTY()
+
+UPROPERTY()
 	UWeapon* weaponUsed;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))

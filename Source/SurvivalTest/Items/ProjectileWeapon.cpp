@@ -6,8 +6,6 @@
 #include "SurvivalTest/BaseProjectile.h"
 #include "SurvivalTest/HelperFunctions.h"
 
-#define mSetReloadTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_ShotTimerExpired, &UProjectileWeapon::ReloadExpired, GetProjectileWeaponData().reloadSpeed)
-
 #define mSetFireTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_ShotTimerExpired, &UWeapon::AttackComplete, GetWeaponData().useRate)
 
 #define mSetRecoilResetTimer() mSetTimerWorld(GetCharacterOwner()->GetWorld(), TimerHandle_RecoilReset, &UProjectileWeapon::RecoilReset, 0.33)
@@ -55,6 +53,7 @@ void UProjectileWeapon::ConsumeAmmo()
 	{
 		instanceWeaponData.ammo = 0;
 		OnOutOfAmmo.Broadcast();
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("UProjectileWeapon OnOutOfAmmo"));
 	}
 }
 
@@ -102,7 +101,6 @@ void UProjectileWeapon::ReloadExpired()
 {
 	canAttack = true;
 	OnWeaponReady.Broadcast();
-	OnReloadComplete.Broadcast();
 }
 
 void UProjectileWeapon::RecoilReset()
