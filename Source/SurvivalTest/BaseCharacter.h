@@ -40,11 +40,13 @@ public:
 
 	UFUNCTION()
 	void OtherCharacterDied(ABaseCharacter* character);
+	int32 GetWeaponRange();
 
 	static const FVector cameraCenter;
 	static const FVector leftLean;
 	static const FVector rightLean;
 	static float interactionRadius;
+	FRotator aimRotation;
 
 	UFUNCTION(BlueprintCallable, Category="Tasks")
 	UTaskManagerComponent* GetTaskManager() const
@@ -54,6 +56,9 @@ public:
 
 	float baseWalkSpeed;
 	EMovementState currentMovementState;
+	virtual void AddControllerPitchInput(float Val) override;
+	virtual void AddControllerRollInput(float Val) override;
+	virtual void AddControllerYawInput(float Val) override;
 
 	UPROPERTY()
 	UNavigationInvokerComponent* navInvoker;

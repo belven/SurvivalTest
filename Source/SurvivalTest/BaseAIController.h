@@ -68,6 +68,12 @@ public:
 
 	UFUNCTION()
 	void WeaponEquipped(UWeapon* oldWeapon);
+
+	virtual FPathFollowingRequestResult MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath) override;
+
+	bool IsIsAttacking() const { return isAttacking; }
+	void SetIsAttacking(bool inIsAttacking);
+
 protected:
 	void WeaponLocationQueryFinished(TSharedPtr<FEnvQueryResult> Result);
 	void DetermineNextAction();
@@ -83,13 +89,13 @@ protected:
 	bool HasAmmoForWeapon();
 	void GetAmmo();
 	bool FindAllyWithAmmo();
+	int32 GetKnifeID();
 	void GetNearbyAmmo();
 	bool HasAmmo(ABaseCharacter* other);
 
 	void Inactive();
 	void GetPatrolPath();
 	void Patrol();
-	FVector IncreaseVectorHeight(const FVector& location, int32 increase);
 	FVector GetPredictedLocation(AActor* actor);
 	void LookAt(const FVector& lookAtLocation);
 	virtual void BeginPlay() override;
@@ -112,44 +118,25 @@ protected:
 	UPROPERTY()
 	UEquipmentSwapTask* equipmentSwapTask;
 
-public:
-	virtual FPathFollowingRequestResult MoveTo(const FAIMoveRequest& MoveRequest, FNavPathSharedPtr* OutPath) override;
+	UBaseGameInstance* GetBaseGameInstance();
 
 private:
-	IDamagable* target;
-	FVector lastKnowLocation;
+	static int32 KNIFE_ITEM_ID;
+	float inactiveTimerDuration;
+
 	bool canSee = false;
 	bool needsAmmo = false;
+	bool isAttacking = false;
+
+	int32 currentPathPoint;
+	int32 acceptanceRadius = 100;
+
+	IDamagable* target;
+	FVector lastKnowLocation;
+
 	FTimerHandle TimerHandle_Inactive;
 	FTimerHandle TimerHandle_DetermineAction;
-	float inactiveTimerDuration;
-	bool isAttacking = false;
-	static int32 KNIFE_ITEM_ID;
-	FRotator aimRotation;
 
-public:
-	virtual FRotator GetControlRotation() const override;
-
-	bool IsIsAttacking() const
-	{
-		return isAttacking;
-	}
-
-	void SetIsAttacking(bool inIsAttacking)
-	{
-		isAttacking = inIsAttacking;
-
-		if (isAttacking)
-		{
-			OnUseTool.Broadcast();
-		}
-		else
-		{
-			OnStopUsingTool.Broadcast();
-		}
-	}
-
-private:
 	FPathFollowingResult lastMoveResult;
 
 	UPROPERTY()
@@ -162,6 +149,9 @@ private:
 	ABaseCharacter* AICharacter;
 
 	UPROPERTY()
+	UBaseGameInstance* baseGameInstance;
+
+	UPROPERTY()
 	UEnvQuery* FindWeaponLocationQuery;
 
 	UPROPERTY()
@@ -170,6 +160,4 @@ private:
 	UPROPERTY()
 	APatrolPath* currentPath;
 
-	int32 currentPathPoint;
-	int acceptanceRadius = 30;
 };

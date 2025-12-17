@@ -15,6 +15,9 @@
 #define mGetRandom UHelperFunctions::GetRandom
 #define mGetRandomEnum UHelperFunctions::GetRandomEnum
 
+#define mOnScreenMessageBasic(message, duration, colour) GEngine->AddOnScreenDebugMessage(INDEX_NONE, duration, colour, message);
+#define mOnScreenMessage(message) mOnScreenMessageBasic(message, 5.0f, FColor::Yellow);
+
 //class ABaseCharacter;
 //class ABaseAIController;
 //class UTableManager;
@@ -99,6 +102,16 @@ public:
 			}
 		}
 	}
+	
+	static FVector IncreaseVectorHeight(const FVector& location, int32 increase)
+	{
+		FVector newVec;
+		newVec.X = location.X;
+		newVec.Y = location.Y;
+		newVec.Z = location.Z + increase;
+		return newVec;
+	}
+
 
 	static FString BoolToString(bool value)
 	{

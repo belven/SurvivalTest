@@ -21,7 +21,7 @@ void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (useEquipment && mCurrentWeapon())
 	{
-		mCurrentWeapon()->UseWeapon(GetBaseCharacter()->GetControlRotation());
+		mCurrentWeapon()->UseWeapon(GetBaseCharacter()->aimRotation);
 	}
 }
 
@@ -73,7 +73,7 @@ void UCombatComponent::OnUIStateChanged(bool state)
 void UCombatComponent::OutOfAmmo()
 {
 	Reload();
-	GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("UCombatComponent OnOutOfAmmo"));
+	//mOnScreenMessage(TEXT("UCombatComponent OnOutOfAmmo"));
 }
 
 void UCombatComponent::WeaponReady()

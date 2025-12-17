@@ -53,19 +53,22 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 	TArray<AActor*> ignore;
 	ignore.Add(con->GetCharacter());
 
-	// Each Query will generate a list of Items, these items can either be FVectors or AActors
-	// In our query, we made a grid search pattern, so we know these are going to be FVectors
-	for (FEnvQueryInstance::ItemIterator It(this, QueryInstance); It; ++It)
+	// Check we have a weapon Equipped, this should always be the case
+	if (controllerBaseCharacter->GetEquippedWeapon() != NULL)
 	{
-		// Get the current item as a FVector
-		FVector ItemLocation = GetItemLocation(QueryInstance, It.GetIndex());
+		float range = controllerBaseCharacter->GetWeaponRange();
+		float scaledCapsuleHalfHeight = controllerBaseCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 
-		// Check we have a weapon Equipped, this should always be the case
-		if (controllerBaseCharacter->GetEquippedWeapon() != nullptr)
+		// Each Query will generate a list of Items, these items can either be FVectors or AActors
+		// In our query, we made a grid search pattern, so we know these are going to be FVectors
+		for (FEnvQueryInstance::ItemIterator It(this, QueryInstance); It; ++It)
 		{
+			// Get the current item as a FVector
+			FVector ItemLocation = GetItemLocation(QueryInstance, It.GetIndex());
+
 			float dist = FVector::Dist(targetLocation, ItemLocation);
-			float range = controllerBaseCharacter->GetEquippedWeapon()->GetWeaponData().range;
-			bool inRange = dist < range;
+
+			bool inRange = dist <= range;
 
 			// Check if the Item Location and our target location are within range of each other
 			// item location is a single grid point and target is the AIs current target
@@ -74,10 +77,9 @@ void UEnvQueryTest_WeaponLoS::RunTest(FEnvQueryInstance& QueryInstance) const
 				TArray<FHitResult> hits;
 
 				// Add some height to Sphere trace, otherwise it will collide with objects on the ground
-				ItemLocation.Z += controllerBaseCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+				ItemLocation.Z += scaledCapsuleHalfHeight;
 
 				// Create a sphere trace, slightly larger than the characters capsule, so we make sure there's enough room to shoot
-				// con->GetCharacter()->GetCapsuleComponent()->GetScaledCapsuleRadius()* 1.5
 				mSphereTraceMultiEQS(ItemLocation, targetLocation, 50, hits);
 
 				bool canSee = true;

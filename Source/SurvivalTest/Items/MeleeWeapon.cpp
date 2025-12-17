@@ -31,7 +31,7 @@ void UMeleeWeapon::UseWeapon(const FRotator& LookAtRotation)
 		FVector endLoc = startLoc + (actorForwardVector * GetWeaponData().range);
 		double radius = scaledCapsuleRadius * 1.5;
 		mSphereTraceMultiWeapon(startLoc, endLoc, radius, ETraceTypeQuery::TraceTypeQuery3, hits, ignore);
-		
+
 		for (FHitResult hit : hits)
 		{
 			if (hit.GetComponent()->GetClass() != USphereComponent::StaticClass() &&  hit.GetActor()->Implements<UDamagable>())

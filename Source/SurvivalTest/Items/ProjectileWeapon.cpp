@@ -53,7 +53,7 @@ void UProjectileWeapon::ConsumeAmmo()
 	{
 		instanceWeaponData.ammo = 0;
 		OnOutOfAmmo.Broadcast();
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("UProjectileWeapon OnOutOfAmmo"));
+		//mOnScreenMessage(TEXT("UProjectileWeapon OnOutOfAmmo"));
 	}
 }
 

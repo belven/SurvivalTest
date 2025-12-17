@@ -180,6 +180,24 @@ void ABaseCharacter::SetupLoadout(const FString& loadoutName)
 	inventory->SetupLoadout(ld);
 }
 
+void ABaseCharacter::AddControllerPitchInput(float Val)
+{
+	Super::AddControllerPitchInput(Val);
+	aimRotation = GetControlRotation();
+}
+
+void ABaseCharacter::AddControllerRollInput(float Val)
+{
+	Super::AddControllerRollInput(Val);
+	aimRotation = GetControlRotation();
+}
+
+void ABaseCharacter::AddControllerYawInput(float Val)
+{
+	Super::AddControllerYawInput(Val);
+	aimRotation = GetControlRotation();
+}
+
 UStaticMesh* ABaseCharacter::GetItemMesh(const FItemData& data)
 {
 	if (data.mesh.Equals(""))
@@ -194,6 +212,8 @@ UStaticMesh* ABaseCharacter::GetItemMesh(const FItemData& data)
  */
 void ABaseCharacter::KillCharacter()
 {
+	interactionSphere->DestroyComponent();
+	interactionSphere = NULL;
 	// Stop any animation driving the bones
 	//GetMesh()->bPauseAnims = true;
 	//GetMesh()->bNoSkeletonUpdate = true;
@@ -202,6 +222,8 @@ void ABaseCharacter::KillCharacter()
 
 	// If you're inside ACharacter, disable capsule collision so ragdoll drives collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	GetCapsuleComponent()->SetCapsuleSize(1.f, 1.f);
 
 	// Make sure collision is enabled so the ragdoll reacts with world
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
@@ -360,7 +382,7 @@ void ABaseCharacter::AddInteractable(IInteractable* interractable)
 
 		if (shouldAdd)
 		{
-			if(IsPlayer()) 
+			if (IsPlayer())
 			{
 				interractable->Highlight(true);
 
@@ -372,7 +394,7 @@ void ABaseCharacter::AddInteractable(IInteractable* interractable)
 				}
 			}
 
-			if (!overlappingInteractables.Contains(interractable)) 
+			if (!overlappingInteractables.Contains(interractable))
 			{
 				overlappingInteractables.Add(interractable);
 			}
@@ -394,7 +416,7 @@ void ABaseCharacter::RemoveInteractable(IInteractable* inter)
 
 	if (character)
 	{
-		character->OnCharacterDied.RemoveAll(this);		
+		character->OnCharacterDied.RemoveAll(this);
 	}
 
 	if (IsPlayer())
@@ -573,6 +595,13 @@ void ABaseCharacter::EnemyHit(ABaseCharacter* inActor)
 void ABaseCharacter::OtherCharacterDied(ABaseCharacter* character)
 {
 	AddInteractable(character);
+}
+
+int32 ABaseCharacter::GetWeaponRange()
+{
+	float range = GetInventory()->GetEquippedWeapon()->GetWeaponData().range;
+	double capsuleRadius = GetCapsuleComponent()->GetScaledCapsuleRadius() * 3;
+	return  FMath::Max(capsuleRadius, range);
 }
 
 /**

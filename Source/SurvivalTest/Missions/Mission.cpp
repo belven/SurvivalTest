@@ -172,6 +172,8 @@ void AMission::SpawnAI()
 
 			nav->GetRandomPointInNavigableRadius(GetActorLocation(), boxSize / 2, location);
 
+			location.Location = UHelperFunctions::IncreaseVectorHeight(location.Location, 100);
+
 			ABaseCharacter* character = GetWorld()->SpawnActor<ABaseCharacter>(AIClass, location, GetActorRotation(), params);
 
 			if (character)

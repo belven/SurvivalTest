@@ -578,16 +578,7 @@ void ABaseAIController::GetNearbyAmmo()
 					FString text = "AI " + AICharacter->GetCharacterName() + " found ammo from a body";
 					mOnScreenMessage(*text);
 
-					if (isAmmoForWeapon)
-					{
-						needsAmmo = false;
-
-						if (ammoIDs.IsEmpty())
-						{
-							break;
-						}
-					}
-					else	if (ammoIDs.Contains(id.ID))
+					if (ammoIDs.Contains(id.ID) || isAmmoForWeapon)
 					{
 						needsAmmo = false;
 					}
@@ -601,9 +592,7 @@ void ABaseAIController::GetNearbyAmmo()
 					if ((iwd.ammo > 0 || other->GetInventory()->GetItemAmount(pwd.ammoID)) && !weaponFound)
 					{
 						UE_LOG(AILog, Log, TEXT("AI %s found a weapon from a body"), *AICharacter->GetCharacterName());
-
 						GetBaseCharacter()->GetInventory()->TransferItem(other->GetInventory(), iid, projectileWeapon->GetInstanceItemData().slot);
-
 						FString text = "AI " + AICharacter->GetCharacterName() + " found a " + id.name + " on " + other->GetCharacterName() + "s body";
 						mOnScreenMessage(*text);
 						ammoIDs.Add(pwd.ammoID);

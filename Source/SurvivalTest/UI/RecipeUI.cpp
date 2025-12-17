@@ -61,12 +61,12 @@ void URecipeUI::SetSelected(bool selectedState)
 
 	if (selected)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe selected"));
+		mOnScreenMessage(TEXT("Recipe selected"));
 		Select();
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe deselected"));
+		mOnScreenMessage(TEXT("Recipe deselected"));
 		Deselect();
 	}
 
@@ -77,13 +77,13 @@ void URecipeUI::UpdateRecipeEnabled(bool enabledState)
 {
 	recipeEnabled = enabledState;
 
-	if (recipeEnabled) 
+	if (recipeEnabled)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe Enabled"));
+		mOnScreenMessage(TEXT("Recipe Enabled"));
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Recipe Disabled"));
+		mOnScreenMessage(TEXT("Recipe Disabled"));
 
 		if (selected)
 		{

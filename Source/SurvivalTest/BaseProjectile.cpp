@@ -3,6 +3,7 @@
 #include "Components/SphereComponent.h"
 #include "BaseCharacter.h"
 #include "BaseGameInstance.h"
+#include "HelperFunctions.h"
 #include "Interfaces/Damagable.h"
 #include "Interfaces/Team.h"
 #include "Items/Weapon.h"
@@ -11,6 +12,7 @@
 const float ABaseProjectile::Default_Initial_Speed = 8000.0f;
 const float ABaseProjectile::Default_Initial_Lifespan = 20.0f;
 
+
 ABaseProjectile::ABaseProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -18,10 +20,15 @@ ABaseProjectile::ABaseProjectile()
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(10.0f);
 	CollisionComp->SetCollisionProfileName("Projectile");
-	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly); // TODO Fix collision here
-	CollisionComp->SetCollisionResponseToAllChannels(ECR_Overlap);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->SetGenerateOverlapEvents(true);
+
+	CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Block);
+	CollisionComp->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	CollisionComp->OnComponentHit.AddUniqueDynamic(this, &ABaseProjectile::OnHit);
 	RootComponent = CollisionComp;
 
 	// Only visual
@@ -44,6 +51,7 @@ ABaseProjectile::ABaseProjectile()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 3.0f;
+	ProjectileMovement->bSweepCollision = true;
 
 	InitialLifeSpan = Default_Initial_Lifespan;
 }
@@ -61,8 +69,19 @@ float ABaseProjectile::CalculateDamageFalloff()
 	return FMath::Max(damage, 1);
 }
 
-void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
-	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+
+void ABaseProjectile::OnHit(UPrimitiveComponent* /*inHitComponent*/, AActor* inOtherActor, UPrimitiveComponent* /*inOtherComp*/, FVector /*inNormalImpulse*/, const FHitResult& /*inHit*/)
+{
+	if (!inOtherActor || inOtherActor == healthChange.source)
+	{
+		return;
+	}
+
+	Destroy();
+}
+
+void ABaseProjectile::OnOverlap(UPrimitiveComponent* /*OverlappedComponent*/, AActor* OtherActor,
+	UPrimitiveComponent* /*OtherComp*/, int32 /*OtherBodyIndex*/, bool /*bFromSweep*/, const FHitResult& /*SweepResult*/)
 {
 	// Did we hit something
 	if (OtherActor)
@@ -75,26 +94,26 @@ void ABaseProjectile::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 			// Is it something that's alive and isn't our owner character?
 			if (OtherActor != healthChange.source && hitTarget->IsAlive())
 			{
-					ITeam* hitTeam = Cast<ITeam>(OtherActor);
+				ITeam* hitTeam = Cast<ITeam>(OtherActor);
 
-					// Did we hit something from the other team?
-					if (hitTeam && hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy)
-					{
-						healthChange.changeAmount = CalculateDamageFalloff();
-						hitTarget->ChangeHealth(healthChange);
-						Destroy();
-					}				
+				// Did we hit something from the other team?
+				if (hitTeam && hitTeam->GetRelationship(healthChange.source, mGameInstance()) == ERelationshipType::Enemy)
+				{
+					healthChange.changeAmount = CalculateDamageFalloff();
+					hitTarget->ChangeHealth(healthChange);
+					Destroy();
+				}
 			}
 		}
 		else
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseProjectile OtherActor Not damagable"));
+			//mOnScreenMessage(TEXT("ABaseProjectile OtherActor Not damagable"));
 			Destroy();
 		}
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Yellow, TEXT("ABaseProjectile OtherActor NULL"));
+		mOnScreenMessage(TEXT("ABaseProjectile OtherActor NULL"));
 	}
 }
 

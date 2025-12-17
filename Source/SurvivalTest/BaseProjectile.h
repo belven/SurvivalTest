@@ -17,6 +17,8 @@ class ABaseProjectile : public AActor
 	GENERATED_BODY()
 
 public:
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* inHitComponent, AActor* inOtherActor, UPrimitiveComponent* inOtherComp, FVector inNormalImpulse, const FHitResult& inHit);
 	ABaseProjectile();
 	float CalculateDamageFalloff();
 
